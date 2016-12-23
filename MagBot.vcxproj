@@ -95,7 +95,7 @@
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\ConstructorManager.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
-    <ClCompile Include="Source\BuildOrder.cpp" />
+    <ClCompile Include="Source\BuildOrderManager.cpp" />
     <ClCompile Include="Source\BuildOrderQueue.cpp" />
     <ClCompile Include="Source\GameCommander.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
@@ -109,7 +109,7 @@
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\ConstructorManager.h" />
     <ClInclude Include="Source\ScoutManager.h" />
-    <ClInclude Include="Source\BuildOrder.h" />
+    <ClInclude Include="Source\BuildOrderManager.h" />
     <ClInclude Include="Source\BuildOrderQueue.h" />
     <ClInclude Include="Source\GameCommander.h" />
     <ClInclude Include="Source\MagBotModule.h" />

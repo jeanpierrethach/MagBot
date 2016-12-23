@@ -24,7 +24,8 @@ void WorkerManager::update()
 {
 	updateWorkerTask();
 
-	for (auto & unit : _worker.getWorkers()) //BWAPI::Broodwar->self()->getUnits()
+	// TODO Move for loop in their respective handle function, to make the conditionals more specific
+	for (auto & unit : _worker.getWorkers())
 	{
 		// TODO check these conditionals, if can move to init constructor of worker instead and some can keep here for the update
 		if (!unit->exists())
@@ -42,27 +43,11 @@ void WorkerManager::update()
 		if (!unit->isCompleted())// || unit->isConstructing())
 			continue;
 
-		// TODO FIX display
 		showDebugWorkerInfo(unit);
 
-		if (unit->isIdle() && _worker.getWorkerTask(unit) == Worker::WorkerTask::Mine) // TO UNCOMMENT:  // 
-		{
-			// Order workers carrying a resource to return them to the center,
-			// otherwise find a mineral patch to harvest.
-			if (unit->isCarryingGas() || unit->isCarryingMinerals())
-			{
-				unit->returnCargo();
-			}
-			else if (!unit->getPowerUp())  // The worker cannot harvest anything if it
-			{                             // is carrying a powerup such as a flag
-				// Harvest from the nearest mineral patch or gas refinery
-				if (!unit->gather(unit->getClosestUnit(IsMineralField || IsRefinery)))
-				{
-					// If the call fails, then print the last error message
-					Broodwar << Broodwar->getLastError() << std::endl;
-				}
-			}
-		}
+		handleMineralWorkers(unit);
+
+		handleIdleWorkers(unit);
 	}
 }
 
@@ -86,11 +71,12 @@ BWAPI::Unit WorkerManager::getBuilder()
 	return closestMiningWorker;
 }
 
-// TODO: REMOVE TO MAKE IT GENERIC WITH setWorkerTask(unit, task, taskUnitType) 
 // AND make sure there's is space between buildings (one tile)?
 
 // drawBox the second it is under construction (permanent) instead of updating every frame
-void WorkerManager::buildGateway()
+
+// TODO could add int or a type Priority for the BuildOrderManager
+void WorkerManager::build(BWAPI::UnitType unitType)
 {
 	BWAPI::Unit builder = getBuilder();
 	
@@ -100,21 +86,19 @@ void WorkerManager::buildGateway()
 	{
 		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon)
 		{
-			BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
 			TilePosition pos = unit->getTilePosition();
-			TilePosition targetBuildLocation = Broodwar->getBuildLocation(gateway, pos);
+			TilePosition targetBuildLocation = Broodwar->getBuildLocation(unitType, pos);
 
-			if (Broodwar->canBuildHere(targetBuildLocation, gateway, builder))
+			if (Broodwar->canBuildHere(targetBuildLocation, unitType, builder))
 			{
-				_worker.setWorkerTask(builder, Worker::WorkerTask::Build);
-				Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + gateway.tileSize()), Colors::Green);
-				builder->build(gateway, targetBuildLocation);
+				_worker.setWorkerTask(builder, Worker::WorkerTask::Build, unitType);
+				Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + unitType.tileSize()), Colors::Green);
+				builder->build(unitType, targetBuildLocation);
 				//Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation), Colors::Blue);
 				//Broodwar->drawCircleScreen(pos, 10, Colors::Blue, false);
-				Broodwar->drawTextScreen(0, 0, "Build GATEWAY: OK");
-				
-				//_worker.setWorkerTask(builder, Worker::WorkerTask::Mine);
+				//Broodwar->drawTextScreen(0, 0, "Build GATEWAY: OK");
 			}		
+			// TODO check return here or inside the condition
 			return;
 		}
 	}
@@ -135,6 +119,39 @@ void WorkerManager::showDebugWorkerInfo(BWAPI::Unit unit)
 	}
 }
 
+void WorkerManager::handleMineralWorkers(BWAPI::Unit unit)
+{
+	if (unit->isIdle() && _worker.getWorkerTask(unit) == Worker::WorkerTask::Mine) // TO UNCOMMENT:  // 
+	{
+		// Order workers carrying a resource to return them to the center,
+		// otherwise find a mineral patch to harvest.
+		if (unit->isCarryingGas() || unit->isCarryingMinerals())
+		{
+			unit->returnCargo();
+		}
+		else if (!unit->getPowerUp())  // The worker cannot harvest anything if it
+		{                             // is carrying a powerup such as a flag
+			// Harvest from the nearest mineral patch or gas refinery
+			if (!unit->gather(unit->getClosestUnit(IsMineralField || IsRefinery)))
+			{
+				// If the call fails, then print the last error message
+				Broodwar << Broodwar->getLastError() << std::endl;
+			}
+		}
+	}
+}
+
+void WorkerManager::handleIdleWorkers(BWAPI::Unit unit)
+{
+	for (auto & unit : _worker.getWorkers())
+	{
+		if (_worker.getWorkerTask(unit) == Worker::WorkerTask::Build && unit->isIdle())
+		{
+			_worker.setWorkerTask(unit, Worker::WorkerTask::Mine);
+		}
+	}
+}
+
 
 /*void WorkerManager::addWorker()
 {
@@ -144,12 +161,13 @@ void WorkerManager::showDebugWorkerInfo(BWAPI::Unit unit)
 // other managers that need workers call this when they're done with a unit
 /*void WorkerManager::finishedWithWorker(BWAPI::Unit unit)
 {
-	UAB_ASSERT(unit != nullptr, "Unit was null");
-
+	//UAB_ASSERT(unit != nullptr, "Unit was null");
+	if (!unit)
+		return;
 	//BWAPI::Broodwar->printf("BuildingManager finished with worker %d", unit->getID());
-	if (workerData.getWorkerJob(unit) != WorkerData::Scout)
+	if (_worker.getWorkerTask(unit) != Worker::Scout)
 	{
-		workerData.setWorkerJob(unit, WorkerData::Idle, nullptr);
+		_worker.setWorkerTask(unit, Worker::Idle);
 	}
 }*/
 

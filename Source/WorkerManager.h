@@ -18,7 +18,7 @@ namespace MagBot {
 		
 
 		BWAPI::Unit getBuilder();
-		void buildGateway();
+		void build(BWAPI::UnitType unitType);
 
 
 		void showDebugWorkerInfo(BWAPI::Unit unit);
@@ -33,7 +33,9 @@ namespace MagBot {
 
 		//void finishedWithWorker(BWAPI::Unit unit);
 		//bool isWorkerScout(BWAPI::Unit worker);
-		//bool isFree(BWAPI::Unit worker);
+
+		void handleMineralWorkers(BWAPI::Unit unit);
+		void handleIdleWorkers(BWAPI::Unit unit);
 	};
 
 }

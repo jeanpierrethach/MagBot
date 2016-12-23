@@ -74,13 +74,19 @@ void MagBotModule::onFrame()
 	if (BWAPI::Broodwar->self()->minerals() >= 150 && lastCheckedGateway + 42 < Broodwar->getFrameCount())
 	{
 		lastCheckedGateway = Broodwar->getFrameCount();
-		WorkerManager::Instance().buildGateway();
+		WorkerManager::Instance().build(UnitTypes::Protoss_Gateway);
 	}
 		
 	// TODO: ISSUE INCOMPATIBLE STATE -> this call of update() RESOLVED with checkup of state of unit (exist, constructing, etc.)
 	// TO UNCOMMENT: 
 
+	// TODO: builder may be stuck for few frames...
+
 	// TODO: do same thing for building pylons, etc...
+
+	// TODO build pylons depending of current production rate
+
+	// TODO limit nbOfGateways built 
 
 
 

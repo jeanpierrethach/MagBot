@@ -44,7 +44,7 @@ enum Worker::WorkerTask Worker::getWorkerTask(BWAPI::Unit unit)
 	if (!unit)
 		return Default;
 
-	std::map<BWAPI::Unit, enum WorkerTask>::iterator it = _workerTaskMap.find(unit);
+	const std::map<BWAPI::Unit, enum WorkerTask>::const_iterator it = _workerTaskMap.find(unit);
 
 	if (it != _workerTaskMap.end())
 	{
@@ -54,24 +54,34 @@ enum Worker::WorkerTask Worker::getWorkerTask(BWAPI::Unit unit)
 	return Default;
 }
 
+BWAPI::UnitType	Worker::getWorkerBuildingType(BWAPI::Unit unit)
+{
+	if (!unit) { return BWAPI::UnitTypes::None; }
+
+	std::map<BWAPI::Unit, BWAPI::UnitType>::iterator it = _workerBuildingTypeMap.find(unit);
+
+	if (it != _workerBuildingTypeMap.end())
+	{
+		return it->second;
+	}
+
+	return BWAPI::UnitTypes::None;
+}
+
 void Worker::setWorkerTask(BWAPI::Unit unit, enum WorkerTask task)
 {
 	if (!unit)
 		return;
 
-	//clearPreviousTask(unit); ??
+	clearPreviousTask(unit);
 
 	if (task == Mine)
 	{
 		_workerTaskMap[unit] = task;
-		//BWAPI::Broodwar->drawTextMap(pos, "MINER");
 	}
 	else if (task == Build)
 	{
-		//clearPreviousTask(unit);
 		_workerTaskMap[unit] = task;
-		//Position pos = unit->getPosition();				// TODO REFACTOR
-		//BWAPI::Broodwar->drawTextMap(pos, "BUILDER");	// TODO REFACTOR
 	}
 }
 
@@ -79,20 +89,20 @@ void Worker::setWorkerTask(BWAPI::Unit unit, enum WorkerTask task, BWAPI::UnitTy
 {
 	if (!unit)
 		return;
-	//if (!unit->getType().isWorker())
-	//	return;
 
-	// clear previous job?
 	clearPreviousTask(unit);
-
 	_workerTaskMap[unit] = task;
 	
 	if (task == Build)
 	{
 		_workerBuildingTypeMap[unit] = taskUnitType;
 	}
+	// TODO add building task to a priority queue?
 	
 }
+
+
+// TODO could optimize, instead of erase and insert, do copy/swap and insert
 
 void Worker::clearPreviousTask(BWAPI::Unit unit)
 {
@@ -101,7 +111,13 @@ void Worker::clearPreviousTask(BWAPI::Unit unit)
 
 	WorkerTask previousTask = getWorkerTask(unit);
 
+	if (previousTask == Build)
+	{
+		_workerBuildingTypeMap.erase(unit);
+	}
+
 	_workerTaskMap.erase(unit);
+
 	/*if (previousTask == Mine)
 	{
 		_workerTaskMap.erase(unit);

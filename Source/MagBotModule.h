@@ -2,6 +2,7 @@
 
 #include <BWAPI.h>
 #include "GameCommander.h"
+#include "BuildingManager.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
 

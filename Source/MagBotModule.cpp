@@ -62,6 +62,18 @@ void MagBotModule::onEnd(bool isWinner)
 
 void MagBotModule::onFrame()
 {
+	// TO UNCOMMENT when finished with debugging
+	/*
+	// Return if the game is a replay or is paused
+	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
+		return;
+
+	// Prevent spamming by only running our onFrame once every number of latency frames.
+	// Latency frames are the number of frames before commands are processed.
+	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
+		return;
+		*/
+
 	// Called once every game frame
 	Broodwar->drawTextScreen(0, 30, "Frame Count : %d", Broodwar->getFrameCount());
 
@@ -76,6 +88,8 @@ void MagBotModule::onFrame()
 		lastCheckedGateway = Broodwar->getFrameCount();
 		WorkerManager::Instance().build(UnitTypes::Protoss_Gateway);
 	}
+
+	BuildingManager::Instance().update();
 		
 	// TODO: ISSUE INCOMPATIBLE STATE -> this call of update() RESOLVED with checkup of state of unit (exist, constructing, etc.)
 	// TO UNCOMMENT: 
@@ -94,14 +108,7 @@ void MagBotModule::onFrame()
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
 
-	// Return if the game is a replay or is paused
-	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
-		return;
-
-	// Prevent spamming by only running our onFrame once every number of latency frames.
-	// Latency frames are the number of frames before commands are processed.
-	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
-		return;
+	
 
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits())

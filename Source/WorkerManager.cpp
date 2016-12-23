@@ -71,6 +71,7 @@ BWAPI::Unit WorkerManager::getBuilder()
 	return closestMiningWorker;
 }
 
+// TODO buildWithSpacing(int)
 // AND make sure there's is space between buildings (one tile)?
 
 // drawBox the second it is under construction (permanent) instead of updating every frame
@@ -81,7 +82,8 @@ void WorkerManager::build(BWAPI::UnitType unitType)
 	BWAPI::Unit builder = getBuilder();
 	
 
-	// TODO modify to pylons built, that exist then if !canBuildHere then continue, if can build, if cant find then build pylon, 
+	// TODO modify to pylons built, that exist then if !canBuildHere then continue, if can build, if cant find then build pylon,
+	
 	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon)

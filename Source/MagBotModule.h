@@ -1,8 +1,11 @@
 #pragma once
 
 #include <BWAPI.h>
+#include <BWTA.h>
 #include "GameCommander.h"
 #include "BuildingManager.h"
+
+#include "Config.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
 

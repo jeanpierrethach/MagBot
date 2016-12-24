@@ -7,18 +7,29 @@ using namespace Filter;
 
 void MagBotModule::onStart()
 {
-	// Hello World!
-	Broodwar->sendText("Hello world!");
-
 	// Print the map name.
 	// BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
-	// Enable the UserInput flag, which allows us to control the bot and type messages.
-	Broodwar->enableFlag(Flag::UserInput);
+	// Set our BWAPI options here    
+	BWAPI::Broodwar->setLocalSpeed(Config::BWAPIOptions::SetLocalSpeed);
+	BWAPI::Broodwar->setFrameSkip(Config::BWAPIOptions::SetFrameSkip);
 
-	// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
-	//Broodwar->enableFlag(Flag::CompleteMapInformation);
+	if (Config::BWAPIOptions::EnableCompleteMapInformation)
+	{
+		BWAPI::Broodwar->enableFlag(BWAPI::Flag::CompleteMapInformation);
+	}
+
+	// Enable the UserInput flag, which allows us to control the bot and type messages.
+	if (Config::BWAPIOptions::EnableUserInput)
+	{
+		BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
+	}
+
+	if (Config::BotInfo::PrintInfoOnStart)
+	{
+		BWAPI::Broodwar->printf("Hello! I am %s, written by %s", Config::BotInfo::BotName.c_str(), Config::BotInfo::Author.c_str());
+	}
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
@@ -47,6 +58,12 @@ void MagBotModule::onStart()
 		// If you wish to deal with multiple enemies then you must use enemies().
 		if (Broodwar->enemy()) // First make sure there is an enemy
 			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
+	}
+
+	if (Config::Modules::UsingGameCommander)
+	{
+		BWTA::readMap();
+		BWTA::analyze();
 	}
 
 }

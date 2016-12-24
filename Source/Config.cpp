@@ -27,4 +27,12 @@ namespace Config
 		std::string Author = "Jean-Pierre Thach";
 		bool PrintInfoOnStart = true;
 	}
+
+	namespace DebugInfo
+	{
+		bool DrawAllInfo = true;
+		bool DrawBuildingTilesInfo = true;
+	    bool DrawBuildingTimeInConstruction = true;
+		bool DrawWorkerTaskInfo = true;
+	}
 }

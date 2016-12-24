@@ -33,10 +33,13 @@ void Worker::update()
 		}
 	}
 
-	int size = _workers.size();
-	Broodwar->registerEvent([size](Game*){ Broodwar->drawTextScreen(0, 10, "Protoss_Probe : %d", size, Text::White); },   // action
-		nullptr,    // condition
-		Broodwar->getLatencyFrames());  // frames to run
+	if (Config::DebugInfo::DrawAllInfo)
+	{
+		int size = _workers.size();
+		Broodwar->registerEvent([size](Game*){ Broodwar->drawTextScreen(0, 10, "Protoss_Probe : %d", size, Text::White); },   // action
+			nullptr,    // condition
+			Broodwar->getLatencyFrames());  // frames to run
+	}	
 }
 
 enum Worker::WorkerTask Worker::getWorkerTask(BWAPI::Unit unit)

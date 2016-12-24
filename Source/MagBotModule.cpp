@@ -7,8 +7,6 @@ using namespace Filter;
 
 void MagBotModule::onStart()
 {
-	// Print the map name.
-	// BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
 	// Set our BWAPI options here    
@@ -68,14 +66,17 @@ void MagBotModule::onFrame()
 		*/
 
 	// Called once every game frame
-	Broodwar->drawTextScreen(0, 30, "Frame Count : %d", Broodwar->getFrameCount());
-
+	if (Config::DebugInfo::DrawAllInfo)
+	{
+		Broodwar->drawTextScreen(0, 30, "Frame Count : %d", Broodwar->getFrameCount());
+	}
+		
 	// initialize a worker manager
 	WorkerManager::Instance().update();
 
 	static int lastCheckedGateway = 0;
 	
-	// TODO check frames, if too fast it may try to build more than what wanted
+	// TODO check frames, if too fast it may try to build more than what wanted, have to use buildOrderQueue
 	if (BWAPI::Broodwar->self()->minerals() >= 150 && lastCheckedGateway + 42 < Broodwar->getFrameCount())
 	{
 		lastCheckedGateway = Broodwar->getFrameCount();
@@ -83,9 +84,6 @@ void MagBotModule::onFrame()
 	}
 
 	BuildingManager::Instance().update();
-		
-	// TODO: ISSUE INCOMPATIBLE STATE -> this call of update() RESOLVED with checkup of state of unit (exist, constructing, etc.)
-	// TO UNCOMMENT: 
 
 	// TODO: builder may be stuck for few frames...
 
@@ -96,12 +94,12 @@ void MagBotModule::onFrame()
 	// TODO limit nbOfGateways built 
 
 
-
 	// Display the game frame rate as text in the upper left area of the screen
-	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
-	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
-
-	
+	if (Config::DebugInfo::DrawAllInfo)
+	{
+		Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
+		Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
+	}
 
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits())
@@ -145,14 +143,17 @@ void MagBotModule::onFrame()
 							if (targetBuildLocation)
 							{
 								// Register an event that draws the target build location
-								Broodwar->registerEvent([targetBuildLocation, supplyProviderType](Game*)
+								if (Config::DebugInfo::DrawAllInfo)
 								{
-									Broodwar->drawBoxMap(Position(targetBuildLocation),
-										Position(targetBuildLocation + supplyProviderType.tileSize()),
-										Colors::Blue);
-								},
-									nullptr,  // condition
-									supplyProviderType.buildTime() + 100);  // frames to run
+									Broodwar->registerEvent([targetBuildLocation, supplyProviderType](Game*)
+									{
+										Broodwar->drawBoxMap(Position(targetBuildLocation),
+											Position(targetBuildLocation + supplyProviderType.tileSize()),
+											Colors::Blue);
+									},
+										nullptr,  // condition
+										supplyProviderType.buildTime() + 100);  // frames to run
+								}
 
 								// Order the builder to construct the supply structure
 								supplyBuilder->build(supplyProviderType, targetBuildLocation);

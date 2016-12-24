@@ -43,8 +43,11 @@ void WorkerManager::update()
 		if (!unit->isCompleted())// || unit->isConstructing())
 			continue;
 
-		showDebugWorkerInfo(unit);
-
+		if (Config::DebugInfo::DrawAllInfo && Config::DebugInfo::DrawWorkerTaskInfo)
+		{
+			showDebugWorkerInfo(unit);
+		}
+		
 		handleMineralWorkers(unit);
 
 		handleIdleWorkers(unit);
@@ -83,7 +86,9 @@ void WorkerManager::build(BWAPI::UnitType unitType)
 	
 
 	// TODO modify to pylons built, that exist then if !canBuildHere then continue, if can build, if cant find then build pylon,
-	
+	// TODO fix bug when targetlocation is slightly in the fog of war, it doesn't build it: SOLUTION -> moveBuilder to location before?
+	// -> could be even before having enough minerals to optimize build time
+	// TODO when selecting a valid targetlocation, make sure it stays there unless theres something blocking the construction
 	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon)
@@ -94,7 +99,16 @@ void WorkerManager::build(BWAPI::UnitType unitType)
 			if (Broodwar->canBuildHere(targetBuildLocation, unitType, builder))
 			{
 				_worker.setWorkerTask(builder, Worker::WorkerTask::Build, unitType);
-				Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + unitType.tileSize()), Colors::Green);
+				//Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + unitType.tileSize()), Colors::Green);
+				
+				if (Config::DebugInfo::DrawAllInfo)
+				{
+					Broodwar->registerEvent([targetBuildLocation, unitType](Game*)
+					{ Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + unitType.tileSize()), Colors::Green); },   // action
+					nullptr,    // condition
+					42);  // frames to run
+				}		
+				
 				builder->build(unitType, targetBuildLocation);
 				//Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation), Colors::Blue);
 				//Broodwar->drawCircleScreen(pos, 10, Colors::Blue, false);

@@ -103,6 +103,7 @@
     <ClCompile Include="Source\MagBotModule.cpp" />
     <ClCompile Include="Source\WorkerManager.cpp" />
     <ClCompile Include="Source\Worker.cpp" />
+    <ClCompile Include="Source\Strategy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Config.h" />
@@ -117,6 +118,7 @@
     <ClInclude Include="Source\MagBotModule.h" />
     <ClInclude Include="Source\WorkerManager.h" />
     <ClInclude Include="Source\Worker.h" />
+    <ClInclude Include="Source\Strategy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

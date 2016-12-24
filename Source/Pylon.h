@@ -10,6 +10,7 @@ namespace MagBot
 		//int hp;
 		//int shield;
 		//int armor;
+		//TilePosition;
 	};
 
 	class Pylon

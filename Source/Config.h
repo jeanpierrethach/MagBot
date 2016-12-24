@@ -30,6 +30,14 @@ namespace Config
 		extern bool PrintInfoOnStart;
 	}
 
+	namespace DebugInfo
+	{
+		extern bool DrawAllInfo;
+		extern bool DrawBuildingTilesInfo;
+		extern bool DrawBuildingTimeInConstruction;
+		extern bool DrawWorkerTaskInfo;
+	}
+
 	//namespace config file
 	//namespace strategy
 	//namespace debug

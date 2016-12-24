@@ -10,7 +10,7 @@ namespace Config
 
 	namespace BWAPIOptions
 	{
-		int SetLocalSpeed = 42;
+		int SetLocalSpeed = 24;
 		int SetFrameSkip = 0;
 		bool EnableUserInput = true;
 		bool EnableCompleteMapInformation = false;
@@ -25,6 +25,6 @@ namespace Config
 	{
 		std::string BotName = "MagBot";
 		std::string Author = "Jean-Pierre Thach";
-		bool PrintInfoOnStart = false;
+		bool PrintInfoOnStart = true;
 	}
 }

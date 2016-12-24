@@ -33,32 +33,8 @@ void MagBotModule::onStart()
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
+	// TODO may remove this
 	Broodwar->setCommandOptimizationLevel(2);
-
-	// Check if this is a replay
-	if (Broodwar->isReplay())
-	{
-
-		// Announce the players in the replay
-		Broodwar << "The following players are in this replay:" << std::endl;
-
-		// Iterate all the players in the game using a std:: iterator
-		Playerset players = Broodwar->getPlayers();
-		for (auto p : players)
-		{
-			// Only print the player if they are not an observer
-			if (!p->isObserver())
-				Broodwar << p->getName() << ", playing as " << p->getRace() << std::endl;
-		}
-
-	}
-	else // if this is not a replay
-	{
-		// Retrieve you and your enemy's races. enemy() will just return the first enemy.
-		// If you wish to deal with multiple enemies then you must use enemies().
-		if (Broodwar->enemy()) // First make sure there is an enemy
-			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
-	}
 
 	if (Config::Modules::UsingGameCommander)
 	{
@@ -257,7 +233,7 @@ void MagBotModule::onUnitHide(BWAPI::Unit unit)
 
 void MagBotModule::onUnitCreate(BWAPI::Unit unit)
 {
-	if (Broodwar->isReplay())
+	/*if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
 		if (unit->getType().isBuilding() && !unit->getPlayer()->isNeutral())
@@ -267,7 +243,7 @@ void MagBotModule::onUnitCreate(BWAPI::Unit unit)
 			seconds %= 60;
 			Broodwar->sendText("%.2d:%.2d: %s creates a %s", minutes, seconds, unit->getPlayer()->getName().c_str(), unit->getType().c_str());
 		}
-	}
+	}*/
 }
 
 void MagBotModule::onUnitDestroy(BWAPI::Unit unit)
@@ -276,7 +252,7 @@ void MagBotModule::onUnitDestroy(BWAPI::Unit unit)
 
 void MagBotModule::onUnitMorph(BWAPI::Unit unit)
 {
-	if (Broodwar->isReplay())
+	/*if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
 		if (unit->getType().isBuilding() && !unit->getPlayer()->isNeutral())
@@ -286,7 +262,7 @@ void MagBotModule::onUnitMorph(BWAPI::Unit unit)
 			seconds %= 60;
 			Broodwar->sendText("%.2d:%.2d: %s morphs a %s", minutes, seconds, unit->getPlayer()->getName().c_str(), unit->getType().c_str());
 		}
-	}
+	}*/
 }
 
 void MagBotModule::onUnitRenegade(BWAPI::Unit unit)

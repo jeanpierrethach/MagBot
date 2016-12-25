@@ -35,6 +35,7 @@ namespace Config
 		extern bool DrawAllInfo;
 		extern bool DrawBuildingTilesInfo;
 		extern bool DrawBuildingTimeInConstruction;
+		extern bool DrawBuildingsOwnedOrDestroyed;
 		extern bool DrawWorkerTaskInfo;
 	}
 

@@ -14,8 +14,14 @@ namespace MagBot
 
 		BWAPI::Unitset _buildings;
 		std::vector<BWAPI::Unit> _buildingsUnderConstruction;
-		std::map<BWAPI::Unit, BWAPI::UnitType> _buildingsMap;
 
+		// TODO find better way for this
+		std::map<BWAPI::UnitType, int> _buildingsOwnedMap;
+		std::map<BWAPI::UnitType, int> _buildingsDestroyedMap;
+		int _buildingDestroyed = 0;
+
+		// TODO Building instance
+		// building stats: hp, shield, armor, mineral cost, gas cost, position, tileposition, damage taken, etc.
 
 	public:
 		BuildingManager();
@@ -23,11 +29,13 @@ namespace MagBot
 
 		void update();
 
+		void removeBuildingsDestroyed();
 		void addBuildingsUnderConstruction();
 		void removeBuildingsCompleted();
 
 		void showDebugBuildings();
 		void showBuildTimeBuildings();
+		void showOwnedOrDestroyedBuildings();
 
 		const BWAPI::Unitset getBuildings() const { return _buildings; }
 		

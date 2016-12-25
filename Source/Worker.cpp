@@ -22,10 +22,6 @@ void Worker::update()
 		if (!unit->exists() || !unit->isCompleted())
 			continue;
 
-		/*Broodwar->registerEvent([pos](Game*){ Broodwar->drawTextMap(pos, "Worker", Text::White); },   // action
-		nullptr,    // condition
-		Broodwar->getLatencyFrames());  // frames to run*/
-
 		if (unit->getType().isWorker() && !_workers.contains(unit))
 		{
 			setWorkerTask(unit, Mine);
@@ -33,13 +29,25 @@ void Worker::update()
 		}
 	}
 
+	removeDestroyedWorker();
+
 	if (Config::DebugInfo::DrawAllInfo)
 	{
-		int size = _workers.size();
-		Broodwar->registerEvent([size](Game*){ Broodwar->drawTextScreen(0, 10, "Protoss_Probe : %d", size, Text::White); },   // action
-			nullptr,    // condition
-			Broodwar->getLatencyFrames());  // frames to run
+		// TODO change hard coded worker name
+		Broodwar->drawTextScreen(0, 10, "Protoss_Probe : %d", getWorkers().size(), Text::White);
 	}	
+}
+
+void Worker::removeDestroyedWorker()
+{
+	for (auto & unit : getWorkers())
+	{
+		if (!unit->exists())
+		{
+			clearPreviousTask(unit);
+			_workers.erase(unit);
+		}
+	}
 }
 
 enum Worker::WorkerTask Worker::getWorkerTask(BWAPI::Unit unit)
@@ -100,13 +108,10 @@ void Worker::setWorkerTask(BWAPI::Unit unit, enum WorkerTask task, BWAPI::UnitTy
 	{
 		_workerBuildingTypeMap[unit] = taskUnitType;
 	}
-	// TODO add building task to a priority queue?
-	
+	// TODO add building task to a priority queue?	
 }
 
-
 // TODO could optimize, instead of erase and insert, do copy/swap and insert
-
 void Worker::clearPreviousTask(BWAPI::Unit unit)
 {
 	if (!unit)

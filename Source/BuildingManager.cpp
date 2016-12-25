@@ -32,10 +32,15 @@ void BuildingManager::update()
 					unit->getTilePosition().x, unit->getTilePosition().y);
 			}
 			_buildings.insert(unit);		
-			_buildingsMap[unit] = unitType;		
+			_buildingsOwnedMap[unitType] += 1;		
 		}
 	}
 
+	// TODO reposition and add config debug info option
+	Broodwar->drawTextScreen(200, 80, "Buildings count: %d", getBuildings().size());
+	Broodwar->drawTextScreen(200, 90, "Buildings destroyed: %d", _buildingDestroyed);
+
+	removeBuildingsDestroyed();
 	addBuildingsUnderConstruction();
 	removeBuildingsCompleted();
 
@@ -48,6 +53,10 @@ void BuildingManager::update()
 		if (Config::DebugInfo::DrawBuildingTimeInConstruction)
 		{
 			showBuildTimeBuildings();
+		}
+		if (Config::DebugInfo::DrawBuildingsOwnedOrDestroyed)
+		{
+			showOwnedOrDestroyedBuildings();
 		}
 	}
 }
@@ -62,6 +71,23 @@ void BuildingManager::showDebugBuildings()
 		Broodwar->drawBoxMap(Position(tilePosition), Position(tilePosition + unitType.tileSize()), Colors::Orange);
 
 		Broodwar->drawCircleMap(Position(tilePosition), unitType.sightRange(), Colors::Blue);
+	}
+}
+
+void BuildingManager::removeBuildingsDestroyed()
+{
+	for (auto & unit : getBuildings())
+	{
+		if (!unit->exists())
+		{
+			_buildings.erase(unit);
+			
+			_buildingDestroyed += 1;
+
+			BWAPI::UnitType unitType = unit->getType();
+			_buildingsOwnedMap[unitType] -= 1;
+			_buildingsDestroyedMap[unitType] += 1;
+		}
 	}
 }
 
@@ -103,4 +129,27 @@ void BuildingManager::showBuildTimeBuildings()
 	}
 
 	Broodwar->drawTextScreen(0, 60, "Buildings in construction: %d", _buildingsUnderConstruction.size());
+}
+
+
+// TODO show at all time, not just when the specific building is destroyed
+void BuildingManager::showOwnedOrDestroyedBuildings()
+{
+	const std::map<BWAPI::UnitType, int>::const_iterator it;
+	const std::map<BWAPI::UnitType, int>::const_iterator it2;
+	int count = 0;
+	
+	for (auto & it = _buildingsOwnedMap.begin(); it != _buildingsOwnedMap.end(); ++it)
+	{
+		for (auto & it2 = _buildingsDestroyedMap.begin(); it2 != _buildingsDestroyedMap.end(); ++it2)
+		{
+			if (it2->first == it->first)
+			{
+				// owned : destroyed - UnitType name
+				Broodwar->drawTextScreen(200, count, "%d : %d - %s\t", it->second, it2->second, it->first.c_str());
+				count += 10;
+			}	
+		}		
+	}
+	
 }

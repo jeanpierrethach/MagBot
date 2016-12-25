@@ -65,12 +65,29 @@ BWAPI::Unit WorkerManager::getBuilder()
 
 	for (auto & unit : _worker.getWorkers())
 	{
+		
 		// TODO check closest
 		//closestMiningWorker = unit;
 		//Position pos = unit->getPosition();
 		//Broodwar->drawBoxScreen(pos, pos, Colors::Orange, false);// (pos, 10, Colors::Orange, false);
 		return unit;
 	}
+	return closestMiningWorker;
+}
+
+BWAPI::Unit WorkerManager::getBuilderClosestTo(BWAPI::TilePosition tilePosition)
+{
+	BWAPI::Unit closestMiningWorker = nullptr;
+
+	// TODO find closestMiningWorker
+	// find the closest unit to this one -> so find the worker which is the closest to the pylon
+	closestMiningWorker->getClosestUnit();
+
+	if (!closestMiningWorker)
+	{
+		return getBuilder();
+	}
+
 	return closestMiningWorker;
 }
 
@@ -82,9 +99,6 @@ BWAPI::Unit WorkerManager::getBuilder()
 // TODO could add int or a type Priority for the BuildOrderManager
 void WorkerManager::build(BWAPI::UnitType unitType)
 {
-	BWAPI::Unit builder = getBuilder();
-	
-
 	// TODO modify to pylons built, that exist then if !canBuildHere then continue, if can build, if cant find then build pylon,
 	// TODO fix bug when targetlocation is slightly in the fog of war, it doesn't build it: SOLUTION -> moveBuilder to location before?
 	// -> could be even before having enough minerals to optimize build time
@@ -95,6 +109,13 @@ void WorkerManager::build(BWAPI::UnitType unitType)
 		{
 			TilePosition pos = unit->getTilePosition();
 			TilePosition targetBuildLocation = Broodwar->getBuildLocation(unitType, pos);
+
+			// TODO fix getBuilderClosestTo
+			//BWAPI::Unit builder = getBuilderClosestTo(targetBuildLocation);
+			BWAPI::Unit builder = getBuilder();
+
+			if (!builder)
+				return;
 
 			if (Broodwar->canBuildHere(targetBuildLocation, unitType, builder))
 			{
@@ -110,9 +131,7 @@ void WorkerManager::build(BWAPI::UnitType unitType)
 				}		
 				
 				builder->build(unitType, targetBuildLocation);
-				//Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation), Colors::Blue);
-				//Broodwar->drawCircleScreen(pos, 10, Colors::Blue, false);
-				//Broodwar->drawTextScreen(0, 0, "Build GATEWAY: OK");
+
 			}		
 			// TODO check return here or inside the condition
 			return;

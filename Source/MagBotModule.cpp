@@ -97,8 +97,8 @@ void MagBotModule::onFrame()
 	// Display the game frame rate as text in the upper left area of the screen
 	if (Config::DebugInfo::DrawAllInfo)
 	{
-		Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
-		Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
+		Broodwar->drawTextScreen(360, 0, "FPS: %d", Broodwar->getFPS());
+		Broodwar->drawTextScreen(360, 20, "Average FPS: %f", Broodwar->getAverageFPS());
 	}
 
 	// Iterate through all the units that we own

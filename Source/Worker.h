@@ -22,6 +22,8 @@ namespace MagBot
 
 		void clearPreviousTask(BWAPI::Unit unit);
 
+		// TODO instantiate auto defense class object and in that class will have the micro aspect for workers
+
 	public:
 		
 		Worker();
@@ -31,6 +33,8 @@ namespace MagBot
 		
 		// void addWorker
 		void update();
+
+		void removeDestroyedWorker();
 
 		enum WorkerTask getWorkerTask(BWAPI::Unit unit);
 		BWAPI::UnitType getWorkerBuildingType(BWAPI::Unit unit);

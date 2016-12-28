@@ -21,8 +21,8 @@ namespace MagBot {
 		BWAPI::Unit getBuilderClosestTo(BWAPI::TilePosition tilePosition);
 		void build(BWAPI::UnitType unitType);
 
-		// TODO add handling for vespene gas max workers count
-		// TODO add handling for mineral max workers per mineral patch
+		// TODO add handling for vespene gas max workers count (optimal 3)
+		// TODO add handling for mineral max workers per mineral patch (optimal 1.5 to 2-3)
 
 		void showDebugWorkerInfo(BWAPI::Unit unit);
 

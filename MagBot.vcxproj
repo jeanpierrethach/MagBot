@@ -90,35 +90,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\MetaType.cpp" />
+    <ClCompile Include="Source\ProductionManager.cpp" />
+    <ClCompile Include="Source\Pathfinder.cpp" />
     <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
     <ClCompile Include="Source\Pylon.cpp" />
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\ConstructorManager.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
-    <ClCompile Include="Source\BuildOrderManager.cpp" />
+    <ClCompile Include="Source\BuildOrder.cpp" />
     <ClCompile Include="Source\BuildOrderQueue.cpp" />
     <ClCompile Include="Source\GameCommander.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\MagBotModule.cpp" />
     <ClCompile Include="Source\WorkerManager.cpp" />
     <ClCompile Include="Source\Worker.cpp" />
-    <ClCompile Include="Source\Strategy.cpp" />
+    <ClCompile Include="Source\StrategyManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\MetaType.h" />
+    <ClInclude Include="Source\ProductionManager.h" />
+    <ClInclude Include="Source\Pathfinder.h" />
     <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\BuildingManager.h" />
     <ClInclude Include="Source\Pylon.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\ConstructorManager.h" />
     <ClInclude Include="Source\ScoutManager.h" />
-    <ClInclude Include="Source\BuildOrderManager.h" />
+    <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\BuildOrderQueue.h" />
     <ClInclude Include="Source\GameCommander.h" />
     <ClInclude Include="Source\MagBotModule.h" />
     <ClInclude Include="Source\WorkerManager.h" />
     <ClInclude Include="Source\Worker.h" />
-    <ClInclude Include="Source\Strategy.h" />
+    <ClInclude Include="Source\StrategyManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

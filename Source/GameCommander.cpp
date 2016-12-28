@@ -84,7 +84,7 @@ BWAPI::Unit GameCommander::getFirstSupplyProvider()
 
 	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
-		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon) //BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+		if (unit->getType() == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
 		{
 			supplyProvider = unit;
 			break;

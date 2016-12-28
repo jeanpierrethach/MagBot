@@ -53,6 +53,13 @@ void MagBotModule::onEnd(bool isWinner)
 
 void MagBotModule::onFrame()
 {
+	if (Config::Modules::UsingGameCommander)
+	{
+		drawTerrainData();
+	}
+
+	// Broodwar->getFrameCount() % 30 == 0
+
 	// TO UNCOMMENT when finished with debugging
 	/*
 	// Return if the game is a replay or is paused
@@ -64,24 +71,46 @@ void MagBotModule::onFrame()
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 		*/
-
+	
 	// Called once every game frame
 	if (Config::DebugInfo::DrawAllInfo)
 	{
 		Broodwar->drawTextScreen(0, 30, "Frame Count : %d", Broodwar->getFrameCount());
+		Broodwar->drawTextScreen(0, 40, "APM : %d", Broodwar->getAPM());
 	}
 		
 	// initialize a worker manager
 	WorkerManager::Instance().update();
 
 	static int lastCheckedGateway = 0;
-	
+
+	// TODO FIX its calling every frame
+	/*static bool forge = false;
 	// TODO check frames, if too fast it may try to build more than what wanted, have to use buildOrderQueue
-	if (BWAPI::Broodwar->self()->minerals() >= 150 && lastCheckedGateway + 42 < Broodwar->getFrameCount())
+	if (!forge && BWAPI::Broodwar->self()->minerals() >= 150 && lastCheckedGateway + 42 < Broodwar->getFrameCount())
 	{
 		lastCheckedGateway = Broodwar->getFrameCount();
-		WorkerManager::Instance().build(UnitTypes::Protoss_Gateway);
-	}
+		WorkerManager::Instance().build(UnitTypes::Protoss_Forge);
+		forge = true;
+	}*/
+	/*if (BWAPI::Broodwar->self()->minerals() >= 150 && lastCheckedGateway + 42 < Broodwar->getFrameCount())
+	{
+		lastCheckedGateway = Broodwar->getFrameCount();
+		WorkerManager::Instance().build(UnitTypes::Protoss_Photon_Cannon);
+	}*/
+	
+	/*if (BWAPI::Broodwar->self()->minerals() >= 100 && lastCheckedGateway + 42 < Broodwar->getFrameCount())
+	{
+		lastCheckedGateway = Broodwar->getFrameCount();
+		WorkerManager::Instance().build(UnitTypes::Protoss_Pylon);
+	}*/
+
+	/*static int lastChecked2 = 0;
+	if (lastCheckedGateway + 400 < BWAPI::Broodwar->getFrameCount())
+	{
+		lastChecked2 = BWAPI::Broodwar->getFrameCount();*/
+		ProductionManager::Instance().update();
+	//}
 
 	BuildingManager::Instance().update();
 
@@ -101,8 +130,10 @@ void MagBotModule::onFrame()
 		Broodwar->drawTextScreen(360, 20, "Average FPS: %f", Broodwar->getAverageFPS());
 	}
 
+	// TODO train workers from buildOrderManager and add to the buildOrderQueue
 	// Iterate through all the units that we own
-	for (auto &u : Broodwar->self()->getUnits())
+	
+	/*for (auto & u : Broodwar->self()->getUnits())
 	{
 		if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
 		{
@@ -170,7 +201,8 @@ void MagBotModule::onFrame()
 
 		}
 
-	} // closure: unit iterator
+	} // closure: unit iterator*/
+	
 }
 
 void MagBotModule::onSendText(std::string text)
@@ -178,11 +210,6 @@ void MagBotModule::onSendText(std::string text)
 
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", text.c_str());
-
-
-	// Make sure to use %s and pass the text as a parameter,
-	// otherwise you may run into problems when you use the %(percent) character!
-
 }
 
 void MagBotModule::onReceiveText(BWAPI::Player player, std::string text)
@@ -277,4 +304,59 @@ void MagBotModule::onSaveGame(std::string gameName)
 
 void MagBotModule::onUnitComplete(BWAPI::Unit unit)
 {
+}
+
+void MagBotModule::drawTerrainData()
+{
+	// iterate through all the base locations, and draw their outlines.
+	for (const auto & baseLocation : BWTA::getBaseLocations())
+	{
+		TilePosition p = baseLocation->getTilePosition();
+
+		// draw outline of center location
+		Position leftTop(p.x * TILE_SIZE, p.y * TILE_SIZE);
+		Position rightBottom(leftTop.x + 4 * TILE_SIZE, leftTop.y + 3 * TILE_SIZE);
+		Broodwar->drawBoxMap(leftTop, rightBottom, Colors::Blue);
+
+		// draw a circle at each mineral patch
+		for (const auto & mineral : baseLocation->getStaticMinerals())
+		{
+			Broodwar->drawCircleMap(mineral->getInitialPosition(), 30, Colors::Cyan);
+		}
+
+		// draw the outlines of vespene geysers
+		for (const auto& geyser : baseLocation->getGeysers())
+		{
+			TilePosition p1 = geyser->getInitialTilePosition();
+			Position leftTop1(p1.x * TILE_SIZE, p1.y * TILE_SIZE);
+			Position rightBottom1(leftTop1.x + 4 * TILE_SIZE, leftTop1.y + 2 * TILE_SIZE);
+			Broodwar->drawBoxMap(leftTop1, rightBottom1, Colors::Orange);
+		}
+
+		// if this is an island expansion, draw a yellow circle around the base location
+		if (baseLocation->isIsland())
+		{
+			Broodwar->drawCircleMap(baseLocation->getPosition(), 80, Colors::Yellow);
+		}
+	}
+
+	// iterate through all the regions
+	for (const auto & region : BWTA::getRegions())
+	{
+		// draw the polygon outline of it in green
+		BWTA::Polygon p = region->getPolygon();
+		for (size_t j = 0; j < p.size(); ++j)
+		{
+			Position point1 = p[j];
+			Position point2 = p[(j + 1) % p.size()];
+			Broodwar->drawLineMap(point1, point2, Colors::Green);
+		}
+		// visualize the chokepoints with red lines
+		for (auto const & chokepoint : region->getChokepoints())
+		{
+			Position point1 = chokepoint->getSides().first;
+			Position point2 = chokepoint->getSides().second;
+			Broodwar->drawLineMap(point1, point2, Colors::Red);
+		}
+	}
 }

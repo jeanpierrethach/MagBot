@@ -103,9 +103,10 @@ void WorkerManager::build(BWAPI::UnitType unitType)
 	// TODO fix bug when targetlocation is slightly in the fog of war, it doesn't build it: SOLUTION -> moveBuilder to location before?
 	// -> could be even before having enough minerals to optimize build time
 	// TODO when selecting a valid targetlocation, make sure it stays there unless theres something blocking the construction
+	// TODO FIX targetlocation example : building photon cannons on some of the tiles of a pylon, etc.
 	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
-		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon)
+		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon || unitType == BWAPI::UnitTypes::Protoss_Pylon)
 		{
 			TilePosition pos = unit->getTilePosition();
 			TilePosition targetBuildLocation = Broodwar->getBuildLocation(unitType, pos);
@@ -131,10 +132,12 @@ void WorkerManager::build(BWAPI::UnitType unitType)
 				}		
 				
 				builder->build(unitType, targetBuildLocation);
+				// TODO check return here or after the condition
+				return;
 
 			}		
 			// TODO check return here or inside the condition
-			return;
+			// return;
 		}
 	}
 

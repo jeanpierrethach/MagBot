@@ -15,8 +15,7 @@ Worker::~Worker()
 
 void Worker::update()
 {
-	// TODO only update for units that still haven't been verified.. so store into a container units that exists/doesn't exists??
-	// if cant do that way then try to shorten the verification of all units
+	// TODO try to shorten the verification of all units
 	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (!unit->exists() || !unit->isCompleted())
@@ -33,8 +32,7 @@ void Worker::update()
 
 	if (Config::DebugInfo::DrawAllInfo)
 	{
-		// TODO change hard coded worker name
-		Broodwar->drawTextScreen(0, 10, "Protoss_Probe : %d", getWorkers().size(), Text::White);
+		Broodwar->drawTextScreen(0, 10, "%s : %d", Broodwar->self()->getRace().getWorker().c_str(), getWorkers().size(), Text::White);
 	}	
 }
 

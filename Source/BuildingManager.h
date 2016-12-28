@@ -15,7 +15,7 @@ namespace MagBot
 		BWAPI::Unitset _buildings;
 		std::vector<BWAPI::Unit> _buildingsUnderConstruction;
 
-		// TODO find better way for this
+		// TODO find better way for this since i want to be able to select one BWAPI::Unit instance
 		std::map<BWAPI::UnitType, int> _buildingsOwnedMap;
 		std::map<BWAPI::UnitType, int> _buildingsDestroyedMap;
 		int _buildingDestroyed = 0;

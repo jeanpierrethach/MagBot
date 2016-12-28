@@ -32,13 +32,14 @@ void BuildingManager::update()
 					unit->getTilePosition().x, unit->getTilePosition().y);
 			}
 			_buildings.insert(unit);		
-			_buildingsOwnedMap[unitType] += 1;		
+			_buildingsOwnedMap[unitType] += 1;	
+
+			if (_buildingsDestroyedMap.find(unitType) == _buildingsDestroyedMap.end())
+			{
+				_buildingsDestroyedMap[unitType] = 0;
+			}
 		}
 	}
-
-	// TODO reposition and add config debug info option
-	Broodwar->drawTextScreen(200, 80, "Buildings count: %d", getBuildings().size());
-	Broodwar->drawTextScreen(200, 90, "Buildings destroyed: %d", _buildingDestroyed);
 
 	removeBuildingsDestroyed();
 	addBuildingsUnderConstruction();
@@ -131,25 +132,25 @@ void BuildingManager::showBuildTimeBuildings()
 	Broodwar->drawTextScreen(0, 60, "Buildings in construction: %d", _buildingsUnderConstruction.size());
 }
 
-
-// TODO show at all time, not just when the specific building is destroyed
 void BuildingManager::showOwnedOrDestroyedBuildings()
 {
-	const std::map<BWAPI::UnitType, int>::const_iterator it;
-	const std::map<BWAPI::UnitType, int>::const_iterator it2;
+	std::map<BWAPI::UnitType, int>::const_iterator it;
+	std::map<BWAPI::UnitType, int>::const_iterator it2;
 	int count = 0;
-	
-	for (auto & it = _buildingsOwnedMap.begin(); it != _buildingsOwnedMap.end(); ++it)
+
+	for (it = _buildingsOwnedMap.begin(); it != _buildingsOwnedMap.end(); ++it)
 	{
-		for (auto & it2 = _buildingsDestroyedMap.begin(); it2 != _buildingsDestroyedMap.end(); ++it2)
+		for (it2 = _buildingsDestroyedMap.begin(); it2 != _buildingsDestroyedMap.end(); ++it2)
 		{
-			if (it2->first == it->first)
+			if (it->first == it2->first)
 			{
 				// owned : destroyed - UnitType name
 				Broodwar->drawTextScreen(200, count, "%d : %d - %s\t", it->second, it2->second, it->first.c_str());
 				count += 10;
-			}	
-		}		
-	}
-	
+			}
+		}
+	}	
+
+	Broodwar->drawTextScreen(200, 80, "Buildings count: %d", getBuildings().size());
+	Broodwar->drawTextScreen(200, 90, "Buildings destroyed: %d", _buildingDestroyed);
 }

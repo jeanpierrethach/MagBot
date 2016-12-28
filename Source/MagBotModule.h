@@ -4,6 +4,7 @@
 #include <BWTA.h>
 #include "GameCommander.h"
 #include "BuildingManager.h"
+#include "ProductionManager.h"
 
 #include "Config.h"
 
@@ -37,6 +38,7 @@ namespace MagBot
 		virtual void onUnitComplete(BWAPI::Unit unit);
 		// Everything below this line is safe to modify.
 
+		void drawTerrainData();
 	};
 
 }

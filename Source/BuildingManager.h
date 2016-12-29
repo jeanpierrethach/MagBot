@@ -13,12 +13,12 @@ namespace MagBot
 		// interfering
 
 		BWAPI::Unitset _buildings;
-		std::vector<BWAPI::Unit> _buildingsUnderConstruction;
+		std::vector<BWAPI::Unit> _buildings_under_construction;
 
 		// TODO find better way for this since i want to be able to select one BWAPI::Unit instance
-		std::map<BWAPI::UnitType, int> _buildingsOwnedMap;
-		std::map<BWAPI::UnitType, int> _buildingsDestroyedMap;
-		int _buildingDestroyed = 0;
+		std::map<BWAPI::UnitType, int> _buildings_owned_map;
+		std::map<BWAPI::UnitType, int> _buildings_destroyed_map;
+		int _building_destroyed = 0;
 
 		// TODO Building instance
 		// building stats: hp, shield, armor, mineral cost, gas cost, position, tileposition, damage taken, etc.

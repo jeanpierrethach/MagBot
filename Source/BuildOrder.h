@@ -9,14 +9,14 @@ namespace MagBot
 
 	class BuildOrder
 	{
-		BWAPI::Race               _race;
-		std::vector<MetaType>     _buildOrder;
+		BWAPI::Race _race;
+		std::vector<MetaType> _build_order;
 
 	public:
 		BuildOrder();
 		~BuildOrder();
 		BuildOrder(const BWAPI::Race & race);
-		BuildOrder(const BWAPI::Race & race, const std::vector<MetaType> & metaVector);
+		BuildOrder(const BWAPI::Race & race, const std::vector<MetaType> & meta_vector);
 
 		void add(const MetaType & t);
 

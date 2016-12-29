@@ -11,14 +11,14 @@ namespace MagBot
 	{
 
 	public:
-		enum WorkerTask { Mine, Gas, Build, Idle, Default };
+		enum WorkerTask { MINE, GAS, BUILD, IDLE, DEFAULT };
 
 	private:
 
 		// could change so i can retrieve a specific worker?
 		BWAPI::Unitset _workers;
-		std::map<BWAPI::Unit, enum WorkerTask> _workerTaskMap;
-		std::map<BWAPI::Unit, BWAPI::UnitType> _workerBuildingTypeMap;
+		std::map<BWAPI::Unit, enum WorkerTask> _worker_task_map;
+		std::map<BWAPI::Unit, BWAPI::UnitType> _worker_building_type_map;
 
 		void clearPreviousTask(BWAPI::Unit unit);
 
@@ -40,7 +40,7 @@ namespace MagBot
 		BWAPI::UnitType getWorkerBuildingType(BWAPI::Unit unit);
 		
 		void setWorkerTask(BWAPI::Unit unit, WorkerTask task);
-		void setWorkerTask(BWAPI::Unit worker, WorkerTask task, BWAPI::UnitType taskUnitType);
+		void setWorkerTask(BWAPI::Unit worker, WorkerTask task, BWAPI::UnitType task_unit_type);
 
 		const BWAPI::Unitset getWorkers() const { return _workers; }
 	};

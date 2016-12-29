@@ -3,9 +3,10 @@
 using namespace MagBot;
 
 ProductionManager::ProductionManager()
+	: _reserved_minerals(0)
+	, _reserved_gas(0)
 {
-	// TODO FIX to allow with build order and change logic location from magbotmodule to here
-	// for pylons, probes, gateways, etc.
+	// TODO FIX allow BuildOrder -> related to MetaType class constructor?
 
 	/*BuildOrder b;
 	MetaType m1(BWAPI::UnitTypes::Protoss_Zealot);
@@ -25,25 +26,28 @@ ProductionManager::ProductionManager()
 
 	// queueItem(BuildOrderItem b)?
 
-	// TODO highestpriority after first created doesn't work proprely
+	// highest at the front, lowest at the back
 
-	// TODO queue as highest priority seems to work but now lowest? check if it workds correctly
-	
-	// TODO change logic of the queue, put highestpriority in front, lowest in the back.
-	// always get the front not the back...
-	
-	
+	// TODO more testing, put probe in priority with false and next item is different but blocking == true and blocking == false
 	_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Probe), true);
-	//_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Probe), true);
-	//_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Probe), true);
-	
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Gateway), true);
+	_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Probe), true);
+	_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Probe), true);
+	_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Probe), true);
 	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Pylon), true);
-	
+
+	// blocking used to skip item if cant build when reaching the item, keep true if cant skip item
+	//_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Nexus), false);
+	//_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Gateway), true);
+
+	// TODO reserve minerals/gas
+	// TODO fix in this case want to build same buildings 2 times, have enough resources and producer ok but
+	// removes both from the queue
+	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Gateway), true);
+	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Gateway), true);
+	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
+	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
+	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
+	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
 }
 
 
@@ -51,17 +55,17 @@ ProductionManager::~ProductionManager()
 {
 }
 
-void ProductionManager::setBuildOrder(const BuildOrder & buildOrder)
+void ProductionManager::setBuildOrder(const BuildOrder & build_order)
 {
 	_queue.clearAll();
 	BWAPI::Broodwar->sendText("Queue cleared");
 
-	for (size_t i(0); i < buildOrder.size(); ++i)
+	for (size_t i(0); i < build_order.size(); ++i)
 	{
-		_queue.queueAsLowestPriority(buildOrder[i], true);
+		_queue.queueAsLowestPriority(build_order[i], true);
 		BWAPI::Broodwar->sendText("Queue added build order");
 	}
-	BWAPI::Broodwar->sendText("Queue size: %d", buildOrder.size());
+	BWAPI::Broodwar->sendText("Queue size: %d", build_order.size());
 }
 
 void ProductionManager::update()
@@ -70,10 +74,8 @@ void ProductionManager::update()
 
 	manageBuildOrderQueue();	
 
-	for (int i = 0; i < _queue.size(); ++i)
-	{
-		BWAPI::Broodwar->drawTextScreen(200, (i * 10) + 130, "%s", _queue[i].metaType.getUnitType().c_str());
-	}
+	// TODO add config for this and other draws/debug in class
+	showProductionQueue();
 }
 
 void ProductionManager::manageBuildOrderQueue()
@@ -85,39 +87,60 @@ void ProductionManager::manageBuildOrderQueue()
 		return;
 	}
 
-	BuildOrderItem & currentItem = _queue.getHighestPriorityItem();
+	// Changed from reference to not affect currentItem in queue when trying to getNextHighestPriorityItem()
+	BuildOrderItem current_item = _queue.getHighestPriorityItem();
 
 	while (!_queue.isEmpty())
 	{
-		BWAPI::Unit producer = getProducer(currentItem.metaType);
-		bool canMake = false;
+		BWAPI::Unit producer = getProducer(current_item.meta_type);
+		bool can_make = false;
 		//bool canMake = canMakeNow(producer, currentItem.metaType);
 
 		// TODO check reserved minerals and gas
-		if (BWAPI::Broodwar->self()->minerals() >= currentItem.metaType.mineralPrice() 
-			&& BWAPI::Broodwar->self()->gas() >= currentItem.metaType.gasPrice())
+		if (getFreeMinerals() >= current_item.meta_type.mineralPrice()
+			&& getFreeGas() >= current_item.meta_type.gasPrice()) // BWAPI::Broodwar->self()->minerals() , BWAPI::Broodwar->self()->gas()
 		{
-			canMake = true;
+			can_make = true;
 		}
 		//BWAPI::Broodwar->sendText("Queue not empty");
 		//BWAPI::Broodwar->sendText("%d", canMake);
 
 		// TODO when we have enough resources and an available producer, ex: probe for gateway with minerals >= 150
 		// it automatically remove from the queue even if we cannot build it yet because pylon hasnt finish, etc.
-		// Solution -> reserve minerals and gas, temp variable for buildings and build when can 
+		// Solution -> check reserve minerals and gas -> not current minerals/gas
+		// since it is checked every frame, temp variable for buildings and build when can 
 		// and skip current highest item
-		if (producer && canMake)
-		{
-			create(producer, currentItem);
 
-			// TODO Move this to create()?
-			_queue.removeHighestPriorityItem();
-			// TODO if its a upgrade or tech
-			if (currentItem.metaType.isUnit())
+		if (producer && can_make)
+		{
+			// TODO if its a upgrade or tech\
+			// TODO FIX reserveMinerals/reservedGas
+			
+			//reservedMinerals += currentItem.metaType.getUnitType().mineralPrice();
+			//reservedGas += currentItem.metaType.getUnitType().gasPrice();
+
+			if (create(producer, current_item))
 			{
-				BWAPI::Broodwar->sendText("%s confirmed and removed from queue", currentItem.metaType.getUnitType().c_str());
-			}	
+				//reservedMinerals -= currentItem.metaType.getUnitType().mineralPrice();
+				//reservedGas -= currentItem.metaType.getUnitType().gasPrice();
+				
+				_queue.removeCurrentHighestPriorityItem();
+
+				if (current_item.meta_type.isUnit())
+				{
+					BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getUnitType().c_str());
+				}
+			}
+			
+			// TODO if its a upgrade or tech
+			
 			break;
+		}
+		else if (_queue.canSkipItem())
+		{
+			_queue.skipItem();
+
+			current_item = _queue.getNextHighestPriorityItem();
 		}
 		else
 		{
@@ -126,31 +149,30 @@ void ProductionManager::manageBuildOrderQueue()
 	}
 }
 
-BWAPI::Unit ProductionManager::getProducer(MetaType m, BWAPI::Position closestTo)
+BWAPI::Unit ProductionManager::getProducer(MetaType meta_type, BWAPI::Position closest_to)
 {
-	BWAPI::UnitType producerType = m.whatBuilds();
+	BWAPI::UnitType producer_type = meta_type.whatBuilds();
 	//BWAPI::Broodwar->sendText("Unittype %s", m.getUnitType().c_str());
 	//BWAPI::Broodwar->sendText("Producer %s", producerType.c_str());
 
-	BWAPI::Unitset producersAvailable;
+	BWAPI::Unitset producers_available;
 
-	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
-		if (unit->getType() != producerType) { continue; }
+		if (unit->getType() != producer_type) { continue; }
 		if (!unit->isCompleted()) { continue; }
 		if (unit->isTraining()) { continue; }
 		if (!unit->isPowered()) { continue; }
-		if (unit->getType() == producerType)
+		if (unit->getType() == producer_type)
 		{
 			//BWAPI::Broodwar->sendText("Inserted producersAvailable");
-			producersAvailable.insert(unit);
+			producers_available.insert(unit);
 		}
 	}
-
-	return getClosestUnitToPosition(producersAvailable, closestTo);
+	return getClosestUnitToPosition(producers_available, closest_to);
 }
 
-BWAPI::Unit ProductionManager::getClosestUnitToPosition(const BWAPI::Unitset & units, BWAPI::Position closestTo)
+BWAPI::Unit ProductionManager::getClosestUnitToPosition(const BWAPI::Unitset & units, BWAPI::Position closest_to)
 {
 	if (units.size() == 0)
 	{
@@ -158,49 +180,46 @@ BWAPI::Unit ProductionManager::getClosestUnitToPosition(const BWAPI::Unitset & u
 	}
 
 	// if we don't care where the unit is return the first one we have
-	if (closestTo == BWAPI::Positions::None)
+	if (closest_to == BWAPI::Positions::None)
 	{
 		return *(units.begin());
 	}
 
-	BWAPI::Unit closestUnit = nullptr;
-	double minDist(1000000);
+	BWAPI::Unit closest_unit = nullptr;
+	double min_dist(1000000);
 
-	for (auto & unit : units)
+	for (const auto & unit : units)
 	{
-		double distance = unit->getDistance(closestTo);
-		if (!closestUnit || distance < minDist)
+		double distance = unit->getDistance(closest_to);
+		if (!closest_unit || distance < min_dist)
 		{
-			closestUnit = unit;
-			minDist = distance;
+			closest_unit = unit;
+			min_dist = distance;
 		}
 	}
-
-	return closestUnit;
+	return closest_unit;
 }
 
-void ProductionManager::create(BWAPI::Unit producer, BuildOrderItem & item)
+bool ProductionManager::create(BWAPI::Unit producer, const BuildOrderItem & item)
 {
 	if (!producer)
 	{
-		return;
+		return false;
 	}
 
-	MetaType t = item.metaType;
+	MetaType meta_type = item.meta_type;
 
 	// TODO if isBuildings -> moveWorker by calculating gathering rate, distance and time to travel
 
-	if (t.isBuilding())
+	if (meta_type.isBuilding())
 	{
-		WorkerManager::Instance().build(t.getUnitType());
-		BWAPI::Broodwar->sendText("Worker is building : %s", t.getUnitType().c_str());
-		
-		//_queue.removeHighestPriorityItem();
+		//BWAPI::Broodwar->sendText("Worker is building : %s", t.getUnitType().c_str());
+		return (WorkerManager::Instance().build(meta_type.getUnitType()));
 	}
-	else if (t.isUnit())
+	else if (meta_type.isUnit())
 	{
-		producer->train(t.getUnitType());
-		//_queue.removeHighestPriorityItem();
+		producer->train(meta_type.getUnitType());
+		return true;
 	}
 	// TODO if tech or upgrade
 	/*
@@ -213,14 +232,36 @@ void ProductionManager::create(BWAPI::Unit producer, BuildOrderItem & item)
 		producer->upgrade(t.getUpgradeType());
 	}
 	*/
+
+	return false;
 }
 
-/*
-void ProductionManager::drawProductionQueue()
+int ProductionManager::getFreeMinerals() const
 {
-
+	return (BWAPI::Broodwar->self()->minerals() - _reserved_minerals);
 }
-*/
+
+int ProductionManager::getFreeGas() const
+{
+	return (BWAPI::Broodwar->self()->gas() - _reserved_gas);
+}
+
+// TODO pass queue in parameter?
+void ProductionManager::showProductionQueue()
+{
+	for (size_t i(0); i < _queue.size(); ++i)
+	{
+		BWAPI::Broodwar->drawTextScreen(200, (i * 10) + 130, "%s", _queue[i].meta_type.getUnitType().c_str());
+	}
+
+	BWAPI::Broodwar->drawTextScreen(200, 120, "Number of skipped item: %d", _queue.num_skipped_items);
+
+	BWAPI::Broodwar->drawTextScreen(360, 40, "Reserved Minerals: %d", _reserved_minerals);
+	BWAPI::Broodwar->drawTextScreen(360, 50, "Reserved Gas: %d", _reserved_gas);
+	BWAPI::Broodwar->drawTextScreen(360, 60, "Free Minerals: %d", getFreeMinerals());
+	BWAPI::Broodwar->drawTextScreen(360, 70, "Free Gas: %d", getFreeGas());
+}
+
 
 ProductionManager & ProductionManager::Instance()
 {

@@ -41,7 +41,6 @@ namespace Config
 
 	//namespace config file
 	//namespace strategy
-	//namespace debug
 	//namespace micro
 	//namespace macro
 	//namespace tools

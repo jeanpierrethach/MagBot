@@ -8,18 +8,18 @@ namespace MagBot
 {
 	struct BuildOrderItem
 	{
-		MetaType metaType;
+		MetaType meta_type;
 		int priority;
 		bool blocking;
 
 		BuildOrderItem(MetaType m, int p, bool b)
-			: metaType(m)
+			: meta_type(m)
 			, priority(p)
 			, blocking(b)
 		{
 		}
 
-		bool operator < (const BuildOrderItem &x) const
+		bool operator < (const BuildOrderItem & x) const
 		{
 			return priority < x.priority;
 		}
@@ -44,45 +44,40 @@ namespace MagBot
 		*/
 		std::deque<BuildOrderItem> _queue;
 
-		int lowestPriority;
-		int highestPriority;
-		int defaultPrioritySpacing;
-		//int numSkippedItems;
+		int _lowest_priority;
+		int _highest_priority;
+		int _default_priority_spacing;
+		
 
 	public:
 		BuildOrderQueue();
 		~BuildOrderQueue();
 		
-		void clearAll();
+		int num_skipped_items;
 
-		//void skipItem();											// increments skippedItems
-		//void queueAsHighestPriority(MetaType m, bool blocking, bool gasSteal = false);		// queues something at the highest priority
-		//void queueAsLowestPriority(MetaType m, bool blocking);		// queues something at the lowest priority
-		
-		void queueAsHighestPriority(MetaType m, bool blocking);
-		void queueAsLowestPriority(MetaType m, bool blocking);
-		void queueItem(BuildOrderItem b);
+		void clearAll();	
+		void skipItem();
+		bool canSkipItem();
+
+		void queueAsHighestPriority(MetaType meta_type, bool blocking);
+		void queueAsLowestPriority(MetaType meta_type, bool blocking);
+		void queueItem(BuildOrderItem build_order_item);
+
 		void removeHighestPriorityItem();
-
-		//void removeCurrentHighestPriorityItem();
+		void removeCurrentHighestPriorityItem();
 
 		//int getHighestPriorityValue();								// returns the highest priority value
 		//int	getLowestPriorityValue();								// returns the lowest priority value
 		
 		size_t size();													// returns the size of the queue
-
 		bool isEmpty();
 
 		//void removeAll(MetaType m);									// removes all matching meta types from queue
 
-		//BuildOrderItem & getNextHighestPriorityItem();	// returns the highest priority item
-
-		//bool canSkipItem();
-
 		//void drawQueueInformation(int x, int y);
 
-
 		BuildOrderItem & getHighestPriorityItem();
+		BuildOrderItem & getNextHighestPriorityItem();
 
 		BuildOrderItem operator [] (int i);
 	};

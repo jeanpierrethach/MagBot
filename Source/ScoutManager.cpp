@@ -14,7 +14,6 @@ ScoutManager::~ScoutManager()
 
 void ScoutManager::update()
 {
-
 }
 
 
@@ -32,6 +31,6 @@ void ScoutManager::setWorkerScout(BWAPI::Unit unit)
 		WorkerManager::Instance().finishedWithWorker(_workerScout);
 	}*/
 
-	_workerScout = unit;
+	_worker_scout = unit;
 	//WorkerManager::Instance().setScoutWorker(_workerScout);
 }

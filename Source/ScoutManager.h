@@ -8,7 +8,7 @@ namespace MagBot
 	class ScoutManager
 	{
 
-		BWAPI::Unit	_workerScout;
+		BWAPI::Unit	_worker_scout;
 
 
 	public:

@@ -14,13 +14,12 @@ namespace MagBot
 {
 	class MagBotModule : public BWAPI::AIModule
 	{
-
-		GameCommander _gameCommander;
+		GameCommander _game_commander;
 
 	public:
 		// Virtual functions for callbacks, leave these as they are.
 		virtual void onStart();
-		virtual void onEnd(bool isWinner);
+		virtual void onEnd(bool is_winner);
 		virtual void onFrame();
 		virtual void onSendText(std::string text);
 		virtual void onReceiveText(BWAPI::Player player, std::string text);
@@ -34,7 +33,7 @@ namespace MagBot
 		virtual void onUnitDestroy(BWAPI::Unit unit);
 		virtual void onUnitMorph(BWAPI::Unit unit);
 		virtual void onUnitRenegade(BWAPI::Unit unit);
-		virtual void onSaveGame(std::string gameName);
+		virtual void onSaveGame(std::string game_name);
 		virtual void onUnitComplete(BWAPI::Unit unit);
 		// Everything below this line is safe to modify.
 

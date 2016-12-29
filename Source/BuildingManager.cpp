@@ -20,23 +20,23 @@ BuildingManager & BuildingManager::Instance()
 
 void BuildingManager::update()
 {
-	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
-		BWAPI::UnitType unitType = unit->getType();
+		BWAPI::UnitType unit_type = unit->getType();
 
-		if (unitType.isBuilding() && !_buildings.contains(unit))
+		if (unit_type.isBuilding() && !_buildings.contains(unit))
 		{
 			if (Config::DebugInfo::DrawAllInfo)
 			{
-				Broodwar->sendText("Building %s confirmed at position (%d, %d)", unitType.c_str(),
+				Broodwar->sendText("Building %s confirmed at position (%d, %d)", unit_type.c_str(),
 					unit->getTilePosition().x, unit->getTilePosition().y);
 			}
 			_buildings.insert(unit);		
-			_buildingsOwnedMap[unitType] += 1;	
+			_buildings_owned_map[unit_type] += 1;
 
-			if (_buildingsDestroyedMap.find(unitType) == _buildingsDestroyedMap.end())
+			if (_buildings_destroyed_map.find(unit_type) == _buildings_destroyed_map.end())
 			{
-				_buildingsDestroyedMap[unitType] = 0;
+				_buildings_destroyed_map[unit_type] = 0;
 			}
 		}
 	}
@@ -64,72 +64,68 @@ void BuildingManager::update()
 
 void BuildingManager::showDebugBuildings()
 {
-	for (auto & unit : getBuildings())
+	for (const auto & unit : getBuildings())
 	{
 		TilePosition tilePosition = unit->getTilePosition();
-		BWAPI::UnitType unitType = unit->getType();
+		BWAPI::UnitType unit_type = unit->getType();
 
-		Broodwar->drawBoxMap(Position(tilePosition), Position(tilePosition + unitType.tileSize()), Colors::Orange);
-
-		Broodwar->drawCircleMap(Position(tilePosition), unitType.sightRange(), Colors::Blue);
+		Broodwar->drawBoxMap(Position(tilePosition), Position(tilePosition + unit_type.tileSize()), Colors::Orange);
+		Broodwar->drawCircleMap(Position(tilePosition), unit_type.sightRange(), Colors::Blue);
 	}
 }
 
 void BuildingManager::removeBuildingsDestroyed()
 {
-	for (auto & unit : getBuildings())
+	for (const auto & unit : getBuildings())
 	{
 		if (!unit->exists())
 		{
-			_buildings.erase(unit);
-			
-			_buildingDestroyed += 1;
+			_buildings.erase(unit);		
+			_building_destroyed += 1;
 
-			BWAPI::UnitType unitType = unit->getType();
-			_buildingsOwnedMap[unitType] -= 1;
-			_buildingsDestroyedMap[unitType] += 1;
+			BWAPI::UnitType unit_type = unit->getType();
+			_buildings_owned_map[unit_type] -= 1;
+			_buildings_destroyed_map[unit_type] += 1;
 		}
 	}
 }
 
 void BuildingManager::addBuildingsUnderConstruction()
 {
-	for (auto & unit : getBuildings())
+	for (const auto & unit : getBuildings())
 	{
-		auto it = std::find(_buildingsUnderConstruction.begin(), _buildingsUnderConstruction.end(), unit);
-		if (unit->isBeingConstructed() && it == _buildingsUnderConstruction.end())
+		auto it = std::find(_buildings_under_construction.begin(), _buildings_under_construction.end(), unit);
+		if (unit->isBeingConstructed() && it == _buildings_under_construction.end())
 		{
-			_buildingsUnderConstruction.push_back(unit);
+			_buildings_under_construction.push_back(unit);
 		}
 	}
 }
 
 void BuildingManager::removeBuildingsCompleted()
 {
-	for (size_t i = 0; i < _buildingsUnderConstruction.size(); ++i)
+	for (size_t i = 0; i < _buildings_under_construction.size(); ++i)
 	{
-		BWAPI::Unit building = _buildingsUnderConstruction[i];
+		BWAPI::Unit building = _buildings_under_construction[i];
 
-		auto it = std::find(_buildingsUnderConstruction.begin(), _buildingsUnderConstruction.end(), building);
+		auto it = std::find(_buildings_under_construction.begin(), _buildings_under_construction.end(), building);
 		if (building->getRemainingBuildTime() <= 0)
 		{
-			auto index = std::distance(_buildingsUnderConstruction.begin(), it);
-			_buildingsUnderConstruction.erase(_buildingsUnderConstruction.begin() + index);
-			_buildingsUnderConstruction.shrink_to_fit();
+			auto index = std::distance(_buildings_under_construction.begin(), it);
+			_buildings_under_construction.erase(_buildings_under_construction.begin() + index);
+			_buildings_under_construction.shrink_to_fit();
 		}
 	}
 }
 
 void BuildingManager::showBuildTimeBuildings()
 {
-	for (size_t i = 0; i < _buildingsUnderConstruction.size(); ++i)
+	for (size_t i = 0; i < _buildings_under_construction.size(); ++i)
 	{
-		BWAPI::Unit building = _buildingsUnderConstruction[i];
-
+		BWAPI::Unit building = _buildings_under_construction[i];
 		Broodwar->drawTextScreen(0, (i * 10) + 70, "%s : %d", building->getType().c_str(), building->getRemainingBuildTime());
 	}
-
-	Broodwar->drawTextScreen(0, 60, "Buildings in construction: %d", _buildingsUnderConstruction.size());
+	Broodwar->drawTextScreen(0, 60, "Buildings in construction: %d", _buildings_under_construction.size());
 }
 
 void BuildingManager::showOwnedOrDestroyedBuildings()
@@ -138,9 +134,9 @@ void BuildingManager::showOwnedOrDestroyedBuildings()
 	std::map<BWAPI::UnitType, int>::const_iterator it2;
 	int count = 0;
 
-	for (it = _buildingsOwnedMap.begin(); it != _buildingsOwnedMap.end(); ++it)
+	for (it = _buildings_owned_map.begin(); it != _buildings_owned_map.end(); ++it)
 	{
-		for (it2 = _buildingsDestroyedMap.begin(); it2 != _buildingsDestroyedMap.end(); ++it2)
+		for (it2 = _buildings_destroyed_map.begin(); it2 != _buildings_destroyed_map.end(); ++it2)
 		{
 			if (it->first == it2->first)
 			{
@@ -150,7 +146,6 @@ void BuildingManager::showOwnedOrDestroyedBuildings()
 			}
 		}
 	}	
-
 	Broodwar->drawTextScreen(200, 80, "Buildings count: %d", getBuildings().size());
-	Broodwar->drawTextScreen(200, 90, "Buildings destroyed: %d", _buildingDestroyed);
+	Broodwar->drawTextScreen(200, 90, "Buildings destroyed: %d", _building_destroyed);
 }

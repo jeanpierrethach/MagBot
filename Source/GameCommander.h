@@ -10,16 +10,13 @@ namespace MagBot
 
 	class GameCommander
 	{
+		BWAPI::Unitset	_valid_units;
+		BWAPI::Unitset  _combat_units;
+		BWAPI::Unitset  _scout_units;
 
-		BWAPI::Unitset	_validUnits;
-		BWAPI::Unitset  _combatUnits;
-		BWAPI::Unitset  _scoutUnits;
-
-		bool _initialScout;
+		bool _initial_scout;
 
 		void setScoutUnits();
-
-		
 
 		void assignUnit(BWAPI::Unit unit, BWAPI::Unitset & set);
 		bool isAssigned(BWAPI::Unit unit) const;

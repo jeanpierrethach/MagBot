@@ -14,11 +14,11 @@ namespace MagBot
 	struct Strategy
 	{
 		std::string _name;
-		BuildOrder _buildOrder;
+		BuildOrder _build_order;
 
-		Strategy(const std::string & name, const BuildOrder & buildOrder)
+		Strategy(const std::string & name, const BuildOrder & build_order)
 			: _name(name)
-			, _buildOrder(buildOrder)
+			, _build_order(build_order)
 		{
 		}
 	};

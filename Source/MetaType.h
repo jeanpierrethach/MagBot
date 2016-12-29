@@ -7,29 +7,24 @@ namespace MagBot
 
 	namespace MetaTypes
 	{
-		enum { Unit, Tech, Upgrade, Default};
+		enum { UNIT, TECH, UPGRADE, DEFAULT};
 	}
 
 	class MetaType
 	{
 		size_t _type;
 		BWAPI::Race _race;
-		BWAPI::UnitType _unitType;
-		BWAPI::TechType _techType;
-		BWAPI::UpgradeType _upgradeType;
+		BWAPI::UnitType _unit_type;
+		BWAPI::TechType _tech_type;
+		BWAPI::UpgradeType _upgrade_type;
 
 	public:
 		MetaType();
-		MetaType(BWAPI::UnitType unitType)
-			: _unitType(unitType)
-		{
-		}
+		//MetaType(const std::string & name);
+		MetaType(BWAPI::UnitType unit_type);
+		MetaType(BWAPI::TechType tech_type);
+		MetaType(BWAPI::UpgradeType upgrade_type);
 		~MetaType();
-		/*MetaType(const std::string & name);
-		MetaType(BWAPI::UnitType t);
-		MetaType(BWAPI::TechType t);
-		MetaType(BWAPI::UpgradeType t);*/
-
 
 		bool isUnit() const;
 		bool isTech() const;

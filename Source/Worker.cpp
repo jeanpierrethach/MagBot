@@ -4,8 +4,7 @@ using namespace MagBot;
 using namespace BWAPI;
 
 Worker::Worker()
-{
-	
+{	
 }
 
 
@@ -16,14 +15,14 @@ Worker::~Worker()
 void Worker::update()
 {
 	// TODO try to shorten the verification of all units
-	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (!unit->exists() || !unit->isCompleted())
 			continue;
 
 		if (unit->getType().isWorker() && !_workers.contains(unit))
 		{
-			setWorkerTask(unit, Mine);
+			setWorkerTask(unit, MINE);
 			_workers.insert(unit);
 		}
 	}
@@ -38,7 +37,7 @@ void Worker::update()
 
 void Worker::removeDestroyedWorker()
 {
-	for (auto & unit : getWorkers())
+	for (const auto & unit : getWorkers())
 	{
 		if (!unit->exists())
 		{
@@ -51,29 +50,27 @@ void Worker::removeDestroyedWorker()
 enum Worker::WorkerTask Worker::getWorkerTask(BWAPI::Unit unit)
 {
 	if (!unit)
-		return Default;
+		return DEFAULT;
 
-	const std::map<BWAPI::Unit, enum WorkerTask>::const_iterator it = _workerTaskMap.find(unit);
+	const std::map<BWAPI::Unit, enum WorkerTask>::const_iterator it = _worker_task_map.find(unit);
 
-	if (it != _workerTaskMap.end())
+	if (it != _worker_task_map.end())
 	{
 		return it->second;
 	}
-
-	return Default;
+	return DEFAULT;
 }
 
 BWAPI::UnitType	Worker::getWorkerBuildingType(BWAPI::Unit unit)
 {
 	if (!unit) { return BWAPI::UnitTypes::None; }
 
-	std::map<BWAPI::Unit, BWAPI::UnitType>::iterator it = _workerBuildingTypeMap.find(unit);
+	std::map<BWAPI::Unit, BWAPI::UnitType>::iterator it = _worker_building_type_map.find(unit);
 
-	if (it != _workerBuildingTypeMap.end())
+	if (it != _worker_building_type_map.end())
 	{
 		return it->second;
 	}
-
 	return BWAPI::UnitTypes::None;
 }
 
@@ -84,27 +81,27 @@ void Worker::setWorkerTask(BWAPI::Unit unit, enum WorkerTask task)
 
 	clearPreviousTask(unit);
 
-	if (task == Mine)
+	if (task == MINE)
 	{
-		_workerTaskMap[unit] = task;
+		_worker_task_map[unit] = task;
 	}
-	else if (task == Build)
+	else if (task == BUILD)
 	{
-		_workerTaskMap[unit] = task;
+		_worker_task_map[unit] = task;
 	}
 }
 
-void Worker::setWorkerTask(BWAPI::Unit unit, enum WorkerTask task, BWAPI::UnitType taskUnitType)
+void Worker::setWorkerTask(BWAPI::Unit unit, enum WorkerTask task, BWAPI::UnitType task_unit_type)
 {
 	if (!unit)
 		return;
 
 	clearPreviousTask(unit);
-	_workerTaskMap[unit] = task;
+	_worker_task_map[unit] = task;
 	
-	if (task == Build)
+	if (task == BUILD)
 	{
-		_workerBuildingTypeMap[unit] = taskUnitType;
+		_worker_building_type_map[unit] = task_unit_type;
 	}
 	// TODO add building task to a priority queue?	
 }
@@ -115,24 +112,23 @@ void Worker::clearPreviousTask(BWAPI::Unit unit)
 	if (!unit)
 		return;
 
-	WorkerTask previousTask = getWorkerTask(unit);
+	WorkerTask previous_task = getWorkerTask(unit);
 
-	if (previousTask == Build)
+	if (previous_task == BUILD)
 	{
-		_workerBuildingTypeMap.erase(unit);
+		_worker_building_type_map.erase(unit);
 	}
 
-	_workerTaskMap.erase(unit);
+	_worker_task_map.erase(unit);
 
-	/*if (previousTask == Mine)
+	/*if (previous_task == Mine)
 	{
-		_workerTaskMap.erase(unit);
+		_worker_task_map.erase(unit);
 	}
-	else if (previousTask == Build)
+	else if (previous_task == Build)
 	{
-		_workerTaskMap.erase(unit);
+		_worker_task_map.erase(unit);
 	}*/
-
 }
 
 

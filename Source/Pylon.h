@@ -16,7 +16,7 @@ namespace MagBot
 	class Pylon
 	{
 		BWAPI::Unitset _pylons;
-		std::map<BWAPI::Unit, PylonData> _pylonMap;
+		std::map<BWAPI::Unit, PylonData> _pylon_map;
 
 	public:
 		Pylon();

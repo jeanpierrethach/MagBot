@@ -7,8 +7,7 @@ namespace MagBot
 
 	class ConstructorManager
 	{
-
-		BWAPI::Unit _constructorWorker;
+		BWAPI::Unit _constructor_worker;
 
 	public:
 		ConstructorManager();

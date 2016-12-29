@@ -3,7 +3,6 @@
 
 using namespace MagBot;
 using namespace BWAPI;
-using namespace Filter;
 
 void MagBotModule::onStart()
 {
@@ -39,13 +38,12 @@ void MagBotModule::onStart()
 		BWTA::readMap();
 		BWTA::analyze();
 	}
-
 }
 
-void MagBotModule::onEnd(bool isWinner)
+void MagBotModule::onEnd(bool is_winner)
 {
 	// Called when the game ends
-	if (isWinner)
+	if (is_winner)
 	{
 		// Log your win here!
 	}
@@ -82,7 +80,7 @@ void MagBotModule::onFrame()
 	// initialize a worker manager
 	WorkerManager::Instance().update();
 
-	static int lastCheckedGateway = 0;
+	//static int lastCheckedGateway = 0;
 
 	// TODO FIX its calling every frame
 	/*static bool forge = false;
@@ -109,7 +107,7 @@ void MagBotModule::onFrame()
 	if (lastCheckedGateway + 400 < BWAPI::Broodwar->getFrameCount())
 	{
 		lastChecked2 = BWAPI::Broodwar->getFrameCount();*/
-		ProductionManager::Instance().update();
+	ProductionManager::Instance().update();
 	//}
 
 	BuildingManager::Instance().update();
@@ -133,7 +131,7 @@ void MagBotModule::onFrame()
 	// TODO train workers from buildOrderManager and add to the buildOrderQueue
 	// Iterate through all the units that we own
 	
-	/*for (auto & u : Broodwar->self()->getUnits())
+	/*for (const auto & u : Broodwar->self()->getUnits())
 	{
 		if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
 		{
@@ -202,12 +200,10 @@ void MagBotModule::onFrame()
 		}
 
 	} // closure: unit iterator*/
-	
 }
 
 void MagBotModule::onSendText(std::string text)
 {
-
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", text.c_str());
 }
@@ -227,7 +223,6 @@ void MagBotModule::onPlayerLeft(BWAPI::Player player)
 
 void MagBotModule::onNukeDetect(BWAPI::Position target)
 {
-
 	// Check if the target is a valid position
 	if (target)
 	{
@@ -297,9 +292,9 @@ void MagBotModule::onUnitRenegade(BWAPI::Unit unit)
 {
 }
 
-void MagBotModule::onSaveGame(std::string gameName)
+void MagBotModule::onSaveGame(std::string game_name)
 {
-	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
+	Broodwar << "The game was saved to \"" << game_name << "\"" << std::endl;
 }
 
 void MagBotModule::onUnitComplete(BWAPI::Unit unit)
@@ -309,34 +304,34 @@ void MagBotModule::onUnitComplete(BWAPI::Unit unit)
 void MagBotModule::drawTerrainData()
 {
 	// iterate through all the base locations, and draw their outlines.
-	for (const auto & baseLocation : BWTA::getBaseLocations())
+	for (const auto & base_location : BWTA::getBaseLocations())
 	{
-		TilePosition p = baseLocation->getTilePosition();
+		TilePosition p = base_location->getTilePosition();
 
 		// draw outline of center location
-		Position leftTop(p.x * TILE_SIZE, p.y * TILE_SIZE);
-		Position rightBottom(leftTop.x + 4 * TILE_SIZE, leftTop.y + 3 * TILE_SIZE);
-		Broodwar->drawBoxMap(leftTop, rightBottom, Colors::Blue);
+		Position left_top(p.x * TILE_SIZE, p.y * TILE_SIZE);
+		Position right_bottom(left_top.x + 4 * TILE_SIZE, left_top.y + 3 * TILE_SIZE);
+		Broodwar->drawBoxMap(left_top, right_bottom, Colors::Blue);
 
 		// draw a circle at each mineral patch
-		for (const auto & mineral : baseLocation->getStaticMinerals())
+		for (const auto & mineral : base_location->getStaticMinerals())
 		{
 			Broodwar->drawCircleMap(mineral->getInitialPosition(), 30, Colors::Cyan);
 		}
 
 		// draw the outlines of vespene geysers
-		for (const auto& geyser : baseLocation->getGeysers())
+		for (const auto & geyser : base_location->getGeysers())
 		{
 			TilePosition p1 = geyser->getInitialTilePosition();
-			Position leftTop1(p1.x * TILE_SIZE, p1.y * TILE_SIZE);
-			Position rightBottom1(leftTop1.x + 4 * TILE_SIZE, leftTop1.y + 2 * TILE_SIZE);
-			Broodwar->drawBoxMap(leftTop1, rightBottom1, Colors::Orange);
+			Position left_top1(p1.x * TILE_SIZE, p1.y * TILE_SIZE);
+			Position right_bottom1(left_top1.x + 4 * TILE_SIZE, left_top1.y + 2 * TILE_SIZE);
+			Broodwar->drawBoxMap(left_top1, right_bottom1, Colors::Orange);
 		}
 
 		// if this is an island expansion, draw a yellow circle around the base location
-		if (baseLocation->isIsland())
+		if (base_location->isIsland())
 		{
-			Broodwar->drawCircleMap(baseLocation->getPosition(), 80, Colors::Yellow);
+			Broodwar->drawCircleMap(base_location->getPosition(), 80, Colors::Yellow);
 		}
 	}
 

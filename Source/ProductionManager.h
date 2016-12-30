@@ -13,35 +13,29 @@ namespace MagBot
 	{
 		BuildOrderQueue _queue;
 
-		//bool                hasResources(BWAPI::UnitType type);
-		//bool                canMake(BWAPI::UnitType type);
-		//bool                meetsReservedResources(MetaType type);
-		//bool                canMakeNow(BWAPI::Unit producer, MetaType t);
-
-		void setBuildOrder(const BuildOrder & build_order);
-
-		bool create(BWAPI::Unit producer, const BuildOrderItem & item);
-
+		void setBuildOrder(const BuildOrder & build_order);	
 		void manageBuildOrderQueue();
+		void create(BWAPI::Unit producer, const BuildOrderItem & item);
 
 		BWAPI::Unit getClosestUnitToPosition(const BWAPI::Unitset & units, BWAPI::Position closest_to);
 
-		int _reserved_minerals;
-		int _reserved_gas;
+		bool canMakeNow(BWAPI::Unit producer, MetaType meta_type);
+		bool hasEnoughResources(MetaType meta_type);
 
 		int getFreeMinerals() const;
 		int getFreeGas() const;
-		// void                predictWorkerMovement(const Building & b);
+
+		// void predictWorkerMovement(const Building & b);
 
 	public:
 		ProductionManager();
 		~ProductionManager();
 
 		void update();
-
 		void showProductionQueue();
 
 		BWAPI::Unit getProducer(MetaType meta_type, BWAPI::Position closest_to = BWAPI::Positions::None);
+
 		static ProductionManager & Instance();
 	};
 

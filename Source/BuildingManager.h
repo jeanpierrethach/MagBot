@@ -1,45 +1,48 @@
 #pragma once
 
 #include "Common.h"
+#include "BuildingData.h"
+#include "WorkerManager.h"
 
 namespace MagBot
 {
-
 	class BuildingManager
 	{
+		std::vector<Building> _buildings;
 
-		// TODO container for all protoss buildings include or exclude pylons?
-		// TODO update on each frame the count of minerals and gas owned -> make sure when something is in queue, other orders aren't
-		// interfering
+		int _reservedMinerals; // minerals reserved for planned buildings
+		int  _reservedGas; // gas reserved for planned buildings
 
-		BWAPI::Unitset _buildings;
-		std::vector<BWAPI::Unit> _buildings_under_construction;
-
-		// TODO find better way for this since i want to be able to select one BWAPI::Unit instance
+		// TODO better way for this
+		BWAPI::Unitset _all_buildings;
 		std::map<BWAPI::UnitType, int> _buildings_owned_map;
 		std::map<BWAPI::UnitType, int> _buildings_destroyed_map;
 		int _building_destroyed = 0;
+		void removeBuildingsDestroyed();
+		void showAllBuildings();
+		void showDebugBuildings();
+		void showBuildTimeBuildings();
+		void showOwnedOrDestroyedBuildings();
 
-		// TODO Building instance
-		// building stats: hp, shield, armor, mineral cost, gas cost, position, tileposition, damage taken, etc.
+		void removeBuildings(const std::vector<Building> & to_remove_buildings);
+
+		void validateWorkersAndBuildings(); // STEP 1
+		void assignWorkersToUnassignedBuildings(); // STEP 2
+		void constructAssignedBuildings(); // STEP 3
+		void checkForStartedConstruction();	// STEP 4
+		void checkForCompletedBuildings(); // STEP 5
 
 	public:
 		BuildingManager();
 		~BuildingManager();
 
 		void update();
+		void addBuildingTask(BWAPI::UnitType type);
+		bool isBeingBuilt(BWAPI::UnitType unit_type);	
 
-		void removeBuildingsDestroyed();
-		void addBuildingsUnderConstruction();
-		void removeBuildingsCompleted();
+		int getReservedMinerals();
+		int getReservedGas();
 
-		void showDebugBuildings();
-		void showBuildTimeBuildings();
-		void showOwnedOrDestroyedBuildings();
-
-		const BWAPI::Unitset getBuildings() const { return _buildings; }
-		
 		static BuildingManager & Instance();
 	};
-
 }

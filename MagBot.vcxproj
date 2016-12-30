@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\BuildingData.cpp" />
     <ClCompile Include="Source\MetaType.cpp" />
     <ClCompile Include="Source\ProductionManager.cpp" />
     <ClCompile Include="Source\Pathfinder.cpp" />
@@ -107,8 +108,11 @@
     <ClCompile Include="Source\WorkerManager.cpp" />
     <ClCompile Include="Source\Worker.cpp" />
     <ClCompile Include="Source\StrategyManager.cpp" />
+    <ClCompile Include="Source\Squad.cpp" />
+    <ClCompile Include="Source\SquadManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\BuildingData.h" />
     <ClInclude Include="Source\MetaType.h" />
     <ClInclude Include="Source\ProductionManager.h" />
     <ClInclude Include="Source\Pathfinder.h" />
@@ -125,6 +129,8 @@
     <ClInclude Include="Source\WorkerManager.h" />
     <ClInclude Include="Source\Worker.h" />
     <ClInclude Include="Source\StrategyManager.h" />
+    <ClInclude Include="Source\Squad.h" />
+    <ClInclude Include="Source\SquadManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

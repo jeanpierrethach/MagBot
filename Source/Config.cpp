@@ -31,9 +31,11 @@ namespace Config
 	namespace DebugInfo
 	{
 		bool DrawAllInfo = true;
+		bool DrawBuildingsCount = true;
 		bool DrawBuildingTilesInfo = true;
 	    bool DrawBuildingTimeInConstruction = true;
 		bool DrawBuildingsOwnedOrDestroyed = true;
 		bool DrawWorkerTaskInfo = true;
+		bool DrawProductionQueue = true;
 	}
 }

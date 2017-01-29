@@ -18,7 +18,9 @@ namespace MagBot
 		BuildOrder(const BWAPI::Race & race);
 		BuildOrder(const BWAPI::Race & race, const std::vector<MetaType> & meta_vector);
 
-		void add(const MetaType & t);
+		void add(const MetaType & meta_type);
+		void add(const MetaType & meta_type, int amount);
+		void add(const MetaType & meta_type, int amount, int at_supply);
 
 		const size_t size() const;
 		const BWAPI::Race & getRace() const;

@@ -23,6 +23,12 @@ namespace MagBot
 		{
 			return priority < x.priority;
 		}
+
+		// TODO has item on queue (contains)
+		/*const bool BuildOrderItem::operator == (const BuildOrderItem & b)
+		{
+			return (b.priority == priority);
+		}*/
 	};
 
 	class BuildOrderQueue
@@ -47,13 +53,11 @@ namespace MagBot
 		int _lowest_priority;
 		int _highest_priority;
 		int _default_priority_spacing;
-		
+		int _num_skipped_items;
 
 	public:
 		BuildOrderQueue();
 		~BuildOrderQueue();
-		
-		int num_skipped_items;
 
 		void clearAll();	
 		void skipItem();
@@ -66,15 +70,15 @@ namespace MagBot
 		void removeHighestPriorityItem();
 		void removeCurrentHighestPriorityItem();
 
-		//int getHighestPriorityValue();								// returns the highest priority value
-		//int	getLowestPriorityValue();								// returns the lowest priority value
+		//int getHighestPriorityValue();
+		//int getLowestPriorityValue();	
 		
-		size_t size();													// returns the size of the queue
+		const size_t size() const;
 		bool isEmpty();
 
-		//void removeAll(MetaType m);									// removes all matching meta types from queue
+		int getSkippedItemsCount() const;
 
-		//void drawQueueInformation(int x, int y);
+		bool hasItem(BWAPI::UnitType unit_type);
 
 		BuildOrderItem & getHighestPriorityItem();
 		BuildOrderItem & getNextHighestPriorityItem();

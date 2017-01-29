@@ -20,16 +20,17 @@ namespace MagBot
 
 	public:
 		MetaType();
+
 		//MetaType(const std::string & name);
 		MetaType(BWAPI::UnitType unit_type);
 		MetaType(BWAPI::TechType tech_type);
 		MetaType(BWAPI::UpgradeType upgrade_type);
 		~MetaType();
-
+		
 		bool isUnit() const;
 		bool isTech() const;
 		bool isUpgrade() const;
-		//bool isCommand() const;
+		//bool isCommand() const;	may be useful for cancelling attacked and low hp constructing buildings
 		bool isBuilding() const;
 		bool isRefinery() const;
 
@@ -47,8 +48,5 @@ namespace MagBot
 		BWAPI::UnitType whatBuilds() const;
 		std::string getName() const;
 
-
-
 	};
-
 }

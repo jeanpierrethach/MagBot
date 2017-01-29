@@ -33,10 +33,12 @@ namespace Config
 	namespace DebugInfo
 	{
 		extern bool DrawAllInfo;
+		extern bool DrawBuildingsCount;
 		extern bool DrawBuildingTilesInfo;
 		extern bool DrawBuildingTimeInConstruction;
 		extern bool DrawBuildingsOwnedOrDestroyed;
 		extern bool DrawWorkerTaskInfo;
+		extern bool DrawProductionQueue;
 	}
 
 	//namespace config file

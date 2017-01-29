@@ -6,7 +6,7 @@ BuildOrderQueue::BuildOrderQueue()
 	: _highest_priority(0)
 	, _lowest_priority(0)
 	, _default_priority_spacing(10)
-	, num_skipped_items(0)
+	, _num_skipped_items(0)
 {
 }
 
@@ -24,13 +24,13 @@ void BuildOrderQueue::clearAll()
 
 BuildOrderItem & BuildOrderQueue::getHighestPriorityItem()
 {
-	num_skipped_items = 0;
+	_num_skipped_items = 0;
 	return _queue.front();
 }
 
 BuildOrderItem & BuildOrderQueue::getNextHighestPriorityItem()
 {
-	return _queue[num_skipped_items];
+	return _queue[_num_skipped_items];
 }
 
 void BuildOrderQueue::queueAsHighestPriority(MetaType meta_type, bool blocking)
@@ -47,17 +47,17 @@ void BuildOrderQueue::queueAsLowestPriority(MetaType meta_type, bool blocking)
 
 void BuildOrderQueue::skipItem()
 {
-	++num_skipped_items;
+	++_num_skipped_items;
 }
 
 bool BuildOrderQueue::canSkipItem()
 {
-	bool bigEnough = _queue.size() > (size_t)(1 + num_skipped_items);
+	bool bigEnough = _queue.size() > (size_t)(1 + _num_skipped_items);
 	if (!bigEnough)
 	{
 		return false;
 	}
-	return (!_queue[num_skipped_items].blocking);
+	return (!_queue[_num_skipped_items].blocking);
 }
 
 void BuildOrderQueue::removeHighestPriorityItem()
@@ -72,7 +72,7 @@ void BuildOrderQueue::removeHighestPriorityItem()
 
 void BuildOrderQueue::removeCurrentHighestPriorityItem()
 {
-	_queue.erase(_queue.begin() + num_skipped_items);
+	_queue.erase(_queue.begin() + _num_skipped_items);
 
 	// if the list is not empty, set the highest accordingly
 	_highest_priority = _queue.empty() ? 0 : _queue.front().priority;
@@ -114,7 +114,7 @@ BuildOrderItem BuildOrderQueue::operator [] (int index)
 	return _queue[index];
 }
 
-size_t BuildOrderQueue::size()
+const size_t BuildOrderQueue::size() const
 {
 	return _queue.size();
 }
@@ -123,3 +123,20 @@ bool BuildOrderQueue::isEmpty()
 {
 	return (_queue.size() == 0);
 }
+
+int BuildOrderQueue::getSkippedItemsCount() const
+{
+	return _num_skipped_items;
+}
+
+// TODO has item on queue (contains)
+/*bool BuildOrderQueue::hasItem(BWAPI::UnitType unit_type)
+{
+	const auto & item = std::find(_queue.begin(), _queue.end(), unit_type);
+
+	if (item != _queue.end())
+	{
+		return true;
+	}
+	return false;
+}*/

@@ -90,13 +90,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\ReaverShuttleMicro.cpp" />
     <ClCompile Include="Source\BuildingData.cpp" />
     <ClCompile Include="Source\MetaType.cpp" />
     <ClCompile Include="Source\ProductionManager.cpp" />
     <ClCompile Include="Source\Pathfinder.cpp" />
     <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
-    <ClCompile Include="Source\Pylon.cpp" />
+    <ClCompile Include="Source\PylonData.cpp" />
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\ConstructorManager.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
@@ -112,13 +113,14 @@
     <ClCompile Include="Source\SquadManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\ReaverShuttleMicro.h" />
     <ClInclude Include="Source\BuildingData.h" />
     <ClInclude Include="Source\MetaType.h" />
     <ClInclude Include="Source\ProductionManager.h" />
     <ClInclude Include="Source\Pathfinder.h" />
     <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\BuildingManager.h" />
-    <ClInclude Include="Source\Pylon.h" />
+    <ClInclude Include="Source\PylonData.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\ConstructorManager.h" />
     <ClInclude Include="Source\ScoutManager.h" />

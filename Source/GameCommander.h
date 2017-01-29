@@ -15,6 +15,7 @@ namespace MagBot
 		BWAPI::Unitset  _scout_units;
 
 		bool _initial_scout;
+		bool _active_scout;
 
 		void setScoutUnits();
 

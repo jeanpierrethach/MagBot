@@ -1,6 +1,8 @@
 #pragma once
 
 #include <BWAPI.h>
+#include "WorkerManager.h"
+#include <BWTA.h>
 
 namespace MagBot
 {
@@ -9,7 +11,6 @@ namespace MagBot
 	{
 
 		BWAPI::Unit	_worker_scout;
-
 
 	public:
 		ScoutManager();

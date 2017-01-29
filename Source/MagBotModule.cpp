@@ -2,11 +2,10 @@
 #include <iostream>
 
 using namespace MagBot;
-using namespace BWAPI;
 
 void MagBotModule::onStart()
 {
-	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
+	BWAPI::Broodwar << "The map is " << BWAPI::Broodwar->mapName() << "!" << std::endl;
 
 	// Set our BWAPI options here    
 	BWAPI::Broodwar->setLocalSpeed(Config::BWAPIOptions::SetLocalSpeed);
@@ -31,7 +30,7 @@ void MagBotModule::onStart()
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
 	// TODO may remove this
-	Broodwar->setCommandOptimizationLevel(2);
+	BWAPI::Broodwar->setCommandOptimizationLevel(2);
 
 	if (Config::Modules::UsingGameCommander)
 	{
@@ -73,11 +72,10 @@ void MagBotModule::onFrame()
 	// Called once every game frame
 	if (Config::DebugInfo::DrawAllInfo)
 	{
-		Broodwar->drawTextScreen(0, 30, "Frame Count : %d", Broodwar->getFrameCount());
-		Broodwar->drawTextScreen(0, 40, "APM : %d", Broodwar->getAPM());
+		BWAPI::Broodwar->drawTextScreen(0, 30, "Frame Count : %d", BWAPI::Broodwar->getFrameCount());
+		BWAPI::Broodwar->drawTextScreen(0, 40, "APM : %d", BWAPI::Broodwar->getAPM());
 	}
-		
-	// initialize a worker manager
+
 	WorkerManager::Instance().update();
 
 	//static int lastCheckedGateway = 0;
@@ -103,14 +101,11 @@ void MagBotModule::onFrame()
 		WorkerManager::Instance().build(UnitTypes::Protoss_Pylon);
 	}*/
 
-	/*static int lastChecked2 = 0;
-	if (lastCheckedGateway + 400 < BWAPI::Broodwar->getFrameCount())
-	{
-		lastChecked2 = BWAPI::Broodwar->getFrameCount();*/
 	ProductionManager::Instance().update();
-	//}
 
 	BuildingManager::Instance().update();
+
+	_game_commander.update();
 
 	// TODO: builder may be stuck for few frames...
 
@@ -124,12 +119,9 @@ void MagBotModule::onFrame()
 	// Display the game frame rate as text in the upper left area of the screen
 	if (Config::DebugInfo::DrawAllInfo)
 	{
-		Broodwar->drawTextScreen(360, 0, "FPS: %d", Broodwar->getFPS());
-		Broodwar->drawTextScreen(360, 20, "Average FPS: %f", Broodwar->getAverageFPS());
+		BWAPI::Broodwar->drawTextScreen(360, 0, "FPS: %d", BWAPI::Broodwar->getFPS());
+		BWAPI::Broodwar->drawTextScreen(360, 20, "Average FPS: %f", BWAPI::Broodwar->getAverageFPS());
 	}
-
-	// TODO train workers from buildOrderManager and add to the buildOrderQueue
-	// Iterate through all the units that we own
 	
 	/*for (const auto & u : Broodwar->self()->getUnits())
 	{
@@ -205,20 +197,20 @@ void MagBotModule::onFrame()
 void MagBotModule::onSendText(std::string text)
 {
 	// Send the text to the game if it is not being processed.
-	Broodwar->sendText("%s", text.c_str());
+	BWAPI::Broodwar->sendText("%s", text.c_str());
 }
 
 void MagBotModule::onReceiveText(BWAPI::Player player, std::string text)
 {
 	// Parse the received text
-	Broodwar << player->getName() << " said \"" << text << "\"" << std::endl;
+	BWAPI::Broodwar << player->getName() << " said \"" << text << "\"" << std::endl;
 }
 
 void MagBotModule::onPlayerLeft(BWAPI::Player player)
 {
 	// Interact verbally with the other players in the game by
 	// announcing that the other player has left.
-	Broodwar->sendText("Goodbye %s!", player->getName().c_str());
+	BWAPI::Broodwar->sendText("Goodbye %s!", player->getName().c_str());
 }
 
 void MagBotModule::onNukeDetect(BWAPI::Position target)
@@ -227,12 +219,12 @@ void MagBotModule::onNukeDetect(BWAPI::Position target)
 	if (target)
 	{
 		// if so, print the location of the nuclear strike target
-		Broodwar << "Nuclear Launch Detected at " << target << std::endl;
+		BWAPI::Broodwar << "Nuclear Launch Detected at " << target << std::endl;
 	}
 	else
 	{
 		// Otherwise, ask other players where the nuke is!
-		Broodwar->sendText("Where's the nuke?");
+		BWAPI::Broodwar->sendText("Where's the nuke?");
 	}
 
 	// You can also retrieve all the nuclear missile targets using Broodwar->getNukeDots()!
@@ -294,7 +286,7 @@ void MagBotModule::onUnitRenegade(BWAPI::Unit unit)
 
 void MagBotModule::onSaveGame(std::string game_name)
 {
-	Broodwar << "The game was saved to \"" << game_name << "\"" << std::endl;
+	BWAPI::Broodwar << "The game was saved to \"" << game_name << "\"" << std::endl;
 }
 
 void MagBotModule::onUnitComplete(BWAPI::Unit unit)
@@ -306,32 +298,32 @@ void MagBotModule::drawTerrainData()
 	// iterate through all the base locations, and draw their outlines.
 	for (const auto & base_location : BWTA::getBaseLocations())
 	{
-		TilePosition p = base_location->getTilePosition();
+		BWAPI::TilePosition p = base_location->getTilePosition();
 
 		// draw outline of center location
-		Position left_top(p.x * TILE_SIZE, p.y * TILE_SIZE);
-		Position right_bottom(left_top.x + 4 * TILE_SIZE, left_top.y + 3 * TILE_SIZE);
-		Broodwar->drawBoxMap(left_top, right_bottom, Colors::Blue);
+		BWAPI::Position left_top(p.x * TILE_SIZE, p.y * TILE_SIZE);
+		BWAPI::Position right_bottom(left_top.x + 4 * TILE_SIZE, left_top.y + 3 * TILE_SIZE);
+		BWAPI::Broodwar->drawBoxMap(left_top, right_bottom, BWAPI::Colors::Blue);
 
 		// draw a circle at each mineral patch
 		for (const auto & mineral : base_location->getStaticMinerals())
 		{
-			Broodwar->drawCircleMap(mineral->getInitialPosition(), 30, Colors::Cyan);
+			BWAPI::Broodwar->drawCircleMap(mineral->getInitialPosition(), 30, BWAPI::Colors::Cyan);
 		}
 
 		// draw the outlines of vespene geysers
 		for (const auto & geyser : base_location->getGeysers())
 		{
-			TilePosition p1 = geyser->getInitialTilePosition();
-			Position left_top1(p1.x * TILE_SIZE, p1.y * TILE_SIZE);
-			Position right_bottom1(left_top1.x + 4 * TILE_SIZE, left_top1.y + 2 * TILE_SIZE);
-			Broodwar->drawBoxMap(left_top1, right_bottom1, Colors::Orange);
+			BWAPI::TilePosition p1 = geyser->getInitialTilePosition();
+			BWAPI::Position left_top1(p1.x * TILE_SIZE, p1.y * TILE_SIZE);
+			BWAPI::Position right_bottom1(left_top1.x + 4 * TILE_SIZE, left_top1.y + 2 * TILE_SIZE);
+			BWAPI::Broodwar->drawBoxMap(left_top1, right_bottom1, BWAPI::Colors::Orange);
 		}
 
 		// if this is an island expansion, draw a yellow circle around the base location
 		if (base_location->isIsland())
 		{
-			Broodwar->drawCircleMap(base_location->getPosition(), 80, Colors::Yellow);
+			BWAPI::Broodwar->drawCircleMap(base_location->getPosition(), 80, BWAPI::Colors::Yellow);
 		}
 	}
 
@@ -342,16 +334,20 @@ void MagBotModule::drawTerrainData()
 		BWTA::Polygon p = region->getPolygon();
 		for (size_t j = 0; j < p.size(); ++j)
 		{
-			Position point1 = p[j];
-			Position point2 = p[(j + 1) % p.size()];
-			Broodwar->drawLineMap(point1, point2, Colors::Green);
+			BWAPI::Position point1 = p[j];
+			BWAPI::Position point2 = p[(j + 1) % p.size()];
+			BWAPI::Broodwar->drawLineMap(point1, point2, BWAPI::Colors::Green);
 		}
 		// visualize the chokepoints with red lines
 		for (auto const & chokepoint : region->getChokepoints())
 		{
-			Position point1 = chokepoint->getSides().first;
-			Position point2 = chokepoint->getSides().second;
-			Broodwar->drawLineMap(point1, point2, Colors::Red);
+			BWAPI::Position point1 = chokepoint->getSides().first;
+			BWAPI::Position point2 = chokepoint->getSides().second;
+			BWAPI::Broodwar->drawLineMap(point1, point2, BWAPI::Colors::Red);
+
+			int chokepoint_radius = (int)(chokepoint->getWidth() / 2);
+			BWAPI::Broodwar->drawCircleMap(chokepoint->getCenter(), chokepoint_radius, BWAPI::Colors::Teal, false);
+
 		}
 	}
 }

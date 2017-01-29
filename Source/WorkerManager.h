@@ -2,6 +2,8 @@
 
 #include <BWAPI.h>
 #include "Worker.h"
+#include "BuildingManager.h"
+#include <stdint.h>
 
 namespace MagBot {
 
@@ -9,35 +11,41 @@ namespace MagBot {
 	{
 		Worker _worker;
 
+		void handleMineralWorkers();
+		void handleGasWorkers();
+		void handleIdleWorkers();
+
 	public:
 		WorkerManager();
 		~WorkerManager();
 
 		void update();
-		void updateWorkerTask();
+		void updateWorkerCount();
 		
-		BWAPI::Unit getBuilder();
+		BWAPI::Unit getBuilder(Building & building);
 		BWAPI::Unit getBuilderClosestTo(BWAPI::TilePosition tile_position);
-		bool build(BWAPI::UnitType unit_type);
+		BWAPI::Unit getClosestDepot(BWAPI::Unit worker);
+
+		BWAPI::Unit getGasWorker(BWAPI::Unit refinery);
 
 		// TODO add handling for vespene gas max workers count (optimal 3)
 		// TODO add handling for mineral max workers per mineral patch (optimal 1.5 to 2-3)
 
-		void showDebugWorkerInfo(BWAPI::Unit unit);
+		void setWorkerScout(BWAPI::Unit worker);
+
+		void showDebugWorkerInfo(const BWAPI::Unit & worker);
 
 		static WorkerManager & Instance();
 
+		std::string getWorkerTaskName(BWAPI::Unit worker);
+
 		//void addWorker();
 		//void removeWorker()
-		//void freeWorker()
+		void setWorkerFree(BWAPI::Unit worker);
 		
 		//bool exists()
 
-		//void finishedWithWorker(BWAPI::Unit unit);
 		//bool isWorkerScout(BWAPI::Unit worker);
-
-		void handleMineralWorkers(BWAPI::Unit unit);
-		void handleIdleWorkers(BWAPI::Unit unit);
 	};
 
 }

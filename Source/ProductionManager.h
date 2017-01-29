@@ -5,6 +5,7 @@
 #include "BuildingManager.h"
 #include "BuildOrder.h"
 #include "WorkerManager.h"
+#include "StrategyManager.h"
 
 namespace MagBot
 {

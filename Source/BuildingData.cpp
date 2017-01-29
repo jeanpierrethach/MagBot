@@ -8,7 +8,7 @@ BuildingData::BuildingData()
 
 void BuildingData::removeBuilding(const Building & b)
 {
-	auto & building = std::find(_buildings.begin(), _buildings.end(), b);
+	const auto & building = std::find(_buildings.begin(), _buildings.end(), b);
 
 	if (building != _buildings.end())
 	{
@@ -28,7 +28,7 @@ void BuildingData::addBuilding(const Building & building)
 
 bool BuildingData::isBeingBuilt(BWAPI::UnitType unit_type)
 {
-	for (auto & building : _buildings)
+	for (const auto & building : _buildings)
 	{
 		if (building._unit_type == unit_type)
 		{

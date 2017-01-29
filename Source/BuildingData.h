@@ -17,8 +17,8 @@ namespace MagBot
 		// TODO add more info, position, desiredposition, etc..
 
 		BWAPI::UnitType _unit_type;
-		BWAPI::Unit _building_unit;
-		BWAPI::Unit _builder_unit;
+		BWAPI::Unit _building_unit; // Unit that represents the building
+		BWAPI::Unit _builder_unit; // Unit that builds the building
 		size_t _status;
 
 		bool _under_construction;
@@ -59,10 +59,10 @@ namespace MagBot
 
 		std::vector<Building> & getBuildings();
 
-		void addBuilding(const Building & b);
+		void addBuilding(const Building & building);
 		void removeBuilding(const Building & b);
 		void removeBuildings(const std::vector<Building> & buildings);
-		bool isBeingBuilt(BWAPI::UnitType type);
+		bool isBeingBuilt(BWAPI::UnitType unit_type);
 	};
 
 }

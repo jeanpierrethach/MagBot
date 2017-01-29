@@ -89,14 +89,7 @@ const BWAPI::UpgradeType & MetaType::getUpgradeType() const
 
 int MetaType::supplyRequired()
 {
-	if (isUnit())
-	{
-		return _unit_type.supplyRequired();
-	}
-	else
-	{
-		return 0;
-	}
+	return isUnit() ? _unit_type.supplyRequired() : 0;
 }
 
 int MetaType::mineralPrice() const

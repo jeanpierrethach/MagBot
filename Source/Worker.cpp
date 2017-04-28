@@ -57,6 +57,8 @@ void Worker::update()
 
 // *************	UNDER WORK (Cooperative pathfinding + queue system algorithms    ********************************
 
+	// TODO add linemap from pos to assigned mineral patch (queue)
+
 	// TODO calculate best mineral patch to assign for worker when returned cargo, calculate by distance, time travel, speed, etc..
 	/*
 	for (auto & worker : _workers)
@@ -104,8 +106,6 @@ void Worker::update()
 	*/
 // ************************************************************************************************************************
 
-	removeDestroyedWorker();
-
 	if (Config::DebugInfo::DrawAllInfo)
 	{
 		BWAPI::Broodwar->drawTextScreen(0, 0, "%s total : %d", 
@@ -118,7 +118,7 @@ void Worker::update()
 		}
 		else
 		{
-			int total_at_depot = 0;
+			uint8_t total_at_depot {0};
 			for (auto & depot : _depot_worker_count)
 			{
 				total_at_depot += depot.second;			
@@ -134,7 +134,7 @@ void Worker::update()
 		}
 		else
 		{
-			int total_on_gas = 0;
+			uint8_t total_on_gas {0};
 			for (auto & refinery : _refinery_worker_count)
 			{
 				total_on_gas += refinery.second;
@@ -145,16 +145,13 @@ void Worker::update()
 	}
 }
 
-void Worker::removeDestroyedWorker()
+void Worker::removeDestroyedWorker(BWAPI::Unit unit)
 {
-	for (const auto & unit : getWorkers())
-	{
-		if (!unit->exists())
-		{
-			clearPreviousTask(unit);
-			_workers.erase(unit);
-		}
-	}
+	if (!unit)
+		return;
+
+	clearPreviousTask(unit);
+	_workers.erase(unit);
 }
 
 enum Worker::WorkerTask Worker::getWorkerTask(BWAPI::Unit unit)
@@ -347,12 +344,12 @@ BWAPI::Unit Worker::getWorkerResource(BWAPI::Unit unit)
 	return nullptr;
 }
 
-int Worker::getNumAssignedWorkers(BWAPI::Unit unit)
+uint8_t Worker::getNumAssignedDepotWorkers(BWAPI::Unit unit)
 {
 	if (!unit)
 		return 0;
 
-	std::map<BWAPI::Unit, int>::iterator it;
+	std::map<BWAPI::Unit, uint8_t>::iterator it;
 
 	if (unit->getType().isResourceDepot())
 	{
@@ -363,7 +360,6 @@ int Worker::getNumAssignedWorkers(BWAPI::Unit unit)
 			return it->second;
 		}
 	}
-	
 	return 0;
 }
 
@@ -388,6 +384,7 @@ uint8_t Worker::getNumAssignedRefineryWorkers(BWAPI::Unit unit)
 			_refinery_worker_count[unit] = 0;
 		}
 	}
+	return 0;
 }
 
 // TODO rebalance function

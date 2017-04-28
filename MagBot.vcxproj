@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -14,6 +14,7 @@
     <ProjectGuid>{2E63AE74-758A-4607-9DE4-D28E814A6E13}</ProjectGuid>
     <RootNamespace>ExampleAIModule</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -24,7 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -90,16 +91,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\ReaverShuttleMicro.cpp" />
+    <ClCompile Include="Source\TODO later on\ReaverShuttleMicro.cpp" />
     <ClCompile Include="Source\BuildingData.cpp" />
     <ClCompile Include="Source\MetaType.cpp" />
     <ClCompile Include="Source\ProductionManager.cpp" />
-    <ClCompile Include="Source\Pathfinder.cpp" />
+    <ClCompile Include="Source\TODO later on\Pathfinder.cpp" />
     <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
     <ClCompile Include="Source\PylonData.cpp" />
     <ClCompile Include="Source\Common.cpp" />
-    <ClCompile Include="Source\ConstructorManager.cpp" />
+    <ClCompile Include="Source\TODO later on\ConstructorManager.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
     <ClCompile Include="Source\BuildOrder.cpp" />
     <ClCompile Include="Source\BuildOrderQueue.cpp" />
@@ -109,20 +110,21 @@
     <ClCompile Include="Source\WorkerManager.cpp" />
     <ClCompile Include="Source\Worker.cpp" />
     <ClCompile Include="Source\StrategyManager.cpp" />
-    <ClCompile Include="Source\Squad.cpp" />
+    <ClCompile Include="Source\SquadData.cpp" />
     <ClCompile Include="Source\SquadManager.cpp" />
+    <ClCompile Include="Source\Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\ReaverShuttleMicro.h" />
+    <ClInclude Include="Source\TODO later on\ReaverShuttleMicro.h" />
     <ClInclude Include="Source\BuildingData.h" />
     <ClInclude Include="Source\MetaType.h" />
     <ClInclude Include="Source\ProductionManager.h" />
-    <ClInclude Include="Source\Pathfinder.h" />
+    <ClInclude Include="Source\TODO later on\Pathfinder.h" />
     <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\BuildingManager.h" />
     <ClInclude Include="Source\PylonData.h" />
     <ClInclude Include="Source\Common.h" />
-    <ClInclude Include="Source\ConstructorManager.h" />
+    <ClInclude Include="Source\TODO later on\ConstructorManager.h" />
     <ClInclude Include="Source\ScoutManager.h" />
     <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\BuildOrderQueue.h" />
@@ -131,8 +133,9 @@
     <ClInclude Include="Source\WorkerManager.h" />
     <ClInclude Include="Source\Worker.h" />
     <ClInclude Include="Source\StrategyManager.h" />
-    <ClInclude Include="Source\Squad.h" />
+    <ClInclude Include="Source\SquadData.h" />
     <ClInclude Include="Source\SquadManager.h" />
+    <ClInclude Include="Source\Unit.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

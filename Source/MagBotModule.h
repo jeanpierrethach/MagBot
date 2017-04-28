@@ -5,6 +5,7 @@
 #include "GameCommander.h"
 #include "BuildingManager.h"
 #include "ProductionManager.h"
+#include "SquadManager.h"
 
 #include "Config.h"
 

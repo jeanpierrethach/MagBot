@@ -61,7 +61,7 @@ void ScoutManager::update()
 
 				// if nothing prevents it, attack the target
 				_worker_scout->move(BWAPI::Position(start_location_tilepos));
-	
+				// TODO if found enemy base location
 				return;
 			}
 		}

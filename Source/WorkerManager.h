@@ -35,6 +35,8 @@ namespace MagBot {
 
 		void showDebugWorkerInfo(const BWAPI::Unit & worker);
 
+		void onUnitDestroy(BWAPI::Unit unit);
+
 		static WorkerManager & Instance();
 
 		std::string getWorkerTaskName(BWAPI::Unit worker);

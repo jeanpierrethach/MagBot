@@ -27,6 +27,8 @@ void MagBotModule::onStart()
 		BWAPI::Broodwar->printf("Hello! I am %s, written by %s", Config::BotInfo::BotName.c_str(), Config::BotInfo::Author.c_str());
 	}
 
+	// TODO initialize information manager
+
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
 	// TODO may remove this
@@ -104,6 +106,8 @@ void MagBotModule::onFrame()
 	ProductionManager::Instance().update();
 
 	BuildingManager::Instance().update();
+
+	SquadManager::Instance().update();
 
 	_game_commander.update();
 
@@ -240,6 +244,7 @@ void MagBotModule::onUnitEvade(BWAPI::Unit unit)
 
 void MagBotModule::onUnitShow(BWAPI::Unit unit)
 {
+	// TODO add onUnitShow in info manager (buildings)
 }
 
 void MagBotModule::onUnitHide(BWAPI::Unit unit)
@@ -263,6 +268,10 @@ void MagBotModule::onUnitCreate(BWAPI::Unit unit)
 
 void MagBotModule::onUnitDestroy(BWAPI::Unit unit)
 {
+	// TODO add onUnitDestroy in info manager (enemy buildings)
+	WorkerManager::Instance().onUnitDestroy(unit);
+	BuildingManager::Instance().onUnitDestroy(unit);
+	SquadManager::Instance().onUnitDestroy(unit);
 }
 
 void MagBotModule::onUnitMorph(BWAPI::Unit unit)
@@ -332,7 +341,7 @@ void MagBotModule::drawTerrainData()
 	{
 		// draw the polygon outline of it in green
 		BWTA::Polygon p = region->getPolygon();
-		for (size_t j = 0; j < p.size(); ++j)
+		for (size_t j {0}; j < p.size(); ++j)
 		{
 			BWAPI::Position point1 = p[j];
 			BWAPI::Position point2 = p[(j + 1) % p.size()];

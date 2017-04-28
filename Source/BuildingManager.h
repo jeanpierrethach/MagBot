@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "BuildingData.h"
 #include "WorkerManager.h"
+#include <stdint.h>
 
 namespace MagBot
 {
@@ -16,11 +17,11 @@ namespace MagBot
 
 		// TODO better way for this
 		BWAPI::Unitset _all_buildings;
-		std::map<BWAPI::UnitType, int> _buildings_owned_map;
-		std::map<BWAPI::UnitType, int> _buildings_destroyed_map;
-		int _building_destroyed = 0;
+		std::map<BWAPI::UnitType, uint8_t> _buildings_owned_map;
+		std::map<BWAPI::UnitType, uint8_t> _buildings_destroyed_map;
+		uint16_t _building_destroyed;
 
-		void removeBuildingsDestroyed();
+		void removeBuildingDestroyed(BWAPI::Unit unit);
 		void showAllBuildings();
 		void showDebugBuildings();
 		void showBuildTimeBuildings();
@@ -43,6 +44,8 @@ namespace MagBot
 
 		int getReservedMinerals();
 		int getReservedGas();
+
+		void onUnitDestroy(BWAPI::Unit unit);
 
 		static BuildingManager & Instance();
 	};

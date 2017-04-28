@@ -17,6 +17,17 @@ BuildingManager & BuildingManager::Instance()
 	return instance;
 }
 
+void BuildingManager::onUnitDestroy(BWAPI::Unit unit)
+{
+	if (!unit)
+		return;
+
+	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self())
+	{
+		removeBuildingDestroyed(unit);
+	}
+}
+
 void BuildingManager::update()
 {
 	validateWorkersAndBuildings();          // check to see if assigned workers have died en route or while constructing
@@ -68,7 +79,6 @@ void BuildingManager::showAllBuildings()
 			}
 		}
 	}
-	removeBuildingsDestroyed();
 }
 
 void BuildingManager::showDebugBuildings()
@@ -83,43 +93,42 @@ void BuildingManager::showDebugBuildings()
 	}
 }
 
-void BuildingManager::removeBuildingsDestroyed()
+void BuildingManager::removeBuildingDestroyed(BWAPI::Unit unit)
 {
-	for (const auto & unit : _all_buildings)
-	{
-		if (!unit->exists())
-		{	
-			_all_buildings.erase(unit);
+	if (!unit)
+		return;
 
-			BWAPI::UnitType unit_type = unit->getType();
-			--_buildings_owned_map[unit_type];
-			++_buildings_destroyed_map[unit_type];
-			++_building_destroyed;
-		}
-	}
+	_all_buildings.erase(unit);
+
+	BWAPI::UnitType unit_type = unit->getType();
+	--_buildings_owned_map[unit_type];
+	++_buildings_destroyed_map[unit_type];
+	++_building_destroyed;
 }
 
 void BuildingManager::showBuildTimeBuildings()
 {
-	int building_under_construction = 0;
+	uint8_t building_count {0};
+
 	for (const auto & building : _buildings.getBuildings())
 	{
-		if (building._under_construction)
+		// TODO FIX display when, example : 3 pylons are being queued but 2 only built since one of them couldn't find a location 
+		if (building._status == BuildingStatus::UNDERCONSTRUCTION)
 		{
-			BWAPI::Broodwar->drawTextScreen(0, (building_under_construction * 10) + 70, "%s : %d",
+			BWAPI::Broodwar->drawTextScreen(0, (building_count * 10) + 70, "%s : %d",
 				building._unit_type.c_str(), building._building_unit->getRemainingBuildTime());
 
-			++building_under_construction;
+			++building_count;
 		}
 	}
-	BWAPI::Broodwar->drawTextScreen(0, 60, "Buildings in construction: %d", building_under_construction);
+	BWAPI::Broodwar->drawTextScreen(0, 60, "Buildings in construction: %d", building_count);
 }
 
 void BuildingManager::showOwnedOrDestroyedBuildings()
 {
-	std::map<BWAPI::UnitType, int>::const_iterator it;
-	std::map<BWAPI::UnitType, int>::const_iterator it2;
-	int count = 0;
+	std::map<BWAPI::UnitType, uint8_t>::const_iterator it;
+	std::map<BWAPI::UnitType, uint8_t>::const_iterator it2;
+	uint8_t count {0};
 
 	for (it = _buildings_owned_map.begin(); it != _buildings_owned_map.end(); ++it)
 	{

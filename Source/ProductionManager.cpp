@@ -33,7 +33,7 @@ void ProductionManager::setBuildOrder(const BuildOrder & build_order)
 {
 	_queue.clearAll();
 
-	for (size_t i(0); i < build_order.size(); ++i)
+	for (size_t i {0}; i < build_order.size(); ++i)
 	{
 		_queue.queueAsLowestPriority(build_order[i], true);
 	}
@@ -49,10 +49,10 @@ void ProductionManager::update()
 		if (depot->getType().isResourceDepot())
 		{
 			BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
-			if (!depot->isTraining() && canMakeNow(depot, MetaType(probe)) 
+			if (!depot->isTraining() && canMakeNow(depot, MetaType{probe})
 				&& BWAPI::Broodwar->self()->completedUnitCount(probe) < 21) // TODO modify if want to expand
 			{
-				_queue.queueAsHighestPriority(MetaType(probe), false);
+				_queue.queueAsHighestPriority(MetaType{probe}, false);
 			}
 		}
 	}
@@ -66,24 +66,24 @@ void ProductionManager::update()
 			/*BWAPI::UnitType cyber = BWAPI::UnitTypes::Protoss_Cybernetics_Core;
 			if (BWAPI::Broodwar->self()->completedUnitCount(cyber) == 0) //!_queue.hasItem(cyber) && 
 			{
-				_queue.queueAsHighestPriority(MetaType(cyber), true);
+				_queue.queueAsHighestPriority(MetaType{cyber}, true);
 			}*/
 
 			BWAPI::UnitType dragoon = BWAPI::UnitTypes::Protoss_Dragoon;
-			if (!building->isTraining() && canMakeNow(building, MetaType(dragoon)))
+			if (!building->isTraining() && canMakeNow(building, MetaType{dragoon}))
 			{
-				static int lastChecked = 0;
+				static int lastChecked {0};
 
 				if (_queue.isEmpty())
 				{
-					_queue.queueAsLowestPriority(MetaType(dragoon), false);
+					_queue.queueAsLowestPriority(MetaType{dragoon}, false);
 				}
 				// TODO modify value/store for strategies + modify 400 into the exact amount to a pylon constructing time?
 				// or construct pylon with an offset depending on current used supply.
 				else if (lastChecked + 400 < BWAPI::Broodwar->getFrameCount())
 				{
 					lastChecked = BWAPI::Broodwar->getFrameCount();
-					_queue.queueAsLowestPriority(MetaType(dragoon), false);
+					_queue.queueAsLowestPriority(MetaType{dragoon}, false);
 				}			
 			}
 			// TODO move constructing pylon outside, be independent of any units, should be checking for supply used + an offset
@@ -91,7 +91,7 @@ void ProductionManager::update()
 			else
 			{
 				//BWAPI::UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
-				static int lastChecked = 0;
+				static int lastChecked {0};
 				BWAPI::Error lastErr = BWAPI::Broodwar->getLastError();
 
 				// If we are supply blocked and haven't tried constructing more recently
@@ -193,7 +193,7 @@ BWAPI::Unit ProductionManager::getClosestUnitToPosition(const BWAPI::Unitset & u
 	}
 
 	BWAPI::Unit closest_unit = nullptr;
-	int min_dist {0};
+	int min_dist {9999};
 
 	for (const auto & unit : units)
 	{
@@ -277,7 +277,7 @@ bool ProductionManager::canMakeNow(BWAPI::Unit producer, MetaType meta_type)
 // TODO pass queue in parameter?
 void ProductionManager::showProductionQueue()
 {
-	for (size_t i(0); i < _queue.size(); ++i)
+	for (size_t i {0}; i < _queue.size(); ++i)
 	{
 		if (_queue[i].meta_type.isUnit())
 		{

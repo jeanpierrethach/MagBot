@@ -85,7 +85,7 @@ bool GameCommander::isAssigned(BWAPI::Unit unit) const
 BWAPI::Unit GameCommander::getClosestWorkerToTarget(BWAPI::Position target)
 {
 	BWAPI::Unit closest_unit = nullptr;
-	int closest_dist {0};
+	int closest_dist {9999};
 
 	// TODO fetch from container of workermanagement?
 	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())

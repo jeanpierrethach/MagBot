@@ -102,7 +102,7 @@ void WorkerManager::updateWorkerCount()
 BWAPI::Unit WorkerManager::getBuilder(Building & building)
 {
 	BWAPI::Unit closest_mining_worker = nullptr;
-	int closest_mining_distance {0};
+	int closest_mining_distance {9999};
 
 	for (const auto & worker : _worker.getWorkers())
 	{
@@ -137,7 +137,7 @@ BWAPI::Unit WorkerManager::getBuilder(Building & building)
 BWAPI::Unit WorkerManager::getBuilderClosestTo(BWAPI::TilePosition tile_position)
 {
 	BWAPI::Unit closest_mining_worker = nullptr;
-	int closest_mining_distance {0};
+	int closest_mining_distance {9999};
 
 	// find the closest unit to this one -> so find the worker which is the closest to the pylon
 	for (const auto & worker : _worker.getWorkers())
@@ -244,6 +244,7 @@ void WorkerManager::handleMineralWorkers()
 
 				if (!worker->gather(worker->getClosestUnit(BWAPI::Filter::IsMineralField)))
 				{
+					//TODO send workers to next mineral lines
 					// If the call fails, then print the last error message
 					BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 				}
@@ -259,11 +260,10 @@ void WorkerManager::handleGasWorkers()
 		// if that unit is a refinery
 		if (unit->getType().isRefinery() && unit->isCompleted())
 		{
-			// get the number of workers currently assigned to it
 			uint8_t num_assigned = _worker.getNumAssignedRefineryWorkers(unit);
 
 			// if it's less than we want it to be, fill up
-			for (uint8_t i = 0; i < (3 - num_assigned); ++i)
+			for (uint8_t i {0}; i < (3 - num_assigned); ++i)
 			{
 				BWAPI::Unit gas_worker = getGasWorker(unit);
 				if (gas_worker)
@@ -308,7 +308,7 @@ void WorkerManager::handleIdleWorkers()
 BWAPI::Unit WorkerManager::getGasWorker(BWAPI::Unit refinery)
 {
 	BWAPI::Unit closest_worker = nullptr;	
-	int closest_distance {0};
+	int closest_distance {9999};
 
 	for (const auto & worker : _worker.getWorkers())
 	{
@@ -332,7 +332,7 @@ BWAPI::Unit WorkerManager::getGasWorker(BWAPI::Unit refinery)
 BWAPI::Unit WorkerManager::getClosestDepot(BWAPI::Unit worker)
 {
 	BWAPI::Unit closest_depot = nullptr;
-	int closest_distance {0};
+	int closest_distance {9999};
 
 	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
@@ -388,5 +388,16 @@ void WorkerManager::setWorkerFree(BWAPI::Unit worker)
 		{
 			_worker.setWorkerTask(worker, Worker::MINE, depot);
 		}
+	}
+}
+
+void WorkerManager::onUnitDestroy(BWAPI::Unit unit)
+{
+	if (!unit)
+		return;
+
+	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self())
+	{
+		_worker.removeDestroyedWorker(unit);
 	}
 }

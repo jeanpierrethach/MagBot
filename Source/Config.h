@@ -12,8 +12,8 @@ namespace Config
 
 	namespace BWAPIOptions
 	{
-		extern int SetLocalSpeed;
-		extern int SetFrameSkip;
+		extern unsigned short int SetLocalSpeed;
+		extern unsigned short int SetFrameSkip;
 		extern bool EnableUserInput;
 		extern bool EnableCompleteMapInformation;
 	}

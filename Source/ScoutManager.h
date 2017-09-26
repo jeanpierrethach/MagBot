@@ -3,11 +3,12 @@
 #include <BWAPI.h>
 #include "WorkerManager.h"
 #include <BWTA.h>
+#include "InformationManager.h"
 
 namespace MagBot
 {
 
-	class ScoutManager
+	class ScoutManager : InformationManager
 	{
 
 		BWAPI::Unit	_worker_scout;

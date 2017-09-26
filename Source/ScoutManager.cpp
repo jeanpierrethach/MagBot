@@ -31,13 +31,20 @@ void ScoutManager::update()
 		for (BWTA::BaseLocation * start_location : BWTA::getStartLocations())
 		{
 			BWAPI::TilePosition start_location_tilepos = start_location->getTilePosition();
-			// if we haven't explored it yet
+			InformationManager::setStartingBaseLocation(BWAPI::Position(start_location->getPosition()));
 			if (!BWAPI::Broodwar->isExplored(start_location_tilepos))
 			{
 				
 				if (!_worker_scout || !start_location_tilepos.isValid())
 				{
 					return;
+				}
+
+				// todo work on a fix
+				if (_worker_scout->isUnderAttack())
+				{
+					BWAPI::Broodwar->sendText("Found enemy base location");
+					InformationManager::setEnemyStartingBaseLocation(BWAPI::Position(start_location->getPosition()));
 				}
 
 				// if we have issued a command to this unit already this frame, ignore this one
@@ -61,12 +68,13 @@ void ScoutManager::update()
 
 				// if nothing prevents it, attack the target
 				_worker_scout->move(BWAPI::Position(start_location_tilepos));
-				// TODO if found enemy base location
+				
 				return;
 			}
 		}
 	}
 }
+
 
 
 ScoutManager & ScoutManager::Instance()

@@ -4,6 +4,7 @@
 #include "Worker.h"
 #include "BuildingManager.h"
 #include <stdint.h>
+#include <deque>
 
 namespace MagBot {
 
@@ -31,6 +32,8 @@ namespace MagBot {
 		// TODO add handling for vespene gas max workers count (optimal 3)
 		// TODO add handling for mineral max workers per mineral patch (optimal 1.5 to 2-3)
 
+		void optimizeWorkersMining();
+
 		void setWorkerScout(BWAPI::Unit worker);
 
 		void showDebugWorkerInfo(const BWAPI::Unit & worker);
@@ -41,13 +44,7 @@ namespace MagBot {
 
 		std::string getWorkerTaskName(BWAPI::Unit worker);
 
-		//void addWorker();
-		//void removeWorker()
 		void setWorkerFree(BWAPI::Unit worker);
-		
-		//bool exists()
-
-		//bool isWorkerScout(BWAPI::Unit worker);
 	};
 
 }

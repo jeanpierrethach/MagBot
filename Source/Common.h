@@ -8,6 +8,3 @@
 
 #include "Config.h"
 #include <BWAPI.h>
-
-// TODO remove unused includes
-

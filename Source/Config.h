@@ -40,10 +40,4 @@ namespace Config
 		extern bool DrawWorkerTaskInfo;
 		extern bool DrawProductionQueue;
 	}
-
-	//namespace config file
-	//namespace strategy
-	//namespace micro
-	//namespace macro
-	//namespace tools
 }

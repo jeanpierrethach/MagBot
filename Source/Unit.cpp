@@ -2,10 +2,10 @@
 
 using namespace MagBot;
 
-void Unit::setPosition(BWAPI::Position pos)
+void Unit::setPosition(BWAPI::Position pos, bool b)
 {
 	_pos = pos;
-	_is_position_set = true;
+	_is_position_set = b;
 }
 
 BWAPI::Position Unit::getPosition()

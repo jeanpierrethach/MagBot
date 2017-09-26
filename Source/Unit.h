@@ -22,7 +22,7 @@ namespace MagBot
 		{
 		}
 
-		void setPosition(BWAPI::Position pos);
+		void setPosition(BWAPI::Position pos, bool b);
 		BWAPI::Position getPosition();
 
 		bool isPositionSet();

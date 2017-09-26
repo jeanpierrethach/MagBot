@@ -21,12 +21,9 @@ void SquadData::addSquad(const Squad & squad)
 	_squads.push_back(squad);
 }
 
-// void SquadData::assignUnitTo() // BWAPI::Unit unit, const Squad & squad
 
-void SquadData::findUnitandAssign(Squad & squad) // BWAPI::Unit unit, const Squad & squad
+void SquadData::findUnitandAssign(Squad & squad)
 {
-	// TODO if squad size > x then return;
-
 	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (!unit->exists() || !unit->isCompleted())
@@ -37,8 +34,9 @@ void SquadData::findUnitandAssign(Squad & squad) // BWAPI::Unit unit, const Squa
 		if (unit->getType() == dragoon && !squad.containsUnit(unit))
 		{
 			if (!squad.hasLeader())
-				// TODO fix setLeader, it is setting a new one?
+			{
 				squad.setLeader(unit);
+			}
 			Unit u;
 			squad.addUnit(unit, u);
 		}

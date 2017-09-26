@@ -55,6 +55,11 @@ void BuildingManager::update()
 			showOwnedOrDestroyedBuildings();
 		}
 	}
+
+	BWAPI::Broodwar->drawTextScreen(360, 130, "Mineral Rate %f", _inf_manager.calculateMineralRate());
+	BWAPI::Broodwar->drawTextScreen(360, 140, "Gas Rate %f", _inf_manager.calculateGasRate());
+	BWAPI::Broodwar->drawTextScreen(360, 150, "Minerate Rate/sec %d", BWAPI::Broodwar->getLatency());
+	BWAPI::Broodwar->drawTextScreen(360, 160, "Gas Rate/sec");
 }
 
 void BuildingManager::showAllBuildings()
@@ -164,7 +169,6 @@ void BuildingManager::validateWorkersAndBuildings()
 	}
 
 	_buildings.removeBuildings(to_remove_buildings);
-	//removeBuildings(to_remove_buildings);
 }
 
 // STEP 2:
@@ -201,8 +205,6 @@ void BuildingManager::assignWorkersToUnassignedBuildings()
 
 			if (!test_location.isValid())
 			{
-				// TODO FIX BUILDER ?? and mining
-				// TODO may not need this below??
 				WorkerManager::Instance().setWorkerFree(worker_to_assign);
 				b._builder_unit = nullptr;
 				continue;
@@ -222,13 +224,11 @@ void BuildingManager::constructAssignedBuildings()
 		{
 			continue;
 		}
-		// if the assigned worker isn't constructing or moving to build
+
 		if (!b._builder_unit->isConstructing())
 		{
 		    if (b._build_command_given)
 			{
-				// tell worker manager the unit we had is not needed now, since we might not be able
-				// to get a valid location soon enough
 				WorkerManager::Instance().setWorkerFree(b._builder_unit);
 
 				b._builder_unit = nullptr;
@@ -244,35 +244,28 @@ void BuildingManager::constructAssignedBuildings()
 	}
 }
 
-// TODO if worker dies when a building was assigned to him and cannot build it anymore, what happens? select another one?
-// what happens with the reserved resources, etc..
-
 // STEP 4:
 void BuildingManager::checkForStartedConstruction()
 {
-	// for each building unit which is being constructed
 	for (auto & building_started : BWAPI::Broodwar->self()->getUnits())
 	{
-		// filter out units which aren't buildings under construction
 		if (!building_started->getType().isBuilding() || !building_started->isBeingConstructed())
 		{
 			continue;
 		}
-		// check all our building status objects to see if we have a match and if we do, update it
+
 		for (auto & b : _buildings.getBuildings())
 		{
 			if (b._status != BuildingStatus::ASSIGNED)
 			{
 				continue;
 			}
-			// check if the positions match
+
 			if (b._final_position == building_started->getTilePosition())
 			{
-				// the resources should now be spent, so unreserve them
 				_reservedMinerals -= building_started->getType().mineralPrice();
 				_reservedGas -= building_started->getType().gasPrice();
 
-				// flag it as started and set the buildingUnit
 				b._under_construction = true;
 				b._building_unit = building_started;
 
@@ -299,26 +292,11 @@ void BuildingManager::checkForCompletedBuildings()
 		}
 		if (building._building_unit->isCompleted())
 		{
-			//WorkerManager::Instance().setWorkerFree(b._builder_unit);
 			to_remove_buildings.push_back(building);
 		}
 	}
 	_buildings.removeBuildings(to_remove_buildings);
-	//removeBuildings(to_remove_buildings);
 }
-
-/*void BuildingManager::removeBuildings(const std::vector<Building> & to_remove_buildings)
-{
-	for (const auto & building : to_remove_buildings)
-	{
-		const auto & it = std::find(_buildings.begin(), _buildings.end(), building);
-
-		if (it != _buildings.end())
-		{
-			_buildings.erase(it);
-		}
-	}
-}*/
 
 void BuildingManager::addBuildingTask(BWAPI::UnitType unit_type)
 {
@@ -329,7 +307,6 @@ void BuildingManager::addBuildingTask(BWAPI::UnitType unit_type)
 	building._status = BuildingStatus::UNASSIGNED;
 
 	_buildings.addBuilding(building);
-	//_buildings.push_back(building);
 }
 
 int BuildingManager::getReservedMinerals()

@@ -91,6 +91,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\InformationManager.cpp" />
+    <ClCompile Include="Source\DefenceManager.cpp" />
+    <ClCompile Include="Source\MineralNode.cpp" />
     <ClCompile Include="Source\TODO later on\ReaverShuttleMicro.cpp" />
     <ClCompile Include="Source\BuildingData.cpp" />
     <ClCompile Include="Source\MetaType.cpp" />
@@ -115,6 +118,9 @@
     <ClCompile Include="Source\Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\InformationManager.h" />
+    <ClInclude Include="Source\DefenceManager.h" />
+    <ClInclude Include="Source\MineralNode.h" />
     <ClInclude Include="Source\TODO later on\ReaverShuttleMicro.h" />
     <ClInclude Include="Source\BuildingData.h" />
     <ClInclude Include="Source\MetaType.h" />

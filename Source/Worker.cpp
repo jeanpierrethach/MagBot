@@ -7,10 +7,10 @@ Worker::Worker()
 	for (auto & unit : BWAPI::Broodwar->getAllUnits())
 	{
 		BWAPI::TilePosition base = BWAPI::Broodwar->self()->getStartLocation();
-		if (unit->getType() == BWAPI::UnitTypes::Resource_Mineral_Field 
+		if (unit->getType().isMineralField()
 			&& unit->getDistance(BWAPI::Position(base)) < 300)
 		{
-			_mineral_workers_count[unit] = 0;
+			_mineral_workers_count[unit];
 		}
 	}
 }
@@ -21,25 +21,25 @@ Worker::~Worker()
 
 void Worker::update()
 {
+	// detect mineral patch around x radius from starting base location
 	// TODO handle minerals workers with Queue system and cooperative pathfinding algorithms
 	for (auto & mineral_patch : _mineral_workers_count)
 	{
 		BWAPI::Broodwar->drawTextMap(mineral_patch.first->getPosition(), "#%d", mineral_patch.first->getID());
 		if (mineral_patch.first->isBeingGathered())
 		{
+			// get unit that targets the mineral patch
+			//mineral_patch.second.push_back(BWAPI::Broodwar->get);
 			BWAPI::Broodwar->drawCircleMap(mineral_patch.first->getPosition(), 30, BWAPI::Colors::Black, true);
 		}
 	}
 	// step 1 calculate travel distance from position worker to mineral field assigned
-
 	// step 2 calculate time gathering
-
 	// step 3 calculate time travel distance from mineral patch to return cargo
 
 	// assign worker to closest mineral field related to its position
 	// no more than 2 workers on one mineral patch
-
-
+	
 	// position from worker to mineral field
 
 	// TODO try to shorten the verification of all units
@@ -211,13 +211,6 @@ void Worker::setWorkerTask(BWAPI::Unit worker, enum WorkerTask task, BWAPI::Unit
 		// set the refinery the worker is working on
 		_workers_refinery_map[worker] = worker_task;
 
-		//if (worker->isCarryingGas())
-		//{
-		//	worker->returnCargo();
-		//}
-		//else if (!worker->getPowerUp())
-		//{
-
 		if (!worker || !worker_task)
 		{
 			return;
@@ -240,12 +233,6 @@ void Worker::setWorkerTask(BWAPI::Unit worker, enum WorkerTask task, BWAPI::Unit
 		}
 
 		worker->rightClick(worker_task);
-
-		//if (!worker->gather(worker->getClosestUnit(BWAPI::Filter::IsRefinery)))
-		//{
-		//	BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
-		//}
-		//}
 	}
 }
 
@@ -285,14 +272,13 @@ void Worker::setWorkerTask(BWAPI::Unit worker, enum WorkerTask task, BWAPI::Unit
 	}
 }
 
-// TODO could optimize, instead of erase and insert, do copy/swap and insert
 void Worker::clearPreviousTask(BWAPI::Unit unit)
 {
 	if (!unit)
 		return;
 
 	WorkerTask previous_task = getWorkerTask(unit);
-	// TODO add MINE, etc.
+
 	if (previous_task == MINE)
 	{
 		// ********** IN PROGRESS ************
@@ -378,7 +364,6 @@ uint8_t Worker::getNumAssignedRefineryWorkers(BWAPI::Unit unit)
 		{
 			return it->second;
 		}
-		// otherwise, set completed refineries
 		else
 		{
 			_refinery_worker_count[unit] = 0;
@@ -386,42 +371,3 @@ uint8_t Worker::getNumAssignedRefineryWorkers(BWAPI::Unit unit)
 	}
 	return 0;
 }
-
-// TODO rebalance function
-void Worker::rebalanceWorkers()
-{
-
-}
-
-// Ignore the unit if it no longer exists
-// Make sure to include this block when handling any Unit pointer!
-/*if (!u->exists())
-continue;
-
-// Ignore the unit if it has one of the following status ailments
-if (u->isLockedDown() || u->isMaelstrommed() || u->isStasised())
-continue;
-
-// Ignore the unit if it is in one of the following states
-if (u->isLoaded() || !u->isPowered() || u->isStuck())
-continue;
-
-// Ignore the unit if it is incomplete or busy constructing
-if (!u->isCompleted() || u->isConstructing())
-continue;
-*/
-
-/*
-		// step 7: make pylons structure to keep track of their TilePosition, check if pylon exists 
-
-		// step 8: getPositionBuilding(Building -> Pylon)
-
-		// step 9: isBuildable() or canBuildHere()? 
-
-		// step 10: verify minerals, etc. then constructor -> build(gateway, posBuildable)
-
-		// step 11: send back to worker manager and set him to Mine Minerals enum?
-
-		// step 12: create update() function to the constructor and worker manager
-
-*/

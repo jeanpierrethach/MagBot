@@ -28,11 +28,6 @@ namespace MagBot
 		const MetaType & operator [] (const size_t & index) const;
 		MetaType & operator [] (const size_t & index);
 
-		// buildStructure or build
-		// buildUnit
-		// research
-		// upgrade
-		// TODO if structure doesn't exist/dependencies -> do the necessary to build them then build what you need
 	};
 
 }

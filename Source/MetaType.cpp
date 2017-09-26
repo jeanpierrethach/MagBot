@@ -6,12 +6,6 @@ MetaType::MetaType()
 {
 }
 
-/*MetaType::MetaType(const std::string & name)
-	: _type(MetaTypes::Default)
-	, _race(BWAPI::Races::None)
-{
-}*/
-
 MetaType::MetaType(BWAPI::UnitType unit_type)
 	: _unit_type(unit_type)
 	, _type(MetaTypes::UNIT)

@@ -33,21 +33,6 @@ namespace MagBot
 
 	class BuildOrderQueue
 	{
-		// TODO design the queue
-		/*
-			What I need :
-
-			a deque 
-			overload the [] operator for the deque
-			the deque will contain a struct of BuildOrderItem
-			a buildOrderItem consist of a MetaType, priority
-
-			the dequeue needs to be sorted after each insert
-			int variables for lowest and highest priorities
-			skippable items
-			could have multiple items of same priority
-		
-		*/
 		std::deque<BuildOrderItem> _queue;
 
 		int _lowest_priority;
@@ -69,9 +54,6 @@ namespace MagBot
 
 		void removeHighestPriorityItem();
 		void removeCurrentHighestPriorityItem();
-
-		//int getHighestPriorityValue();
-		//int getLowestPriorityValue();	
 		
 		const size_t size() const;
 		bool isEmpty();

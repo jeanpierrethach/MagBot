@@ -62,10 +62,8 @@ bool BuildOrderQueue::canSkipItem()
 
 void BuildOrderQueue::removeHighestPriorityItem()
 {
-	// remove the back element of the vector
 	_queue.pop_front();
 
-	// if the list is not empty, set the highest accordingly
 	_highest_priority = _queue.empty() ? 0 : _queue.front().priority;
 	_lowest_priority = _queue.empty() ? 0 : _lowest_priority;
 }
@@ -74,7 +72,6 @@ void BuildOrderQueue::removeCurrentHighestPriorityItem()
 {
 	_queue.erase(_queue.begin() + _num_skipped_items);
 
-	// if the list is not empty, set the highest accordingly
 	_highest_priority = _queue.empty() ? 0 : _queue.front().priority;
 	_lowest_priority = _queue.empty() ? 0 : _lowest_priority;
 }
@@ -87,7 +84,6 @@ void BuildOrderQueue::queueItem(BuildOrderItem build_order_item)
 		_lowest_priority = build_order_item.priority;
 	}
 
-	// push the item into the queue
 	if (build_order_item.priority >= _highest_priority)
 	{
 		_queue.push_front(build_order_item);
@@ -128,15 +124,3 @@ int BuildOrderQueue::getSkippedItemsCount() const
 {
 	return _num_skipped_items;
 }
-
-// TODO has item on queue (contains)
-/*bool BuildOrderQueue::hasItem(BWAPI::UnitType unit_type)
-{
-	const auto & item = std::find(_queue.begin(), _queue.end(), unit_type);
-
-	if (item != _queue.end())
-	{
-		return true;
-	}
-	return false;
-}*/

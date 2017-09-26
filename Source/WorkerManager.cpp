@@ -163,12 +163,6 @@ BWAPI::Unit WorkerManager::getBuilderClosestTo(BWAPI::TilePosition tile_position
 	return closest_mining_worker;
 }
 
-// TODO buildWithSpacing(int)
-// AND make sure there's is space between buildings (one tile)?
-// procedure: check if tileposition available and valid, if valid but occupied by building/unit, move unit or get tile size of building
-// then add extra tile for spacing then build.
-
-
 // TODO could add int or a type Priority for the BuildOrderManager
 /*bool WorkerManager::build(BWAPI::UnitType unit_type)
 {
@@ -224,15 +218,38 @@ void WorkerManager::showDebugWorkerInfo(const BWAPI::Unit & worker)
 	BWAPI::Broodwar->drawTextMap(pos, "%s", getWorkerTaskName(worker).c_str());
 }
 
+// TODO optimize mineral assignment per worker
+// steps: instantiate queues for each mineral nodes
+// set optimal nb of workers per mineral nodes
+// calculate optimal node for each worker (depending on others)
+// send worker to queue's node
+
+// TODO start of game, assign ids to mineral nodes next to starting base
+// then add into the vector of deques
+
+// loop over mineral nodes and for each id, insert an optimal worker for its node position
+// create mineral node class
+void WorkerManager::optimizeWorkersMining()
+{
+	/*
+	for (auto & mineralNode : _mineralNodes)
+	{
+
+	}*/
+
+	for (const auto & worker : _worker.getWorkers())
+	{
+		
+	}
+}
+
 // TODO call public function from worker.h
 void WorkerManager::handleMineralWorkers()
 {
 	for (const auto & worker : _worker.getWorkers())
 	{
-		if (worker->isIdle() && _worker.getWorkerTask(worker) == Worker::MINE) // TO UNCOMMENT:  // 
+		if (worker->isIdle() && _worker.getWorkerTask(worker) == Worker::MINE)
 		{
-			// Order workers carrying a resource to return them to the center,
-			// otherwise find a mineral patch to harvest.
 			if (worker->isCarryingMinerals())
 			{
 				worker->returnCargo();
@@ -257,12 +274,10 @@ void WorkerManager::handleGasWorkers()
 {
 	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
-		// if that unit is a refinery
 		if (unit->getType().isRefinery() && unit->isCompleted())
 		{
 			uint8_t num_assigned = _worker.getNumAssignedRefineryWorkers(unit);
 
-			// if it's less than we want it to be, fill up
 			for (uint8_t i {0}; i < (3 - num_assigned); ++i)
 			{
 				BWAPI::Unit gas_worker = getGasWorker(unit);
@@ -273,28 +288,13 @@ void WorkerManager::handleGasWorkers()
 			}
 		}
 	}
-
-	/*if (unit->isIdle() && _worker.getWorkerTask(unit) == Worker::GAS)
-	{
-		if (unit->isCarryingGas())
-		{
-			unit->returnCargo();
-		}
-		else if (!unit->getPowerUp())
-		{
-			if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsRefinery)))
-			{
-				Broodwar << Broodwar->getLastError() << std::endl;
-			}
-		}
-	}*/
 }
 
 void WorkerManager::handleIdleWorkers()
 {
 	for (const auto & worker : _worker.getWorkers())
 	{
-		if (_worker.getWorkerTask(worker) == Worker::IDLE) // (_worker.getWorkerTask(worker) == Worker::BUILD && worker->isIdle())
+		if (_worker.getWorkerTask(worker) == Worker::IDLE)
 		{
 			BWAPI::Unit depot = getClosestDepot(worker);
 			if (depot)
@@ -312,7 +312,6 @@ BWAPI::Unit WorkerManager::getGasWorker(BWAPI::Unit refinery)
 
 	for (const auto & worker : _worker.getWorkers())
 	{
-		// if miner is carrying minerals, don't select him
 		if (worker->isCarryingMinerals())
 			continue;
 

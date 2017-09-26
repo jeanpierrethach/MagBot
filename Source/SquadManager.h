@@ -9,16 +9,12 @@ namespace MagBot
 
 	class SquadManager
 	{
-		//std::map<std::string, SquadData> _squads;
 		SquadData _squads;
 		void cohesionUpdate(const Squad & squad);
 		void concaveSqUpdate(Squad & squad, std::vector<BWAPI::Position> v_target_location);
 		void concaveUpdate(const Squad & squad, BWAPI::Position target_location);
 
 		void dragoonKiteMicro(const Squad & squad);
-
-		void smartAttackMove(BWAPI::Unit unit, const BWAPI::Position & target_location);
-
 		void removeUnit(BWAPI::Unit unit);
 
 		double radToDeg(double angle);
@@ -28,12 +24,12 @@ namespace MagBot
 		void average(BWAPI::Position & pos, int size);
 		void normalize(BWAPI::Position & pos);
 
-		// void rebalanceSquads();
-		// void sendReinforcement(const Squad & squad);
-
 	public:
 		SquadManager();
 		~SquadManager();
+
+
+		virtual void smartAttackMove(BWAPI::Unit unit, const BWAPI::Position & target_location);
 
 		void update();	
 

@@ -5,30 +5,12 @@ using namespace MagBot;
 ProductionManager::ProductionManager()
 {
 	setBuildOrder(StrategyManager::Instance().getOpeningBuildOrder());
-
-	// TODO add(unit_type, nb)
-	// TODO MetaType m(" ", nb, " ", nb, " " nb);
-
-	// queueItem(BuildOrderItem b)?
-
-	// highest at the front, lowest at the back
-
-	// TODO more testing, put probe in priority with false and next item is different but blocking == true and blocking == false
-	/*_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Probe), true);
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Pylon), true);
-
-	// blocking used to skip item if cant build when reaching the item, keep true if cant skip item
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Nexus), false);
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Gateway), true);
-	_queue.queueAsLowestPriority(MetaType(BWAPI::UnitTypes::Protoss_Zealot), true);
-	*/
 }
 
 ProductionManager::~ProductionManager()
 {
 }
 
-// TODO add a bool for blocking or not, here and in the strategymanager.cpp / buildorder.h add() function
 void ProductionManager::setBuildOrder(const BuildOrder & build_order)
 {
 	_queue.clearAll();
@@ -41,16 +23,13 @@ void ProductionManager::setBuildOrder(const BuildOrder & build_order)
 
 void ProductionManager::update()
 {
-	// TODO create typedef? or using? for BWAPI::UnitTypes:: ...
-
-	// TODO move these strategies somewhere..
 	for (auto & depot : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (depot->getType().isResourceDepot())
 		{
 			BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
 			if (!depot->isTraining() && canMakeNow(depot, MetaType{probe})
-				&& BWAPI::Broodwar->self()->completedUnitCount(probe) < 21) // TODO modify if want to expand
+				&& BWAPI::Broodwar->self()->completedUnitCount(probe) < 21)
 			{
 				_queue.queueAsHighestPriority(MetaType{probe}, false);
 			}
@@ -61,14 +40,6 @@ void ProductionManager::update()
 	{
 		if (building->getType() == BWAPI::UnitTypes::Protoss_Gateway)
 		{
-			// TODO check dependencies towards goals, ex: need cyber core for dragoons if count == 0 then add to the queue, etc..
-			// add more or check when trying to make?
-			/*BWAPI::UnitType cyber = BWAPI::UnitTypes::Protoss_Cybernetics_Core;
-			if (BWAPI::Broodwar->self()->completedUnitCount(cyber) == 0) //!_queue.hasItem(cyber) && 
-			{
-				_queue.queueAsHighestPriority(MetaType{cyber}, true);
-			}*/
-
 			BWAPI::UnitType dragoon = BWAPI::UnitTypes::Protoss_Dragoon;
 			if (!building->isTraining() && canMakeNow(building, MetaType{dragoon}))
 			{
@@ -90,11 +61,9 @@ void ProductionManager::update()
 			// to change during the game depending on production rate/gathering rate/priority on mass production of unit,etc...
 			else
 			{
-				//BWAPI::UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
 				static int lastChecked {0};
 				BWAPI::Error lastErr = BWAPI::Broodwar->getLastError();
 
-				// If we are supply blocked and haven't tried constructing more recently
 				if (lastErr == BWAPI::Errors::Insufficient_Supply &&
 					lastChecked + 42 < BWAPI::Broodwar->getFrameCount() &&
 					BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::UnitTypes::Protoss_Pylon) == 0)
@@ -108,7 +77,6 @@ void ProductionManager::update()
 
 	manageBuildOrderQueue();
 
-	// TODO add config for other draws/debug in class
 	if (Config::DebugInfo::DrawProductionQueue)
 	{
 		showProductionQueue();
@@ -120,7 +88,6 @@ void ProductionManager::manageBuildOrderQueue()
 	if (_queue.isEmpty())
 		return;
 
-	// Changed from reference to not affect currentItem in queue when trying to getNextHighestPriorityItem()
 	BuildOrderItem current_item = _queue.getHighestPriorityItem();
 
 	while (!_queue.isEmpty())
@@ -162,9 +129,6 @@ void ProductionManager::manageBuildOrderQueue()
 BWAPI::Unit ProductionManager::getProducer(MetaType meta_type, BWAPI::Position closest_to)
 {
 	BWAPI::UnitType producer_type = meta_type.whatBuilds();
-	//BWAPI::Broodwar->sendText("Unittype %s", meta_type.getUnitType().c_str());
-	//BWAPI::Broodwar->sendText("Producer %s", producer_type.c_str());
-
 	BWAPI::Unitset producers_available;
 
 	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
@@ -213,8 +177,6 @@ void ProductionManager::create(BWAPI::Unit producer, const BuildOrderItem & item
 		return;
 
 	MetaType meta_type = item.meta_type;
-
-	// TODO if isBuildings -> moveWorker by calculating gathering rate, distance and time to travel
 
 	if (meta_type.isUnit() && meta_type.getUnitType().isBuilding())
 	{

@@ -40,7 +40,6 @@ void BuildOrder::add(const MetaType & meta_type, int amount)
 
 void BuildOrder::add(const MetaType & meta_type, int amount, int at_supply)
 {
-	// TODO move this condition to the ProductionManager
 	if (BWAPI::Broodwar->self()->supplyUsed() >= (at_supply * 2))
 	{
 		for (int i {0}; i < amount; ++i)

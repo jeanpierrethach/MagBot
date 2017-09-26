@@ -3,6 +3,7 @@
 #include <BWAPI.h>
 #include "ScoutManager.h"
 #include "WorkerManager.h"
+#include "DefenceManager.h"
 
 
 namespace MagBot
@@ -18,6 +19,7 @@ namespace MagBot
 		bool _active_scout;
 
 		void setScoutUnits();
+		void setCombatUnits();
 
 		void assignUnit(BWAPI::Unit unit, BWAPI::Unitset & set);
 		bool isAssigned(BWAPI::Unit unit) const;

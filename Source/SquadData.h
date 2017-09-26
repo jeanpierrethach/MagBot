@@ -9,7 +9,6 @@ namespace MagBot
 	{
 		BWAPI::Unit squad_leader = nullptr;
 		std::map<BWAPI::Unit, Unit> squad_members;
-		//BWAPI::Unitset squad_members;
 	};
 
 	class Squad
@@ -64,13 +63,8 @@ namespace MagBot
 
 		std::vector<Squad> getSquads() const { return _squads; }
 
-		//void updateSquads();
-
 		bool isEmpty();
 		void addSquad(const Squad & squad);
-		//void assignUnitTo(); // BWAPI::Unit unit,  const Squad & squad
 		void findUnitandAssign(Squad & squad);
-
-		//Squad findNearestSquad(const Squad & squad);
 	};
 }

@@ -3,19 +3,19 @@
 #include "Common.h"
 #include "BuildingData.h"
 #include "WorkerManager.h"
+#include "InformationManager.h"
 #include <stdint.h>
 
 namespace MagBot
 {
 	class BuildingManager
 	{
-		//std::vector<Building> _buildings;
 		BuildingData _buildings;
+		InformationManager _inf_manager;
 
 		int _reservedMinerals; // minerals reserved for planned buildings
 		int _reservedGas; // gas reserved for planned buildings
 
-		// TODO better way for this
 		BWAPI::Unitset _all_buildings;
 		std::map<BWAPI::UnitType, uint8_t> _buildings_owned_map;
 		std::map<BWAPI::UnitType, uint8_t> _buildings_destroyed_map;
@@ -26,8 +26,6 @@ namespace MagBot
 		void showDebugBuildings();
 		void showBuildTimeBuildings();
 		void showOwnedOrDestroyedBuildings();
-
-		//void removeBuildings(const std::vector<Building> & to_remove_buildings);
 
 		void validateWorkersAndBuildings(); // STEP 1
 		void assignWorkersToUnassignedBuildings(); // STEP 2

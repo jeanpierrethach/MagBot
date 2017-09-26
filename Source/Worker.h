@@ -1,27 +1,13 @@
 #pragma once
 
 #include "Common.h"
+#include "MineralNode.h"
 #include <stdint.h>
+
+// quadtree
 
 namespace MagBot
 {
-	//TODO add worker stats
-
-	/*struct MineralsPatch
-	{
-		BWAPI::Unit mineralTrick;
-		BWAPI::Unit mineralPatch;
-		bool trickPossible;
-	};
-
-	struct WorkersMinerals
-	{
-		BWAPI::Unit worker;
-		BWAPI::Unit mineralTrick;
-		BWAPI::Unit mineralPatch;
-		bool useTrick;
-	};*/
-
 	class Worker
 	{
 
@@ -30,19 +16,16 @@ namespace MagBot
 
 	private:
 
-		// TODO add worker stats?
 		BWAPI::Unitset _workers;
 		std::map<BWAPI::Unit, enum WorkerTask> _worker_task_map;
 		std::map<BWAPI::Unit, BWAPI::UnitType> _worker_building_type_map;
 
 
-		//std::vector<MineralsPatch> Minerals;
-		//std::vector<WorkersMinerals> MineralsWorkers;
-
 		// TODO work on queue system + cooperative pathfinding (including collision detection)
 		//std::map<BWAPI::Unit, BWAPI::Unit> _workers_mineral_assignment; // assign a worker for one mineral patch
+		
 		std::map<BWAPI::Unit, std::queue<BWAPI::Unit>> _worker_mineral_assignment;
-		std::map<BWAPI::Unit, uint8_t> _mineral_workers_count; // mineral patch / number
+		std::map<BWAPI::Unit, std::deque<BWAPI::Unit>> _mineral_workers_count; // mineral patch / deque
 
 		std::map<BWAPI::Unit, BWAPI::Unit> _workers_depot_map; // worker / depot
 		std::map<BWAPI::Unit, uint8_t> _depot_worker_count; // depot / number, retrieve count of workers at each depot
@@ -59,12 +42,7 @@ namespace MagBot
 		Worker();
 		~Worker();
 
-		// TODO could add all current workers with Build task, Mine task, etc.. so no need to iterate over all workers
-		
-		// void addWorker
 		void update();
-
-		void rebalanceWorkers();
 
 		void removeDestroyedWorker(BWAPI::Unit unit);
 

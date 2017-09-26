@@ -26,8 +26,6 @@ namespace MagBot
 		int getFreeMinerals() const;
 		int getFreeGas() const;
 
-		// void predictWorkerMovement(const Building & b);
-
 	public:
 		ProductionManager();
 		~ProductionManager();

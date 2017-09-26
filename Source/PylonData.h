@@ -45,7 +45,6 @@ namespace MagBot
 	{
 		std::vector<Pylon> _pylons;
 
-		// TODO may remove this container?
 		std::map<BWAPI::Unit, Pylon> _pylon_map;
 
 	public:

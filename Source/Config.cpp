@@ -2,6 +2,10 @@
 
 namespace Config
 {
+	namespace Paths
+	{
+		std::string Data = "./data.txt";
+	}
 	namespace Modules
 	{
 		bool UsingGameCommander = true;
@@ -37,5 +41,13 @@ namespace Config
 		bool DrawBuildingsOwnedOrDestroyed = true;
 		bool DrawWorkerTaskInfo = true;
 		bool DrawProductionQueue = true;
+		bool DrawMineralHandling = true;
+	}
+
+	namespace StratOptions
+	{
+		bool GateReaver = true;
+		bool TimedExpansion = true;
+		int NbFramesExpansion = 5900;
 	}
 }

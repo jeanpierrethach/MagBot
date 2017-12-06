@@ -4,6 +4,10 @@
 
 namespace Config
 {
+	namespace Paths
+	{
+		extern std::string Data;
+	}
 	namespace Modules
 	{
 		extern bool UsingGameCommander;
@@ -39,5 +43,13 @@ namespace Config
 		extern bool DrawBuildingsOwnedOrDestroyed;
 		extern bool DrawWorkerTaskInfo;
 		extern bool DrawProductionQueue;
+		extern bool DrawMineralHandling;
+	}
+
+	namespace StratOptions
+	{
+		extern bool GateReaver;
+		extern bool TimedExpansion;
+		extern int NbFramesExpansion;
 	}
 }

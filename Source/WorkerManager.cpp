@@ -4,6 +4,23 @@ using namespace MagBot;
 
 WorkerManager::WorkerManager()
 {	
+	for (auto & unit : BWAPI::Broodwar->getAllUnits())
+	{
+		BWAPI::TilePosition base = BWAPI::Broodwar->self()->getStartLocation();
+		if (unit->getType().isMineralField()
+			&& unit->getDistance(BWAPI::Position(base)) < 300)
+		{
+			_mineral_nodes.insertMineralPatch(unit);
+		}
+	}
+
+	_mineral_nodes.initializeMineralPatches();
+	BWAPI::Broodwar->sendText("mineral nodes count: %d", _mineral_nodes.getMineralNodes().size());
+	BWAPI::Broodwar->sendText("deque size: %d", _mineral_nodes.getMineralPatch().size());
+	for (auto & patch : _mineral_nodes.getMineralPatch())
+	{
+		BWAPI::Broodwar->sendText("deque id: %d", patch.first);
+	}
 }
 
 
@@ -81,7 +98,17 @@ void WorkerManager::update()
 
 	handleGasWorkers();
 	handleIdleWorkers();
-	handleMineralWorkers();
+
+	// TODO : time the execution, sequential and parallel methods
+	// make acceleration graphs
+	// + results
+	optimizeWorkersMining();
+	//handleMineralWorkers();
+	if (Config::DebugInfo::DrawMineralHandling)
+	{
+		showDebugMineralHandling();
+	}
+
 }
 
 void WorkerManager::updateWorkerCount()
@@ -229,19 +256,110 @@ void WorkerManager::showDebugWorkerInfo(const BWAPI::Unit & worker)
 
 // loop over mineral nodes and for each id, insert an optimal worker for its node position
 // create mineral node class
+
+// https://github.com/MartinRooijackers/LetaBot/tree/master/Research/MineralGatheringAlgorithm
 void WorkerManager::optimizeWorkersMining()
 {
-	/*
-	for (auto & mineralNode : _mineralNodes)
-	{
-
-	}*/
+	// source : http://wiki.teamliquid.net/starcraft/Mining
+	const int MINING_TIME = 80;
 
 	for (const auto & worker : _worker.getWorkers())
 	{
-		
+		// TODO : when worker state is mining -> need to recalculate
+		// optimal patch
+		/*if (_worker.getWorkerTask(worker) == Worker::MINE)
+		{
+			if (isAssignedToPatch(worker))
+			{
+				// recalculate
+			}
+		}*/
+		/*if (_worker.getWorkerTask(worker) == Worker::MINE)
+		{
+			BWAPI::Broodwar->sendText("mining");
+		}*/
+
+		if (worker->isIdle() && _worker.getWorkerTask(worker) == Worker::MINE)
+		{
+			if (worker->isCarryingMinerals())
+			{
+				//_mineralNodes.removeWorkerFromPatch(worker);
+				BWAPI::Broodwar->sendText("returning to depot");
+				worker->returnCargo();
+			} else 
+			{
+				BWAPI::Unit closest_patch = nullptr;
+				int closest_distance {9999};
+
+				// iterate over all workers mining
+				// get remaining mining frames for each worker
+
+				// calculate distance in frames for current position and
+				// patch + patch to depot
+
+				// assign best patch which minimize 
+				// frames to the current worker
+
+				// search for mineral patch queue
+				for (auto & mineral_patch : _mineral_nodes.getMineralNodes())
+				{
+					int distance = worker->getDistance(mineral_patch);
+					if (!closest_patch || distance < closest_distance)
+					{
+						closest_patch = mineral_patch;
+						closest_distance = distance;
+					}
+				}
+
+				int frame_start_moving = BWAPI::Broodwar->getFrameCount();
+				WorkerMining worker_mining(0, frame_start_moving, closest_patch, worker);
+				worker_mining.setState(WorkerState::MOVING_TO_PATCH);
+				
+				//BWAPI::Broodwar->sendText("patch found id: %d", closest_patch->getID());
+				int patch_id = closest_patch->getID();
+
+				if (_mineral_nodes.getMineralPatch().find(patch_id) != _mineral_nodes.getMineralPatch().end())
+				{
+					BWAPI::Broodwar->sendText("patch id: %d", patch_id);
+				}
+
+				_mineral_nodes.insertWorkerToPatch(worker_mining, patch_id);//, _mineralNodes.getMineralPatch());
+				//BWAPI::Broodwar->sendText("it");
+				worker->gather(closest_patch);
+			}
+
+		}
+		/*if (!worker->isGatheringMinerals())
+		{
+			BWAPI::Position base = InformationManager::getStartingBaseLocation();
+			int dist = worker->getDistance(base);
+			BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
+			double ms = probe.topSpeed();
+
+			// get mindist between each patch - worker
+
+			// check if current optimal patch isn't already occupied/full
+
+
+		}*/
 	}
 }
+
+void WorkerManager::showDebugMineralHandling()
+{
+	for (auto deque : _mineral_nodes.getMineralPatch())
+	{
+		int count = 0;
+		for (auto worker : deque.second)
+		{
+			BWAPI::Unit unit = worker.getWorker();
+			int patch_id = worker.getMineralPatchID();
+			count++;
+			BWAPI::Broodwar->drawTextMap(BWAPI::Position(360, 50 + (count * 10)), "%d, %d", unit->getID(), patch_id);
+		}
+	}
+}
+
 
 // TODO call public function from worker.h
 void WorkerManager::handleMineralWorkers()

@@ -3,18 +3,22 @@
 #include <BWAPI.h>
 #include "Worker.h"
 #include "BuildingManager.h"
+#include "InformationManager.h"
+#include "MineralNode.h"
 #include <stdint.h>
 #include <deque>
 
 namespace MagBot {
 
-	class WorkerManager
+	class WorkerManager : InformationManager
 	{
 		Worker _worker;
+		MineralNode _mineral_nodes;
 
 		void handleMineralWorkers();
 		void handleGasWorkers();
 		void handleIdleWorkers();
+		void showDebugMineralHandling();
 
 	public:
 		WorkerManager();

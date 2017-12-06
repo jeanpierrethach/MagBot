@@ -30,7 +30,9 @@ void Worker::update()
 		{
 			// get unit that targets the mineral patch
 			//mineral_patch.second.push_back(BWAPI::Broodwar->get);
-			BWAPI::Broodwar->drawCircleMap(mineral_patch.first->getPosition(), 30, BWAPI::Colors::Black, true);
+			
+			// TODO : uncomment later if needed
+			//BWAPI::Broodwar->drawCircleMap(mineral_patch.first->getPosition(), 30, BWAPI::Colors::Black, true);
 		}
 	}
 	// step 1 calculate travel distance from position worker to mineral field assigned

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "InformationManager.h"
 
 namespace MagBot
 {
@@ -14,6 +15,7 @@ namespace MagBot
 	public:
 
 		BWAPI::TilePosition _final_position;
+		BWAPI::TilePosition _desired_position;
 		BWAPI::UnitType _unit_type;
 		BWAPI::Unit _building_unit;
 		BWAPI::Unit _builder_unit;
@@ -48,7 +50,7 @@ namespace MagBot
 		}
 	};
 
-	class BuildingData
+	class BuildingData : InformationManager
 	{
 		std::vector<Building> _buildings;
 
@@ -61,6 +63,7 @@ namespace MagBot
 		void removeBuilding(const Building & b);
 		void removeBuildings(const std::vector<Building> & buildings);
 		bool isBeingBuilt(BWAPI::UnitType unit_type);
+		BWAPI::TilePosition findFirstAvailablePosition(const BWAPI::TilePosition tileposition);
 	};
 
 }

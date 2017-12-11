@@ -15,6 +15,9 @@ GameCommander::~GameCommander()
 
 void GameCommander::update()
 {
+	if (!Config::Modules::UsingScoutManager)
+		return;
+
 	setScoutUnits();
 
 	ScoutManager::Instance().update();

@@ -66,3 +66,31 @@ void InformationManager::setStartingBaseLocation(const BWAPI::Position pos)
 {
 	_starting_base_location = pos;
 }
+
+BWAPI::Position InformationManager::getStartingBaseLocation()
+{
+	return _starting_base_location;
+}
+
+// TODO write meta information for acceleration between sequential and parallel methods
+void InformationManager::writeData()
+{
+	// TODO fix path
+	std::fstream results;
+	results.open(Config::Paths::Data);
+	int minerals = BWAPI::Broodwar->self()->gatheredMinerals();
+	std::string mins = std::to_string(minerals);
+	results << mins.c_str();
+	results.close();
+}
+
+void InformationManager::update()
+{
+	writeData();
+}
+
+InformationManager & InformationManager::Instance()
+{
+	static InformationManager instance;
+	return instance;
+}

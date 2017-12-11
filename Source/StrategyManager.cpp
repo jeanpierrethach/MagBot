@@ -36,7 +36,9 @@ BuildOrder StrategyManager::getOpeningBuildOrder()
 	MetaType dragoon_range{BWAPI::UpgradeTypes::Singularity_Charge};
 	MetaType robo{BWAPI::UnitTypes::Protoss_Robotics_Facility};
 	MetaType assimilator{BWAPI::UnitTypes::Protoss_Assimilator};
+	//MetaType fleet(BWAPI::UnitTypes::Protoss_Fleet_Beacon);
 
+	//build_order.add(fleet, 1);
 	build_order.add(pylon, 1);
 	build_order.add(gateway, 1);
 	build_order.add(assimilator, 1);
@@ -52,5 +54,25 @@ BuildOrder StrategyManager::getOpeningBuildOrder()
 	build_order.add(dragoon_range, 1);
 	build_order.add(robo, 1);
 
+	return build_order;
+}
+
+BuildOrder StrategyManager::timedExpansion()
+{
+	MetaType nexus {BWAPI::UnitTypes::Protoss_Nexus};
+
+	BuildOrder build_order;
+
+	build_order.add(nexus, 1);
+
+	return build_order;
+}
+
+BuildOrder StrategyManager::optimizeMiningTest()
+{
+	MetaType pylon {BWAPI::UnitTypes::Protoss_Pylon};
+	BuildOrder build_order;
+
+	build_order.add(pylon, 2);
 	return build_order;
 }

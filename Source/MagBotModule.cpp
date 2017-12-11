@@ -11,6 +11,8 @@ void MagBotModule::onStart()
 {
 	BWAPI::Broodwar << "The map is " << BWAPI::Broodwar->mapName() << "!" << std::endl;
  
+	BWAPI::Broodwar->sendText("%s", Config::Paths::Data.c_str());
+
 	BWAPI::Broodwar->setLocalSpeed(Config::BWAPIOptions::SetLocalSpeed);
 	BWAPI::Broodwar->setFrameSkip(Config::BWAPIOptions::SetFrameSkip);
 
@@ -50,6 +52,7 @@ void MagBotModule::onEnd(bool is_winner)
 	{
 		// Log your win here!
 	}
+	InformationManager::Instance().update();
 }
 
 void MagBotModule::onFrame()
@@ -189,6 +192,13 @@ void MagBotModule::onSaveGame(std::string game_name)
 
 void MagBotModule::onUnitComplete(BWAPI::Unit unit)
 {
+	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self())
+	{
+		BWAPI::Broodwar->sendText("Probe created");
+		// TODO make multithreading optimization on ressource collection
+		// then call WorkerManager method
+		// if not calling on update()
+	}
 }
 
 void MagBotModule::drawTerrainData()

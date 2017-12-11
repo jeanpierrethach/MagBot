@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <deque>
 
+
 namespace MagBot {
 
 	class WorkerManager : InformationManager
@@ -18,7 +19,9 @@ namespace MagBot {
 		void handleMineralWorkers();
 		void handleGasWorkers();
 		void handleIdleWorkers();
-		void showDebugMineralHandling();
+		//void showDebugMineralHandling();
+
+		void calculateBestPatch(BWAPI::Unit worker);
 
 	public:
 		WorkerManager();

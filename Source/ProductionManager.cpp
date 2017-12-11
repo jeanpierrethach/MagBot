@@ -4,8 +4,16 @@ using namespace MagBot;
 
 ProductionManager::ProductionManager()
 {
-	setBuildOrder(StrategyManager::Instance().getOpeningBuildOrder());
+	if (Config::StratOptions::GateReaver)
+	{
+		setBuildOrder(StrategyManager::Instance().getOpeningBuildOrder());
+	}
+	if (Config::TestOptions::OptimizeMining)
+	{
+		setBuildOrder(StrategyManager::Instance().optimizeMiningTest());
+	}
 }
+
 
 ProductionManager::~ProductionManager()
 {
@@ -21,8 +29,26 @@ void ProductionManager::setBuildOrder(const BuildOrder & build_order)
 	}
 }
 
+void ProductionManager::setBuildOrderHP(const BuildOrder & build_order)
+{
+	for (size_t i {0}; i < build_order.size(); ++i)
+	{
+		_queue.queueAsHighestPriority(build_order[i], false);
+	}
+}
+
 void ProductionManager::update()
 {
+	if (Config::StratOptions::TimedExpansion)
+	{
+		//setBuildOrderHP(StrategyManager::Instance().timedExpansion());
+	}
+
+	// TODO require tech building for units
+	//BWAPI::UnitType high_templar = BWAPI::UnitTypes::Protoss_High_Templar;
+	//addUnitInQueue(MetaType {high_templar});
+	//getPrerequiste(MetaType {high_templar});
+
 	for (auto & depot : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (depot->getType().isResourceDepot())
@@ -100,7 +126,7 @@ void ProductionManager::manageBuildOrderQueue()
 		{
 			if (current_item.meta_type.isUnit())
 			{
-				BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getUnitType().c_str());
+				//BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getUnitType().c_str());
 			}
 			else if (current_item.meta_type.isTech())
 			{
@@ -262,6 +288,63 @@ void ProductionManager::showProductionQueue()
 	BWAPI::Broodwar->drawTextScreen(360, 70, "Free Gas: %d", getFreeGas());
 	BWAPI::Broodwar->drawTextScreen(360, 80, "Supply used: %d", BWAPI::Broodwar->self()->supplyUsed());
 	BWAPI::Broodwar->drawTextScreen(360, 90, "Supply total: %d", BWAPI::Broodwar->self()->supplyTotal());
+}
+
+// require testing -> need to fix insertiong of every prerequiste of the metatype
+std::vector<BWAPI::UnitType> ProductionManager::getPrerequiste(const MetaType & meta_type)
+{
+	std::vector<BWAPI::UnitType> unit_types;
+	
+	MetaType m_type = meta_type;
+	
+	//bool has_unit_type = false;
+	while (!hasPrerequiste(m_type))
+	{
+		BWAPI::UnitType producer_type = m_type.whatBuilds();
+		//BWAPI::UnitType tech_type = m_type.getUnitType();
+
+
+		unit_types.push_back(producer_type);
+		BWAPI::Broodwar->sendText("%s", producer_type.getName());
+		MetaType m_type2 = MetaType(producer_type);
+		BWAPI::UnitType new_type = m_type2.whatBuilds();
+		m_type = MetaType(new_type);
+	}
+
+	return unit_types;
+}
+
+bool ProductionManager::hasPrerequiste(const MetaType & meta_type)
+{
+	BWAPI::UnitType producer_type = meta_type.whatBuilds();
+	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+		if (unit->getType() == producer_type)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+// require testing -> todo fix insertion in queue
+void ProductionManager::addUnitInQueue(const MetaType & meta_type)
+{
+	if (hasPrerequiste(meta_type))
+	{
+		_queue.queueAsLowestPriority(meta_type, false);
+	}
+	else
+	{
+		std::vector<BWAPI::UnitType> list_of_units = getPrerequiste(meta_type);
+
+		for (auto it = list_of_units.begin(); it != list_of_units.end();)
+		{
+			MetaType m_type = MetaType {*it};
+			_queue.queueAsLowestPriority(m_type, false);
+			list_of_units.erase(it);
+		}
+	}
 }
 
 ProductionManager & ProductionManager::Instance()

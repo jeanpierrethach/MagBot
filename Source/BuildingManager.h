@@ -33,6 +33,8 @@ namespace MagBot
 		void checkForStartedConstruction();	// STEP 4
 		void checkForCompletedBuildings(); // STEP 5
 
+		void mockTestForDestroyedBuilder();
+
 	public:
 		BuildingManager();
 		~BuildingManager();

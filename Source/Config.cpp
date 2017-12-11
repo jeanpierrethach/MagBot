@@ -9,7 +9,7 @@ namespace Config
 	namespace Modules
 	{
 		bool UsingGameCommander = true;
-		bool UsingScoutManager = true;
+		bool UsingScoutManager = false;
 	}
 
 	namespace BWAPIOptions
@@ -46,8 +46,13 @@ namespace Config
 
 	namespace StratOptions
 	{
-		bool GateReaver = true;
+		bool GateReaver = false;
 		bool TimedExpansion = true;
 		int NbFramesExpansion = 5900;
+	}
+
+	namespace TestOptions
+	{
+		bool OptimizeMining = true;
 	}
 }

@@ -52,4 +52,9 @@ namespace Config
 		extern bool TimedExpansion;
 		extern int NbFramesExpansion;
 	}
+
+	namespace TestOptions
+	{
+		extern bool OptimizeMining;
+	}
 }

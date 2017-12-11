@@ -2,6 +2,8 @@
 
 #include "Common.h"
 #include "BWTA.h"
+#include <fstream>
+#include <string>
 
 namespace MagBot
 {
@@ -31,8 +33,11 @@ namespace MagBot
 
 		void setEnemyStartingBaseLocation(const BWAPI::Position pos);
 		void setStartingBaseLocation(const BWAPI::Position base_location);
+		BWAPI::Position getStartingBaseLocation();
+		void writeData();
+		void update();
 
-
+		static InformationManager & Instance();
 	};
 
 }

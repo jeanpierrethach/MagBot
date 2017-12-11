@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\WorkerNodeQueue.cpp" />
     <ClCompile Include="Source\InformationManager.cpp" />
     <ClCompile Include="Source\DefenceManager.cpp" />
     <ClCompile Include="Source\MineralNode.cpp" />
@@ -116,8 +117,10 @@
     <ClCompile Include="Source\SquadData.cpp" />
     <ClCompile Include="Source\SquadManager.cpp" />
     <ClCompile Include="Source\Unit.cpp" />
+    <ClCompile Include="Source\WorkerMining.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\WorkerNodeQueue.h" />
     <ClInclude Include="Source\InformationManager.h" />
     <ClInclude Include="Source\DefenceManager.h" />
     <ClInclude Include="Source\MineralNode.h" />
@@ -142,6 +145,7 @@
     <ClInclude Include="Source\SquadData.h" />
     <ClInclude Include="Source\SquadManager.h" />
     <ClInclude Include="Source\Unit.h" />
+    <ClInclude Include="Source\WorkerMining.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -33,6 +33,8 @@ namespace MagBot
 	{
 		std::map<std::string, Strategy> _strategies;
 
+		
+
 	public:
 		StrategyManager();
 		~StrategyManager();
@@ -41,8 +43,10 @@ namespace MagBot
 		
 		// TODO when workers destroyed, calculate enemy visible force, rebuild workers greedly or not
 		// up in production? or up in army size?
-
+		BuildOrder timedExpansion();
 		BuildOrder getOpeningBuildOrder();
+
+		BuildOrder optimizeMiningTest();
 		static StrategyManager & Instance();
 		
 	};

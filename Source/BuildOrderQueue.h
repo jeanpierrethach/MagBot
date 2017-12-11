@@ -60,7 +60,7 @@ namespace MagBot
 
 		int getSkippedItemsCount() const;
 
-		bool hasItem(BWAPI::UnitType unit_type);
+		bool hasItemInQueue(BWAPI::UnitType unit_type);
 
 		BuildOrderItem & getHighestPriorityItem();
 		BuildOrderItem & getNextHighestPriorityItem();

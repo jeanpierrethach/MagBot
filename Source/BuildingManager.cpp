@@ -32,7 +32,11 @@ void BuildingManager::update()
 {
 	validateWorkersAndBuildings();          // check to see if assigned workers have died en route or while constructing
 	assignWorkersToUnassignedBuildings();   // assign workers to the unassigned buildings and label them 'planned'    
-	constructAssignedBuildings();           // for each planned building, if the worker isn't constructing, send the command    
+	constructAssignedBuildings();           // for each planned building, if the worker isn't constructing, send the command  
+
+	// testing phase
+	//mockTestForDestroyedBuilder();
+
 	checkForStartedConstruction();          // check to see if any buildings have started construction and update data structures        
 	checkForCompletedBuildings();           // check to see if any buildings have completed and update data structures
 
@@ -72,8 +76,8 @@ void BuildingManager::showAllBuildings()
 		{
 			if (Config::DebugInfo::DrawAllInfo)
 			{
-				BWAPI::Broodwar->sendText("Building %s confirmed at position (%d, %d)", unit_type.c_str(),
-					unit->getTilePosition().x, unit->getTilePosition().y);
+				//BWAPI::Broodwar->sendText("Building %s confirmed at position (%d, %d)", unit_type.c_str(),
+				//	unit->getTilePosition().x, unit->getTilePosition().y);
 			}
 			_all_buildings.insert(unit);
 			++_buildings_owned_map[unit_type];
@@ -162,6 +166,7 @@ void BuildingManager::validateWorkersAndBuildings()
 		{
 			continue;
 		}
+		// if worker has died in the process of construction of the building
 		if (b._building_unit == nullptr || !b._building_unit->getType().isBuilding() || b._building_unit->getHitPoints() <= 0)
 		{
 			to_remove_buildings.push_back(b);
@@ -223,6 +228,16 @@ void BuildingManager::constructAssignedBuildings()
 		if (b._status != BuildingStatus::ASSIGNED)
 		{
 			continue;
+		}
+
+		// if the builder has been destroyed, assign to another worker
+		if (!b._builder_unit)
+		{
+			WorkerManager::Instance().setWorkerFree(b._builder_unit);
+			b._builder_unit = nullptr;
+			b._build_command_given = false;
+			b._status = BuildingStatus::UNASSIGNED;
+			assignWorkersToUnassignedBuildings();
 		}
 
 		if (!b._builder_unit->isConstructing())
@@ -317,4 +332,19 @@ int BuildingManager::getReservedMinerals()
 int BuildingManager::getReservedGas()
 {
 	return _reservedGas;
+}
+
+// used to test when a worker assigned to a building is destroyed
+void BuildingManager::mockTestForDestroyedBuilder()
+{
+	for (Building & b : _buildings.getBuildings())
+	{
+		if (b._builder_unit && b._status == BuildingStatus::ASSIGNED)
+		{
+			WorkerManager::Instance().setWorkerFree(b._builder_unit);
+			b._builder_unit = nullptr;
+			b._build_command_given = false;
+			b._status = BuildingStatus::UNASSIGNED;
+		}
+	}
 }

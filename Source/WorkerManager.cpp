@@ -317,10 +317,8 @@ void WorkerManager::optimizeWorkersMining()
 		if (state == WorkerState::MOVING_TO_PATCH &&
 			order == mining_order && _worker.getWorkerTask(worker) == Worker::MINE)
 		{
-			// TODO set start mining frame for worker
 			int frame = BWAPI::Broodwar->getFrameCount();
 			_mineral_nodes.setFrameStartMining(worker, frame);
-			//BWAPI::Broodwar->sendText("state: Gathering");
 			_mineral_nodes.setWorkerState(worker, WorkerState::MINING);
 		}
 
@@ -339,9 +337,7 @@ void WorkerManager::optimizeWorkersMining()
 		if (state == WorkerState::NONE && //state == WorkerState::MOVING_TO_DEPOT &&
 			!worker->isCarryingMinerals() && _worker.getWorkerTask(worker) == Worker::MINE)
 		{
-			// TODO
 			calculateBestPatch(worker);
-
 
 			//_mineral_nodes.setWorkerState(worker, WorkerState::MOVING_TO_PATCH);
 			//BWAPI::Broodwar->sendText("state: MOVING TO PATCH");
@@ -412,9 +408,8 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 		{
 			// not started mining
 			if (w.frame_start_mining == 0)
-			{
-				//TODO prob in getDistance between nullptr?
-				int distance = //w.getWorker()->getDistance(d.patch);
+			{	
+				int distance = w.worker->getDistance(d.patch);
 				total_work_deque += distance + MINING_TIME;
 			} 
 			else

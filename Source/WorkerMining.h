@@ -18,7 +18,7 @@ namespace MagBot
 		
 		int mineral_patch_id;
 
-		BWAPI::Unit worker;
+		
 		int worker_id;
 		//uint8_t current_workers;
 
@@ -39,8 +39,8 @@ namespace MagBot
 		WorkerState state;
 		int frame_start_mining;
 		BWAPI::Unit mineral_patch;
+		BWAPI::Unit worker;
 
-		BWAPI::Unit getWorker() { return worker; }
 		int getWorkerID() { return worker_id; }
 		int getMineralPatchID() { return mineral_patch_id; }
 		//void setState(enum WorkerState state) { worker_state = state; }

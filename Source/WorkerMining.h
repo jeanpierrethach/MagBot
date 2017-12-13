@@ -41,8 +41,8 @@ namespace MagBot
 		BWAPI::Unit mineral_patch;
 		BWAPI::Unit worker;
 
-		int getWorkerID() { return worker_id; }
-		int getMineralPatchID() { return mineral_patch_id; }
+		const int getWorkerID() const { return worker_id; }
+		const int getMineralPatchID() const { return mineral_patch_id; }
 		//void setState(enum WorkerState state) { worker_state = state; }
 		//WorkerState getState() { return worker_state; }
 	};

@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "BWTA.h"
 #include <fstream>
+#include <iostream>
 #include <string>
 
 namespace MagBot
@@ -17,6 +18,8 @@ namespace MagBot
 
 		BWAPI::Position _enemy_base_location;
 		BWAPI::Position _starting_base_location;
+
+		std::ofstream _mineral_data_file;
 
 	public:
 		InformationManager();
@@ -34,8 +37,16 @@ namespace MagBot
 		void setEnemyStartingBaseLocation(const BWAPI::Position pos);
 		void setStartingBaseLocation(const BWAPI::Position base_location);
 		BWAPI::Position getStartingBaseLocation();
+
+		void openFileData(std::ofstream & file, std::string path);
+		void writeData(std::ofstream & file);
 		void writeData();
+		void closeFileData(std::ofstream & file);
+		void onClose();
+
 		void update();
+
+		void onStart();	
 
 		static InformationManager & Instance();
 	};

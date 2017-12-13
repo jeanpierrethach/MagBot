@@ -51,6 +51,7 @@ namespace Config
 		extern bool GateReaver;
 		extern bool TimedExpansion;
 		extern int NbFramesExpansion;
+		extern int NbOfWorkers;
 	}
 
 	namespace TestOptions

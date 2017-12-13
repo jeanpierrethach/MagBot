@@ -9,6 +9,11 @@ using namespace MagBot;
 
 void MagBotModule::onStart()
 {
+
+	InformationManager::Instance().onStart();
+
+	
+
 	BWAPI::Broodwar << "The map is " << BWAPI::Broodwar->mapName() << "!" << std::endl;
  
 	BWAPI::Broodwar->sendText("%s", Config::Paths::Data.c_str());
@@ -52,7 +57,6 @@ void MagBotModule::onEnd(bool is_winner)
 	{
 		// Log your win here!
 	}
-	InformationManager::Instance().update();
 }
 
 void MagBotModule::onFrame()
@@ -72,6 +76,23 @@ void MagBotModule::onFrame()
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 	*/
+	if (BWAPI::Broodwar->getFrameCount() % 500 == 0)
+	{
+		//InformationManager::Instance().update();
+		//int minerals = BWAPI::Broodwar->self()->gatheredMinerals();
+		//std::string mins = std::to_string(minerals);
+		//results << mins.c_str() << "\n";
+		InformationManager::Instance().update();
+		//results.close();
+		//BWAPI::Broodwar->sendText("written data");
+	}
+
+	if (BWAPI::Broodwar->getFrameCount()>8005)
+	{
+		InformationManager::Instance().onClose();
+		BWAPI::Broodwar->leaveGame();
+	}
+	
 	
 	if (Config::DebugInfo::DrawAllInfo)
 	{
@@ -194,7 +215,7 @@ void MagBotModule::onUnitComplete(BWAPI::Unit unit)
 {
 	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self())
 	{
-		BWAPI::Broodwar->sendText("Probe created");
+		//BWAPI::Broodwar->sendText("Probe created");
 		// TODO make multithreading optimization on ressource collection
 		// then call WorkerManager method
 		// if not calling on update()

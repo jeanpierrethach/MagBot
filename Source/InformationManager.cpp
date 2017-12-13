@@ -35,7 +35,7 @@ double InformationManager::calculateGasRate()
 	return 0;
 }
 
-double InformationManager::calculateMineralRatePerSec()
+/*double InformationManager::calculateMineralRatePerSec()
 {
 	if (BWAPI::Broodwar->getFrameCount() != 0)
 	{
@@ -55,7 +55,7 @@ double InformationManager::calculateGasRatePerSec()
 		return (double) nb_gas / nb_frames;
 	}
 	return 0;
-}
+}*/
 
 void InformationManager::setEnemyStartingBaseLocation(const BWAPI::Position pos)
 {
@@ -73,20 +73,39 @@ BWAPI::Position InformationManager::getStartingBaseLocation()
 }
 
 // TODO write meta information for acceleration between sequential and parallel methods
-void InformationManager::writeData()
+void InformationManager::openFileData(std::ofstream & file, std::string path)
 {
-	// TODO fix path
-	std::fstream results;
-	results.open(Config::Paths::Data);
-	int minerals = BWAPI::Broodwar->self()->gatheredMinerals();
-	std::string mins = std::to_string(minerals);
-	results << mins.c_str();
-	results.close();
+	file.open(path);
+
+	if (file.fail())
+	{
+		BWAPI::Broodwar->sendText("Couldn't open data write file");
+	}
+}
+
+void InformationManager::writeData(std::ofstream & file)
+{
+	file << BWAPI::Broodwar->self()->gatheredMinerals() << "\n";
+}
+
+void InformationManager::closeFileData(std::ofstream & file)
+{
+	file.close();
+}
+
+void InformationManager::onStart()
+{
+	openFileData(_mineral_data_file, Config::Paths::Data);
 }
 
 void InformationManager::update()
 {
-	writeData();
+	writeData(_mineral_data_file);
+}
+
+void InformationManager::onClose()
+{
+	closeFileData(_mineral_data_file);
 }
 
 InformationManager & InformationManager::Instance()

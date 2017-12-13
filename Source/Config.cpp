@@ -4,7 +4,7 @@ namespace Config
 {
 	namespace Paths
 	{
-		std::string Data = "./data.txt";
+		std::string Data = "bwapi-data/write/data.txt";
 	}
 	namespace Modules
 	{
@@ -49,6 +49,7 @@ namespace Config
 		bool GateReaver = false;
 		bool TimedExpansion = true;
 		int NbFramesExpansion = 5900;
+	    int NbOfWorkers = 18;
 	}
 
 	namespace TestOptions

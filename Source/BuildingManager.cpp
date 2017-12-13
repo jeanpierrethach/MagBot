@@ -62,8 +62,8 @@ void BuildingManager::update()
 
 	BWAPI::Broodwar->drawTextScreen(360, 130, "Mineral Rate %f", _inf_manager.calculateMineralRate());
 	BWAPI::Broodwar->drawTextScreen(360, 140, "Gas Rate %f", _inf_manager.calculateGasRate());
-	BWAPI::Broodwar->drawTextScreen(360, 150, "Minerate Rate/sec %d", BWAPI::Broodwar->getLatency());
-	BWAPI::Broodwar->drawTextScreen(360, 160, "Gas Rate/sec");
+	//BWAPI::Broodwar->drawTextScreen(360, 150, "Minerate Rate/sec %d", );
+	//BWAPI::Broodwar->drawTextScreen(360, 160, "Gas Rate/sec %d", );
 }
 
 void BuildingManager::showAllBuildings()

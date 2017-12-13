@@ -295,8 +295,11 @@ void WorkerManager::optimizeWorkersMining()
 			}
 		}*/
 
-		// TODO 
+		// TODO logic 
 		// Gather built-in switching problems
+		// call gather on every frame for the assigned patch
+		//
+
 
 		// CASES:
 		// if idle then state = MOVING_TO_PATCH
@@ -320,6 +323,16 @@ void WorkerManager::optimizeWorkersMining()
 			int frame = BWAPI::Broodwar->getFrameCount();
 			_mineral_nodes.setFrameStartMining(worker, frame);
 			_mineral_nodes.setWorkerState(worker, WorkerState::MINING);
+		}
+
+		// TODO test
+		// make sure worker mine the correct patch
+		if (state == WorkerState::MINING
+			&& !worker->isCarryingMinerals() && _worker.getWorkerTask(worker) == Worker::MINE)
+		{
+			BWAPI::Unit assigned_patch = _mineral_nodes.getAssignedMineralPatch(worker);
+			worker->rightClick(assigned_patch);
+			continue;
 		}
 
 		if (state == WorkerState::MINING && 
@@ -404,6 +417,9 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 	{
 		int total_work_deque = 0;
 
+		if (d.deque.size() > 2)
+			continue;
+
 		for (auto w : d.deque)
 		{
 			// not started mining
@@ -419,7 +435,7 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 			}
 		}
 
-		BWAPI::Broodwar->sendText("total_work_deque: %d", total_work_deque);
+		//BWAPI::Broodwar->sendText("total_work_deque: %d", total_work_deque);
 
 		// calculate work for current worker searching for patch
 		int work_current_worker = 0;

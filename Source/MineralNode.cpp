@@ -16,7 +16,6 @@ void MineralNode::initializePatch()
 	for (auto & min : _mineralNodes)
 	{
 		WorkerNodeQueue dw(min, min->getID());
-		//dw.patch_id = min->getID();
 		_deque_workers.push_back(dw);
 	}
 }
@@ -44,6 +43,34 @@ void MineralNode::displayWorkerinDeque()
 	}
 }
 
+WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit)
+{
+	for (auto & d : _deque_workers)
+	{
+		for (auto & w : d.deque)
+		{
+			if (w.getWorkerID() == unit->getID())
+			{
+				return w;
+			}
+		}
+	}
+}
+
+const WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit) const
+{
+	for (const auto & d : _deque_workers)
+	{
+		for (const auto & w : d.deque)
+		{
+			if (w.getWorkerID() == unit->getID())
+			{
+				return w;
+			}
+		}
+	}
+}
+
 WorkerState MineralNode::getWorkerState(BWAPI::Unit unit)
 {
 	for (auto d : _deque_workers)
@@ -52,7 +79,7 @@ WorkerState MineralNode::getWorkerState(BWAPI::Unit unit)
 		{
 			if (w.getWorkerID() == unit->getID())
 			{
-				WorkerState state = w.state;//w.getState();
+				WorkerState state = w.state;
 				return state;
 			}
 		}
@@ -62,14 +89,18 @@ WorkerState MineralNode::getWorkerState(BWAPI::Unit unit)
 
 void MineralNode::setWorkerState(BWAPI::Unit unit, WorkerState state)
 {
-	for (auto & node : _deque_workers)
+	getWorkerMining(unit).state = state;
+}
+
+BWAPI::Unit MineralNode::getAssignedMineralPatch(BWAPI::Unit unit)
+{
+	for (auto node : _deque_workers)
 	{
-		for (auto & worker : node.deque)
+		for (auto worker : node.deque)
 		{
 			if (worker.getWorkerID() == unit->getID())
 			{
-				worker.state = state;
-				//worker.setState(state);
+				return worker.mineral_patch;
 			}
 		}
 	}
@@ -77,30 +108,12 @@ void MineralNode::setWorkerState(BWAPI::Unit unit, WorkerState state)
 
 void MineralNode::setFrameStartMining(BWAPI::Unit unit, int frame)
 {
-	for (auto & node : _deque_workers)
-	{
-		for (auto & worker : node.deque)
-		{
-			if (worker.getWorkerID() == unit->getID())
-			{
-				worker.frame_start_mining = frame;
-			}
-		}
-	}
+	getWorkerMining(unit).frame_start_mining = frame;
 }
 
-int MineralNode::getFrameStartMining(BWAPI::Unit unit)
+const int MineralNode::getFrameStartMining(BWAPI::Unit unit)
 {
-	for (auto & node : _deque_workers)
-	{
-		for (auto & worker : node.deque)
-		{
-			if (worker.getWorkerID() == unit->getID())
-			{
-				return worker.frame_start_mining;
-			}
-		}
-	}
+	return getWorkerMining(unit).frame_start_mining;
 }
 
 void MineralNode::removeWorkerFromPatch(BWAPI::Unit unit)

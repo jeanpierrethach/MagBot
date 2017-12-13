@@ -31,9 +31,12 @@ namespace MagBot
 		void insertWorkerToPatch(WorkerMining worker, int patch_id);
 		void displayWorkerinDeque();
 
+		WorkerMining & getWorkerMining(BWAPI::Unit unit);
+		const WorkerMining & getWorkerMining(BWAPI::Unit unit) const;
+		BWAPI::Unit getAssignedMineralPatch(BWAPI::Unit unit);
 
 		void setFrameStartMining(BWAPI::Unit unit, int frame);
-		int getFrameStartMining(BWAPI::Unit unit);
+		const int getFrameStartMining(BWAPI::Unit unit);
 		WorkerState getWorkerState(BWAPI::Unit unit);
 		void setWorkerState(BWAPI::Unit unit, WorkerState state);
 

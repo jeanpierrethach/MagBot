@@ -7,11 +7,20 @@
 #include "WorkerMining.h"
 #include <algorithm>
 
+
+
+#include <mutex>
+
 namespace MagBot
 {
 	// change into class with worker and mineral patch as unit	
 	
-	
+	struct WorkerNodeDeque
+	{
+		std::deque<WorkerMining> deque;
+		BWAPI::Unit patch;
+		int patch_id;
+	};
 
 	class MineralNode
 	{
@@ -23,21 +32,30 @@ namespace MagBot
 
 	public:
 		MineralNode();
-		~MineralNode();
 
-		std::vector<WorkerNodeQueue> _deque_workers;
+		// TODO add mutex per deque
+		// TODO how to get _deque_workers updated if thread has modified
+		// during another thread
+		
+		//std::vector<WorkerNodeQueue> _deque_workers;
+
+		std::vector<WorkerNodeDeque> _deque_workers;
+		std::deque<std::mutex> mutexes;
 
 		void initializePatch();
+
 		void insertWorkerToPatch(WorkerMining worker, int patch_id);
+		void insertWorkerToPatchParallel(WorkerMining worker, int patch_id);
+		
 		void displayWorkerinDeque();
 
 		WorkerMining & getWorkerMining(BWAPI::Unit unit);
 		const WorkerMining & getWorkerMining(BWAPI::Unit unit) const;
-		BWAPI::Unit getAssignedMineralPatch(BWAPI::Unit unit);
+		const BWAPI::Unit getAssignedMineralPatch(BWAPI::Unit unit) const;
 
 		void setFrameStartMining(BWAPI::Unit unit, int frame);
 		const int getFrameStartMining(BWAPI::Unit unit);
-		WorkerState getWorkerState(BWAPI::Unit unit);
+		const WorkerState getWorkerState(BWAPI::Unit unit) const;
 		void setWorkerState(BWAPI::Unit unit, WorkerState state);
 
 		void removeWorkerFromPatch(BWAPI::Unit unit);

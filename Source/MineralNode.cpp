@@ -6,19 +6,21 @@ MineralNode::MineralNode()
 {
 }
 
-
-MineralNode::~MineralNode()
-{
-}
-
 void MineralNode::initializePatch()
 {
 	for (auto & min : _mineralNodes)
 	{
-		WorkerNodeQueue dw(min, min->getID());
-		_deque_workers.push_back(dw);
+		WorkerNodeDeque dwq;
+		dwq.patch = min;
+		dwq.patch_id = min->getID();
+		_deque_workers.emplace_back(dwq);
+		if (Config::TestOptions::ParallelAssignmentMining)
+		{
+			mutexes.emplace_back();
+		}
 	}
 }
+
 
 void MineralNode::insertWorkerToPatch(WorkerMining worker, int patch_id)
 {
@@ -26,15 +28,29 @@ void MineralNode::insertWorkerToPatch(WorkerMining worker, int patch_id)
 	{
 		if (d.patch_id == patch_id)
 		{
-			d.deque.push_back(worker);
+			d.deque.emplace_back(worker);
 		}
+	}
+}
+
+void MineralNode::insertWorkerToPatchParallel(WorkerMining worker, int patch_id)
+{
+	int count = 0;
+	for (auto & d : _deque_workers)
+	{
+		if (d.patch_id == patch_id)
+		{
+			std::lock_guard<std::mutex> lock(mutexes[count]);
+			d.deque.emplace_back(worker);
+		}
+		count++;
 	}
 }
 
 void MineralNode::displayWorkerinDeque()
 {
 	int count = 0;
-	for (const auto d : _deque_workers)
+	for (const auto & d : _deque_workers)
 	{
 		BWAPI::Broodwar->drawTextScreen(360, 180 + (count * 10),
 			"patch_id: %d, size: %d", d.patch_id, d.deque.size());
@@ -71,11 +87,11 @@ const WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit) const
 	}
 }
 
-WorkerState MineralNode::getWorkerState(BWAPI::Unit unit)
+const WorkerState MineralNode::getWorkerState(BWAPI::Unit unit) const
 {
-	for (auto d : _deque_workers)
+	for (const auto & d : _deque_workers)
 	{
-		for (auto w : d.deque)
+		for (const auto & w : d.deque)
 		{
 			if (w.getWorkerID() == unit->getID())
 			{
@@ -92,11 +108,11 @@ void MineralNode::setWorkerState(BWAPI::Unit unit, WorkerState state)
 	getWorkerMining(unit).state = state;
 }
 
-BWAPI::Unit MineralNode::getAssignedMineralPatch(BWAPI::Unit unit)
+const BWAPI::Unit MineralNode::getAssignedMineralPatch(BWAPI::Unit unit) const
 {
-	for (auto node : _deque_workers)
+	for (const auto & node : _deque_workers)
 	{
-		for (auto worker : node.deque)
+		for (const auto & worker : node.deque)
 		{
 			if (worker.getWorkerID() == unit->getID())
 			{

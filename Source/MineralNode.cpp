@@ -21,7 +21,6 @@ void MineralNode::initializePatch()
 	}
 }
 
-
 void MineralNode::insertWorkerToPatch(WorkerMining worker, int patch_id)
 {
 	for (auto & d : _deque_workers)
@@ -146,12 +145,6 @@ void MineralNode::removeWorkerFromPatch(BWAPI::Unit unit)
 	}
 }
 
-
-
-
-
-
-
 BWAPI::Unitset MineralNode::getMineralNodes()
 {
 	return _mineralNodes;
@@ -161,83 +154,3 @@ void MineralNode::insertMineralPatch(BWAPI::Unit unit)
 {
 	_mineralNodes.insert(unit);
 }
-
-
-
-
-// ----------------------------------
-
-/*std::vector<std::pair<int, std::deque<WorkerMining>> > MineralNode::getMineralPatch()
-{
-	return _mineral_patch;
-}
-
-
-
-void MineralNode::initializeMineralPatches()
-{
-	//TODO use mineral count at starting base location
-	for (auto & mineral_node : _mineralNodes)
-	{
-		std::deque<WorkerMining> deque;
-		int id = mineral_node->getID();
-		_mineral_patch.push_back(std::make_pair(id, deque));
-	}
-}
-
-
-
-void MineralNode::removeMineralPatch(BWAPI::Unit unit)
-{
-	_mineralNodes.erase(unit);
-}
-
-
-
-
-
-void MineralNode::insertWorkerToPatch(WorkerMining worker, int patch_id)//, std::map<int, std::deque<WorkerMining>> & mineral_nodes)
-{
-	// if worker isn't already in the deque
-
-	
-	//BWAPI::Broodwar->sendText("%s", typeid(_mineral_patch[patch_id]).name());
-	
-	_mineral_patch[patch_id].second.push_back(worker);
-	BWAPI::Broodwar->sendText("patch id: %d, size: %d", patch_id, _mineral_patch[patch_id].second.size());
-	
-	//BWAPI::Broodwar->sendText("patch id: %d, size: %d", patch_id, _mineral_patch[patch_id].second.size());
-	
-	//}
-}
-
-// TODO : add test
-void MineralNode::removeWorkerFromPatch(BWAPI::Unit unit)
-{
-	if (!unit) return;
-
-	int min_id = getMineralIDFrom(unit);
-	
-	if (min_id != -1)
-	{
-	_mineral_patch[min_id].second.pop_front();
-	//	_mineral_patch[min_id].pop_front();
-	}
-}
-
-int MineralNode::getMineralIDFrom(BWAPI::Unit unit)
-{
-	for (auto patch : _mineral_patch)
-	{
-		for (auto worker : patch.second)
-		{
-			if (unit->getID() == worker.getWorker()->getID())
-			{
-				return worker.getMineralPatchID();
-			}
-		}
-	}
-	return -1;
-}
-
-*/

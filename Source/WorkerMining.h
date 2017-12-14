@@ -9,7 +9,6 @@ namespace MagBot
 
 	class WorkerMining
 	{
-		int frame_start_moving;
 		int mineral_patch_id;
 		int worker_id;
 
@@ -30,6 +29,7 @@ namespace MagBot
 		~WorkerMining() {};
 
 		WorkerState state;
+		int frame_start_moving;
 		int frame_start_mining;
 		BWAPI::Unit mineral_patch;
 		BWAPI::Unit worker;
@@ -39,8 +39,6 @@ namespace MagBot
 
 		const int getWorkerID() const { return worker_id; }
 		const int getMineralPatchID() const { return mineral_patch_id; }
-		//void setState(enum WorkerState state) { worker_state = state; }
-		//WorkerState getState() { return worker_state; }
 	};
 
 }

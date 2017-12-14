@@ -43,7 +43,6 @@ namespace Config
 		extern bool DrawBuildingsOwnedOrDestroyed;
 		extern bool DrawWorkerTaskInfo;
 		extern bool DrawProductionQueue;
-		extern bool DrawMineralHandling;
 	}
 
 	namespace StratOptions

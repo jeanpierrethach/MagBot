@@ -41,7 +41,6 @@ namespace Config
 		bool DrawBuildingsOwnedOrDestroyed = false;
 		bool DrawWorkerTaskInfo = true;
 		bool DrawProductionQueue = false;
-		bool DrawMineralHandling = true;
 	}
 
 	namespace StratOptions

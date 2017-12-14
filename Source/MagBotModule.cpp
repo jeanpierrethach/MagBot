@@ -9,10 +9,7 @@ using namespace MagBot;
 
 void MagBotModule::onStart()
 {
-
 	InformationManager::Instance().onStart();
-
-	
 
 	BWAPI::Broodwar << "The map is " << BWAPI::Broodwar->mapName() << "!" << std::endl;
  
@@ -36,8 +33,6 @@ void MagBotModule::onStart()
 	{
 		BWAPI::Broodwar->printf("Hello! I am %s, written by %s", Config::BotInfo::BotName.c_str(), Config::BotInfo::Author.c_str());
 	}
-
-	// TODO initialize information manager
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
@@ -78,13 +73,7 @@ void MagBotModule::onFrame()
 	*/
 	if (BWAPI::Broodwar->getFrameCount() % 500 == 0)
 	{
-		//InformationManager::Instance().update();
-		//int minerals = BWAPI::Broodwar->self()->gatheredMinerals();
-		//std::string mins = std::to_string(minerals);
-		//results << mins.c_str() << "\n";
 		InformationManager::Instance().update();
-		//results.close();
-		//BWAPI::Broodwar->sendText("written data");
 	}
 
 	if (BWAPI::Broodwar->getFrameCount()>8005)

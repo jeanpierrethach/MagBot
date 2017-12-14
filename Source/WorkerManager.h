@@ -22,7 +22,6 @@ namespace MagBot {
 		void handleMineralWorkers();
 		void handleGasWorkers();
 		void handleIdleWorkers();
-		//void showDebugMineralHandling();
 
 		void calculateBestPatch(BWAPI::Unit worker);
 

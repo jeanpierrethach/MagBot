@@ -57,5 +57,6 @@ namespace Config
 	namespace TestOptions
 	{
 		extern bool OptimizeMining;
+		extern bool ParallelAssignmentMining;
 	}
 }

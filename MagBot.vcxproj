@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\SafeDeque.cpp" />
     <ClCompile Include="Source\WorkerNodeQueue.cpp" />
     <ClCompile Include="Source\InformationManager.cpp" />
     <ClCompile Include="Source\DefenceManager.cpp" />
@@ -120,6 +121,7 @@
     <ClCompile Include="Source\WorkerMining.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\SafeDeque.h" />
     <ClInclude Include="Source\WorkerNodeQueue.h" />
     <ClInclude Include="Source\InformationManager.h" />
     <ClInclude Include="Source\DefenceManager.h" />

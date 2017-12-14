@@ -38,9 +38,9 @@ namespace Config
 		bool DrawBuildingsCount = true;
 		bool DrawBuildingTilesInfo = true;
 	    bool DrawBuildingTimeInConstruction = true;
-		bool DrawBuildingsOwnedOrDestroyed = true;
+		bool DrawBuildingsOwnedOrDestroyed = false;
 		bool DrawWorkerTaskInfo = true;
-		bool DrawProductionQueue = true;
+		bool DrawProductionQueue = false;
 		bool DrawMineralHandling = true;
 	}
 
@@ -55,5 +55,6 @@ namespace Config
 	namespace TestOptions
 	{
 		bool OptimizeMining = true;
+		bool ParallelAssignmentMining = true;
 	}
 }

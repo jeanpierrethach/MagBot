@@ -55,7 +55,7 @@ void ProductionManager::update()
 		{
 			BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
 			if (!depot->isTraining() && canMakeNow(depot, MetaType{probe})
-				&& BWAPI::Broodwar->self()->completedUnitCount(probe) <= Config::StratOptions::NbOfWorkers)
+				&& BWAPI::Broodwar->self()->completedUnitCount(probe) < Config::StratOptions::NbOfWorkers)
 			{
 				_queue.queueAsHighestPriority(MetaType{probe}, false);
 			}

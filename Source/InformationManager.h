@@ -35,10 +35,9 @@ namespace MagBot
 		double calculateMineralRate();
 		double calculateGasRate();
 
-		// todo gathering rate per sec
-
-		double calculateMineralRatePerSec();
-		double calculateGasRatePerSec();
+		// TODO:
+		//double calculateMineralRatePerSec();
+		//double calculateGasRatePerSec();
 
 		void setEnemyStartingBaseLocation(const BWAPI::Position pos);
 		void setStartingBaseLocation(const BWAPI::Position base_location);

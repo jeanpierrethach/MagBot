@@ -31,12 +31,11 @@ void WorkerManager::update()
 {
 	updateWorkerCount();
 
-	// TODO Move for loop in their respective handle function, to make the conditionals more specific
 	for (const auto & worker : _worker.getWorkers())
 	{
-		// TODO check these conditionals, if can move to init constructor of worker instead and some can keep here for the update
-		// TODO may have to uncomment if worker isConstruction since we want to be able to have multiple builders at the same time
-		/*if (!worker->exists())
+		// Uncomment when these states will need to be considered
+		/*
+		if (!worker->exists())
 			continue;
 
 		// Ignore the unit if it has one of the following status ailments
@@ -52,7 +51,7 @@ void WorkerManager::update()
 			continue;
 		*/
 
-		if (!worker->isCompleted()) // || worker->isConstructing() TODO may have to remove isConstructing or try to redisplay MINER, etc.
+		if (!worker->isCompleted())
 			continue;
 
 		if (worker->isIdle()
@@ -62,11 +61,7 @@ void WorkerManager::update()
 			_worker.setWorkerTask(worker, Worker::IDLE);
 		}
 
-		// ************** IN PROGRESS **************
-
-		// TODO change logic, find the assigned unit (refinery to the worker)
-		// TODO add function to force assignment to refinery? -> get 3 closest mineral worker and isnt carrying minerals
-		
+		// TODO add function to force assignment to refinery -> get 3 closest mineral worker and that aren't carrying minerals
 		if (_worker.getWorkerTask(worker) == Worker::GAS)
 		{
 			BWAPI::Unit refinery = _worker.getWorkerResource(worker);
@@ -85,14 +80,13 @@ void WorkerManager::update()
 		{
 			showDebugWorkerInfo(worker);
 		}
-		
 	}
 
 	handleGasWorkers();
 	handleIdleWorkers();
+	optimizeWorkersMining();
 
 	//handleMineralWorkers();
-	optimizeWorkersMining();
 }
 
 void WorkerManager::updateWorkerCount()
@@ -100,16 +94,6 @@ void WorkerManager::updateWorkerCount()
 	_worker.update();
 }
 
-// TODO : FIX BUG multiple gateways is built, probe task glitch, check !test_location.isValid() ?
-
-// whats happening, when enough minerals, closest mining worker is set to builder and wants to build, but a worker set to mine
-// also wants to build it
-
-// may be related to the fact that when getbuild gets called, the closest mining worker is set to Builder
-// then if the test location isn't valid, we go to the next closest mining worker?
-// Possible solution : add reserved tiles? getValidBuildingLocation when doing test_location in BuildingManager
-
-// this problem occurs in Benzene 1.1 top right location
 BWAPI::Unit WorkerManager::getBuilder(Building & building)
 {
 	BWAPI::Unit closest_mining_worker = nullptr;
@@ -142,85 +126,6 @@ BWAPI::Unit WorkerManager::getBuilder(Building & building)
 	return closest_mining_worker;
 }
 
-// TODO finish this function
-// Can be used with a Building _final_position tile position
-BWAPI::Unit WorkerManager::getBuilderClosestTo(BWAPI::TilePosition tile_position)
-{
-	BWAPI::Unit closest_mining_worker = nullptr;
-	int closest_mining_distance {9999};
-
-	// find the closest unit to this one -> so find the worker which is the closest to the pylon
-	for (const auto & worker : _worker.getWorkers())
-	{
-		if (_worker.getWorkerTask(worker) == Worker::SCOUT || _worker.getWorkerTask(worker) == Worker::GAS)
-			continue;
-
-		if (_worker.getWorkerTask(worker) == Worker::MINE)
-		{
-			int distance = worker->getDistance(BWAPI::Position(tile_position));
-			if (!closest_mining_worker || distance < closest_mining_distance)
-			{
-				closest_mining_worker = worker;
-				closest_mining_distance = distance;
-			}
-		}
-	}
-
-	if (!closest_mining_worker)
-	{
-		//return getBuilder();
-	}
-	return closest_mining_worker;
-}
-
-// TODO could add int or a type Priority for the BuildOrderManager
-/*bool WorkerManager::build(BWAPI::UnitType unit_type)
-{
-	// TODO modify to pylons built, that exist then if !canBuildHere then continue, if can build, if cant find then build pylon,
-	// TODO fix bug when targetlocation is slightly in the fog of war, it doesn't build it: SOLUTION -> moveBuilder to location before?
-	// -> could be even before having enough minerals to optimize build time
-	// TODO when selecting a valid targetlocation, make sure it stays there unless theres something blocking the construction
-	// TODO FIX targetlocation example : building photon cannons on some of the tiles of a pylon, etc.
-	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
-	{
-		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon || unit_type == BWAPI::UnitTypes::Protoss_Pylon)
-		{
-			TilePosition pos = unit->getTilePosition();
-			TilePosition target_build_location = Broodwar->getBuildLocation(unit_type, pos);
-
-			// TODO fix getBuilderClosestTo
-			//BWAPI::Unit builder = getBuilderClosestTo(target_build_location);
-			BWAPI::Unit builder = getBuilder();
-
-			if (!builder)
-				return false;
-
-			if (Broodwar->canBuildHere(target_build_location, unit_type, builder))
-			{
-				_worker.setWorkerTask(builder, Worker::BUILD, unit_type);
-				//Broodwar->drawBoxMap(Position(target_build_location), Position(target_build_location + unitType.tileSize()), Colors::Green);
-				
-				if (Config::DebugInfo::DrawAllInfo)
-				{
-					Broodwar->registerEvent([target_build_location, unit_type](Game*)
-					{ Broodwar->drawBoxMap(Position(target_build_location),
-					Position(target_build_location + unit_type.tileSize()), Colors::Green); },   // action
-					nullptr,    // condition
-					42);  // frames to run
-				}		
-				
-				builder->build(unit_type, target_build_location);
-				// TODO check return here or after the condition
-				return true;
-
-			}		
-			// TODO check return here or inside the condition
-			// return;
-		}
-	}
-	return false;
-}*/
-
 void WorkerManager::showDebugWorkerInfo(const BWAPI::Unit & worker)
 {
 	BWAPI::Position pos = worker->getPosition();
@@ -243,18 +148,6 @@ void WorkerManager::showDebugWorkerInfo(const BWAPI::Unit & worker)
 	BWAPI::Broodwar->drawTextMap(pos, "%s : %s", getWorkerTaskName(worker).c_str(), state.c_str());
 }
 
-// TODO optimize mineral assignment per worker
-// steps: instantiate queues for each mineral nodes
-// set optimal nb of workers per mineral nodes
-// calculate optimal node for each worker (depending on others)
-// send worker to queue's node
-
-// TODO start of game, assign ids to mineral nodes next to starting base
-// then add into the vector of deques
-
-// loop over mineral nodes and for each id, insert an optimal worker for its node position
-// create mineral node class
-
 void WorkerManager::optimizeWorkersMining()
 {
 	_mineral_nodes.displayWorkerinDeque();
@@ -269,31 +162,27 @@ void WorkerManager::optimizeWorkersMining()
 		if (_worker.getWorkerTask(worker) != Worker::MINE)
 			continue;
 
-		if (state == WorkerState::MOVING_TO_PATCH && order == mining_order) // && _worker.getWorkerTask(worker) == Worker::MINE
+		if (state == WorkerState::MOVING_TO_PATCH && order == mining_order)
 		{
 			int frame = BWAPI::Broodwar->getFrameCount();
 			_mineral_nodes.setFrameStartMining(worker, frame);
 			_mineral_nodes.setWorkerState(worker, WorkerState::MINING);
 		}
 
-		// TODO test
-		// make sure worker mine the correct patch
-
-		// CAUSED ALL PROBLEMS CRASHING 12/14/2017 (size cannot read memory)
-		/*if (state == WorkerState::MINING
-			&& !worker->isCarryingMinerals() && _worker.getWorkerTask(worker) == Worker::MINE)
+		// TODO: 12/14/2017 (size() cannot read memory)
+		/*if (state == WorkerState::MINING && !worker->isCarryingMinerals())
 		{
 			BWAPI::Unit assigned_patch = _mineral_nodes.getAssignedMineralPatch(worker);
 			worker->rightClick(assigned_patch);
 			continue;
 		}*/
 
-		if (state == WorkerState::MINING && worker->isCarryingMinerals()) //  && _worker.getWorkerTask(worker) == Worker::MINE
+		if (state == WorkerState::MINING && worker->isCarryingMinerals())
 		{
 			_mineral_nodes.removeWorkerFromPatch(worker);
 		}
 
-		if (state == WorkerState::NONE && !worker->isCarryingMinerals()) // && _worker.getWorkerTask(worker) == Worker::MINE
+		if (state == WorkerState::NONE && !worker->isCarryingMinerals())
 		{
 			if (Config::TestOptions::ParallelAssignmentMining)
 			{
@@ -308,49 +197,24 @@ void WorkerManager::optimizeWorkersMining()
 
 		// This is called once whenever the worker has been sucessfully completed,
 		// trained from the depot
-		if (worker->isIdle()) // && _worker.getWorkerTask(worker) == Worker::MINE
+		if (worker->isIdle())
 		{
-			// THIS SEEMS NOT ENTERING since worker will never be idle again
-			// because of automatic call of returnCargo for right click
-			// or gather
-			/*if (worker->isCarryingMinerals())
+			if (Config::TestOptions::ParallelAssignmentMining)
 			{
-				//worker->returnCargo();
-			} 
-			else 
-			{*/
-				if (Config::TestOptions::ParallelAssignmentMining)
-				{
-					std::thread second(&WorkerManager::calculateBestPatch, this, worker);
-					second.join();
-				}
-				else
-				{
-					calculateBestPatch(worker);
-				}			
-			//}
+				std::thread second(&WorkerManager::calculateBestPatch, this, worker);
+				second.join();
+			}
+			else
+			{
+				calculateBestPatch(worker);
+			}			
 		}
 	}
 }
 
 
 void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
-{
-	// TODO if best patch according to algorithm
-	// then if that patch already has 2 workers then get
-	// other best patch
-
-	// iterate over all workers mining
-	// get remaining mining frames for each worker
-
-	// calculate distance in frames for current position and
-	// patch + patch to depot
-
-	// assign best patch which minimize 
-	// frames to the current worker
-
-	// search for mineral patch queue
-	
+{	
 	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	// source : http://wiki.teamliquid.net/starcraft/Mining
@@ -431,8 +295,8 @@ void WorkerManager::handleMineralWorkers()
 			{
 				worker->returnCargo();
 			}
-			else if (!worker->getPowerUp())  // The worker cannot harvest anything if it
-			{                                // is carrying a powerup such as a flag
+			else if (!worker->getPowerUp())  // The worker cannot harvest anything if it is carrying a powerup such as a flag
+			{
 				if (!worker->gather(worker->getClosestUnit(BWAPI::Filter::IsMineralField)))
 				{
 					// If the call fails, then print the last error message

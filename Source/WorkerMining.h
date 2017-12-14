@@ -4,23 +4,14 @@
 
 namespace MagBot
 {
-	// TODO:
-	// check which enum needed
+
 	enum WorkerState { MOVING_TO_PATCH = 0, MINING = 1, MOVING_TO_DEPOT = 2, NONE = 3 };
 
 	class WorkerMining
 	{
-		
-		//enum WorkerState { MOVING_TO_PATCH = 0, MINING = 1 };
-
 		int frame_start_moving;
-		
-		
 		int mineral_patch_id;
-
-		
 		int worker_id;
-		//uint8_t current_workers;
 
 	public:
 		WorkerMining() {};
@@ -33,6 +24,8 @@ namespace MagBot
 			worker = worker;
 			mineral_patch_id = mineral_patch->getID();
 			worker_id = worker->getID();
+			patch_pos_x = mineral_patch->getPosition().x;
+			patch_pos_y = mineral_patch->getPosition().y;
 		};
 		~WorkerMining() {};
 
@@ -40,6 +33,9 @@ namespace MagBot
 		int frame_start_mining;
 		BWAPI::Unit mineral_patch;
 		BWAPI::Unit worker;
+
+		int patch_pos_x;
+		int patch_pos_y;
 
 		const int getWorkerID() const { return worker_id; }
 		const int getMineralPatchID() const { return mineral_patch_id; }

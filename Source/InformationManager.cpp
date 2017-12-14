@@ -72,7 +72,6 @@ BWAPI::Position InformationManager::getStartingBaseLocation()
 	return _starting_base_location;
 }
 
-// TODO write meta information for acceleration between sequential and parallel methods
 void InformationManager::openFileData(std::ofstream & file, std::string path)
 {
 	file.open(path);
@@ -85,7 +84,9 @@ void InformationManager::openFileData(std::ofstream & file, std::string path)
 
 void InformationManager::writeData(std::ofstream & file)
 {
-	file << BWAPI::Broodwar->self()->gatheredMinerals() << "\n";
+	std::lock_guard<std::mutex> lock(mutex);
+	file << "Frame:" << BWAPI::Broodwar->getFrameCount() << std::setw(3) << "\t"
+		 << "Total minerals:"<< BWAPI::Broodwar->self()->gatheredMinerals() << "\n";
 }
 
 void InformationManager::closeFileData(std::ofstream & file)
@@ -106,6 +107,23 @@ void InformationManager::update()
 void InformationManager::onClose()
 {
 	closeFileData(_mineral_data_file);
+}
+
+void InformationManager::writeInfo(std::ofstream & file, WorkerMining worker_mining, long long duration)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	file << "Frame:" << BWAPI::Broodwar->getFrameCount() << std::setw(6) << "\t"
+		 << "worker_id:" << worker_mining.getWorkerID() << std::setw(6) << "\t"
+		 << "assigned_patch_id:" << worker_mining.getMineralPatchID() << std::setw(3) << "\t"
+		 << "patch_pos:" << "(" << worker_mining.patch_pos_x << ","
+		 << worker_mining.patch_pos_y << ")" << std::setw(5) << "\t"
+		 << "RUNTIME of calculateBestPatch:" << duration << " microseconds"
+		 << "\n";
+}
+
+void InformationManager::log(WorkerMining worker_mining, long long duration)
+{
+	writeInfo(_mineral_data_file, worker_mining, duration);
 }
 
 InformationManager & InformationManager::Instance()

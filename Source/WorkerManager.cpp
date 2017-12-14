@@ -16,7 +16,12 @@ WorkerManager::WorkerManager()
 	}
 
 	//_mineral_nodes.initializeMineralPatches();
+
 	_mineral_nodes.initializePatch();
+	
+	
+
+
 	//_deque_workers.initializePatch();
 	//BWAPI::Broodwar->sendText("mineral_patch_count: %d", _mineral_nodes.getMineralPatch().size());
 	//BWAPI::Broodwar->sendText("mineral nodes count: %d", _mineral_nodes.getMineralNodes().size());
@@ -327,33 +332,35 @@ void WorkerManager::optimizeWorkersMining()
 
 		// TODO test
 		// make sure worker mine the correct patch
-		if (state == WorkerState::MINING
+
+		// CAUSED ALL PROBLEMS CRASHING 12/14/2017 (size cannot read memory)
+		/*if (state == WorkerState::MINING
 			&& !worker->isCarryingMinerals() && _worker.getWorkerTask(worker) == Worker::MINE)
 		{
 			BWAPI::Unit assigned_patch = _mineral_nodes.getAssignedMineralPatch(worker);
 			worker->rightClick(assigned_patch);
 			continue;
-		}
+		}*/
 
 		if (state == WorkerState::MINING && 
 			worker->isCarryingMinerals() && _worker.getWorkerTask(worker) == Worker::MINE)
 		{
-			// TODO find solution
-			// since we remove worker from deque
-			// can't verify state == WorkerState::MOVING_TO_DEPOT
 			_mineral_nodes.removeWorkerFromPatch(worker);
-			//_mineral_nodes.setWorkerState(worker, WorkerState::MOVING_TO_DEPOT);
-			//BWAPI::Broodwar->sendText("state: MOVING TO DEPOT");
 		}
 
 
-		if (state == WorkerState::NONE && //state == WorkerState::MOVING_TO_DEPOT &&
+		if (state == WorkerState::NONE &&
 			!worker->isCarryingMinerals() && _worker.getWorkerTask(worker) == Worker::MINE)
 		{
-			calculateBestPatch(worker);
-
-			//_mineral_nodes.setWorkerState(worker, WorkerState::MOVING_TO_PATCH);
-			//BWAPI::Broodwar->sendText("state: MOVING TO PATCH");
+			if (Config::TestOptions::ParallelAssignmentMining)
+			{
+				std::thread first(&WorkerManager::calculateBestPatch, this, worker);
+				first.join();
+			}
+			else
+			{
+				calculateBestPatch(worker);
+			}
 		}
 
 		// TODO:
@@ -371,7 +378,15 @@ void WorkerManager::optimizeWorkersMining()
 			} 
 			else 
 			{
-				calculateBestPatch(worker);
+				if (Config::TestOptions::ParallelAssignmentMining)
+				{
+					std::thread second(&WorkerManager::calculateBestPatch, this, worker);
+					second.join();
+				}
+				else
+				{
+					calculateBestPatch(worker);
+				}			
 			}
 
 		}
@@ -391,6 +406,7 @@ void WorkerManager::optimizeWorkersMining()
 	}
 }
 
+
 void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 {
 	// TODO if best patch according to algorithm
@@ -407,20 +423,23 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 	// frames to the current worker
 
 	// search for mineral patch queue
+	
+	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+
 	const int MINING_TIME = 80;
 	
 	BWAPI::Unit best_patch = nullptr;
 	int total_work = 0;
 
 	// calculate total work for each deque and minimize
-	for (auto d : _mineral_nodes._deque_workers)
+	for (auto & d : _mineral_nodes._deque_workers)
 	{
 		int total_work_deque = 0;
 
 		if (d.deque.size() > 2)
 			continue;
 
-		for (auto w : d.deque)
+		for (auto & w : d.deque)
 		{
 			// not started mining
 			if (w.frame_start_mining == 0)
@@ -434,8 +453,6 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 				total_work_deque += MINING_TIME - (current_frame - w.frame_start_mining);
 			}
 		}
-
-		//BWAPI::Broodwar->sendText("total_work_deque: %d", total_work_deque);
 
 		// calculate work for current worker searching for patch
 		int work_current_worker = 0;
@@ -454,14 +471,26 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 	}
 
 	int frame_start_moving = BWAPI::Broodwar->getFrameCount();
-	WorkerMining worker_mining(0, frame_start_moving, best_patch, worker); // closest_patch
+	WorkerMining worker_mining(0, frame_start_moving, best_patch, worker);
 
 	worker_mining.state = WorkerState::MOVING_TO_PATCH;
 	
 	int patch_id = best_patch->getID();
-	_mineral_nodes.insertWorkerToPatch(worker_mining, patch_id);
+
+	if (Config::TestOptions::ParallelAssignmentMining)
+	{
+		_mineral_nodes.insertWorkerToPatchParallel(worker_mining, patch_id);
+	}
+	else
+	{
+		_mineral_nodes.insertWorkerToPatch(worker_mining, patch_id);
+	}
 
 	worker->gather(best_patch);
+
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+	long long duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+	InformationManager::Instance().log(worker_mining, duration);
 }
 
 /*void WorkerManager::showDebugMineralHandling()

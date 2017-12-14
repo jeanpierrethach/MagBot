@@ -8,6 +8,9 @@
 #include <stdint.h>
 #include <deque>
 
+#include <thread>
+#include <string>
+#include <chrono>
 
 namespace MagBot {
 

@@ -5,6 +5,10 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "WorkerMining.h"
+
+#include <iomanip>
+#include <mutex>
 
 namespace MagBot
 {
@@ -20,6 +24,8 @@ namespace MagBot
 		BWAPI::Position _starting_base_location;
 
 		std::ofstream _mineral_data_file;
+
+		std::mutex mutex;
 
 	public:
 		InformationManager();
@@ -40,9 +46,12 @@ namespace MagBot
 
 		void openFileData(std::ofstream & file, std::string path);
 		void writeData(std::ofstream & file);
-		void writeData();
+		
 		void closeFileData(std::ofstream & file);
 		void onClose();
+
+		void writeInfo(std::ofstream & file, WorkerMining worker_mining, long long duration);
+		void log(WorkerMining worker_mining, long long duration);
 
 		void update();
 

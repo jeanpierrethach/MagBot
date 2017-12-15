@@ -182,32 +182,18 @@ void WorkerManager::optimizeWorkersMining()
 			_mineral_nodes.removeWorkerFromPatch(worker);
 		}
 
-		if (state == WorkerState::NONE && !worker->isCarryingMinerals())
+		// isIdle() is called once whenever the worker has been sucessfully completed trained from the depot
+		if ((state == WorkerState::NONE && !worker->isCarryingMinerals() || worker->isIdle()))	
 		{
-			if (Config::TestOptions::ParallelAssignmentMining)
+			if (Config::OptimizationOptions::ParallelAssignmentMining)
 			{
-				std::thread first(&WorkerManager::assignBestPatch, this, worker);
-				first.join();
+				std::thread th(&WorkerManager::assignBestPatch, this, worker);
+				th.join();
 			}
 			else
 			{
 				assignBestPatch(worker);
 			}
-		}
-
-		// This is called once whenever the worker has been sucessfully completed,
-		// trained from the depot
-		if (worker->isIdle())
-		{
-			if (Config::TestOptions::ParallelAssignmentMining)
-			{
-				std::thread second(&WorkerManager::assignBestPatch, this, worker);
-				second.join();
-			}
-			else
-			{
-				assignBestPatch(worker);
-			}			
 		}
 	}
 }
@@ -284,13 +270,13 @@ void WorkerManager::assignBestPatch(BWAPI::Unit worker)
 
 	BWAPI::Unit best_patch = nullptr;
 
-	if (Config::TestOptions::ParallelAssignmentMining)
+	if (Config::OptimizationOptions::ParallelAssignmentMining)
 	{
 		std::vector<std::future<std::pair<BWAPI::Unit, int>> > futures;
 
-		for (int i = 0; i < Config::TestOptions::NbThreads; i++)
+		for (int i = 0; i < Config::OptimizationOptions::NbThreads; i++)
 		{
-			std::pair<int, int> range = getRangePair(i, _mineral_nodes._deque_workers.size(), Config::TestOptions::NbThreads);
+			std::pair<int, int> range = getRangePair(i, _mineral_nodes._deque_workers.size(), Config::OptimizationOptions::NbThreads);
 			futures.emplace_back(std::async(&WorkerManager::calculateBestPatch, this, worker, range.first, range.second));
 		}
 
@@ -319,7 +305,7 @@ void WorkerManager::assignBestPatch(BWAPI::Unit worker)
 	
 	int patch_id = best_patch->getID();
 
-	if (Config::TestOptions::ParallelAssignmentMining)
+	if (Config::OptimizationOptions::ParallelAssignmentMining)
 	{
 		_mineral_nodes.insertWorkerToPatchParallel(worker_mining, patch_id);
 	}

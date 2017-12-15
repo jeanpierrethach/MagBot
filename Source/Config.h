@@ -53,10 +53,15 @@ namespace Config
 		extern int NbOfWorkers;
 	}
 
-	namespace TestOptions
+	namespace OptimizationOptions
 	{
 		extern bool OptimizeMining;
 		extern bool ParallelAssignmentMining;
 		extern int NbThreads;
+	}
+
+	namespace GameOptions
+	{
+		extern int FrameEndGame;
 	}
 }

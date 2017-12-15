@@ -8,7 +8,7 @@ ProductionManager::ProductionManager()
 	{
 		setBuildOrder(StrategyManager::Instance().getOpeningBuildOrder());
 	}
-	if (Config::TestOptions::OptimizeMining)
+	if (Config::OptimizationOptions::OptimizeMining)
 	{
 		setBuildOrder(StrategyManager::Instance().optimizeMiningTest());
 	}

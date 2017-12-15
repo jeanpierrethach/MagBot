@@ -51,10 +51,15 @@ namespace Config
 	    int NbOfWorkers = 18;
 	}
 
-	namespace TestOptions
+	namespace OptimizationOptions
 	{
 		bool OptimizeMining = true;
 		bool ParallelAssignmentMining = true;
 		int NbThreads = 3;
+	}
+
+	namespace GameOptions
+	{
+		int FrameEndGame = 8005;
 	}
 }

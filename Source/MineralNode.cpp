@@ -10,11 +10,11 @@ void MineralNode::initializePatch()
 {
 	for (auto & min : _mineralNodes)
 	{
-		WorkerNodeDeque dwq;
-		dwq.patch = min;
-		dwq.patch_id = min->getID();
-		_deque_workers.emplace_back(dwq);
-		if (Config::TestOptions::ParallelAssignmentMining)
+		WorkerNodeDeque wnd;
+		wnd.patch = min;
+		wnd.patch_id = min->getID();
+		_deque_workers.emplace_back(wnd);
+		if (Config::OptimizationOptions::ParallelAssignmentMining)
 		{
 			mutexes.emplace_back();
 		}
@@ -23,11 +23,11 @@ void MineralNode::initializePatch()
 
 void MineralNode::insertWorkerToPatch(WorkerMining worker, int patch_id)
 {
-	for (auto & d : _deque_workers)
+	for (auto & node : _deque_workers)
 	{
-		if (d.patch_id == patch_id)
+		if (node.patch_id == patch_id)
 		{
-			d.deque.emplace_back(worker);
+			node.deque.emplace_back(worker);
 		}
 	}
 }
@@ -35,12 +35,12 @@ void MineralNode::insertWorkerToPatch(WorkerMining worker, int patch_id)
 void MineralNode::insertWorkerToPatchParallel(WorkerMining worker, int patch_id)
 {
 	int count = 0;
-	for (auto & d : _deque_workers)
+	for (auto & node : _deque_workers)
 	{
-		if (d.patch_id == patch_id)
+		if (node.patch_id == patch_id)
 		{
 			std::lock_guard<std::mutex> lock(mutexes[count]);
-			d.deque.emplace_back(worker);
+			node.deque.emplace_back(worker);
 		}
 		count++;
 	}
@@ -49,24 +49,24 @@ void MineralNode::insertWorkerToPatchParallel(WorkerMining worker, int patch_id)
 void MineralNode::displayWorkerinDeque()
 {
 	int count = 0;
-	for (const auto & d : _deque_workers)
+	for (const auto & node : _deque_workers)
 	{
 		BWAPI::Broodwar->drawTextScreen(360, 180 + (count * 10),
-			"patch_id: %d, size: %d", d.patch_id, d.deque.size());
+			"patch_id: %d, size: %d", node.patch_id, node.deque.size());
 		count++;
-		//BWAPI::Broodwar->sendText("patch_id: %d, size: %d", d.patch_id, d.deque.size());
+		//BWAPI::Broodwar->sendText("patch_id: %d, size: %d", node.patch_id, node.deque.size());
 	}
 }
 
 WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit)
 {
-	for (auto & d : _deque_workers)
+	for (auto & node : _deque_workers)
 	{
-		for (auto & w : d.deque)
+		for (auto & worker : node.deque)
 		{
-			if (w.getWorkerID() == unit->getID())
+			if (worker.getWorkerID() == unit->getID())
 			{
-				return w;
+				return worker;
 			}
 		}
 	}
@@ -74,13 +74,13 @@ WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit)
 
 const WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit) const
 {
-	for (const auto & d : _deque_workers)
+	for (const auto & node : _deque_workers)
 	{
-		for (const auto & w : d.deque)
+		for (const auto & worker : node.deque)
 		{
-			if (w.getWorkerID() == unit->getID())
+			if (worker.getWorkerID() == unit->getID())
 			{
-				return w;
+				return worker;
 			}
 		}
 	}
@@ -88,13 +88,13 @@ const WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit) const
 
 const WorkerState MineralNode::getWorkerState(BWAPI::Unit unit) const
 {
-	for (const auto & d : _deque_workers)
+	for (const auto & node : _deque_workers)
 	{
-		for (const auto & w : d.deque)
+		for (const auto & worker : node.deque)
 		{
-			if (w.getWorkerID() == unit->getID())
+			if (worker.getWorkerID() == unit->getID())
 			{
-				WorkerState state = w.state;
+				WorkerState state = worker.state;
 				return state;
 			}
 		}
@@ -109,16 +109,7 @@ void MineralNode::setWorkerState(BWAPI::Unit unit, WorkerState state)
 
 const BWAPI::Unit MineralNode::getAssignedMineralPatch(BWAPI::Unit unit) const
 {
-	for (const auto & node : _deque_workers)
-	{
-		for (const auto & worker : node.deque)
-		{
-			if (worker.getWorkerID() == unit->getID())
-			{
-				return worker.mineral_patch;
-			}
-		}
-	}
+	return getWorkerMining(unit).mineral_patch;
 }
 
 void MineralNode::setFrameStartMining(BWAPI::Unit unit, int frame)

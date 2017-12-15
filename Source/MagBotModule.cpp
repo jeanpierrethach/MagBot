@@ -76,7 +76,7 @@ void MagBotModule::onFrame()
 		InformationManager::Instance().update();
 	}
 
-	if (BWAPI::Broodwar->getFrameCount()>8005)
+	if (BWAPI::Broodwar->getFrameCount() > Config::GameOptions::FrameEndGame)
 	{
 		InformationManager::Instance().onClose();
 		BWAPI::Broodwar->leaveGame();

@@ -55,7 +55,7 @@ namespace Config
 	{
 		bool OptimizeMining = true;
 		bool ParallelAssignmentMining = true;
-		int NbThreads = 3;
+		int NbThreads = 2;
 	}
 
 	namespace GameOptions

@@ -51,7 +51,7 @@ void MineralNode::displayWorkerinDeque()
 	int count = 0;
 	for (const auto & node : _deque_workers)
 	{
-		BWAPI::Broodwar->drawTextScreen(360, 180 + (count * 10),
+		BWAPI::Broodwar->drawTextScreen(120, 180 + (count * 10),
 			"patch_id: %d, size: %d", node.patch_id, node.deque.size());
 		count++;
 		//BWAPI::Broodwar->sendText("patch_id: %d, size: %d", node.patch_id, node.deque.size());

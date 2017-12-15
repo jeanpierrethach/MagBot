@@ -13,20 +13,15 @@ namespace MagBot
 		int worker_id;
 
 	public:
-		WorkerMining() {};
 		WorkerMining(int frame_start_mining, int frame_start_moving,
-			BWAPI::Unit mineral_patch, BWAPI::Unit worker)
+			BWAPI::Unit mineral_patch, BWAPI::Unit worker) : frame_start_mining(frame_start_mining),
+			frame_start_moving(frame_start_moving), mineral_patch(mineral_patch), worker(worker)
 		{
-			frame_start_mining = frame_start_mining;
-			frame_start_moving = frame_start_moving;
-			mineral_patch = mineral_patch;
-			worker = worker;
 			mineral_patch_id = mineral_patch->getID();
 			worker_id = worker->getID();
 			patch_pos_x = mineral_patch->getPosition().x;
 			patch_pos_y = mineral_patch->getPosition().y;
 		};
-		~WorkerMining() {};
 
 		WorkerState state;
 		int frame_start_moving;

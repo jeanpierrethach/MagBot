@@ -19,7 +19,7 @@ void SquadManager::update()
 	
 	if (_squads.isEmpty())
 	{
-		BWAPI::Broodwar->sendText("_squads is empty");
+		//BWAPI::Broodwar->sendText("_squads is empty");
 		Squad squad;
 		_squads.addSquad(squad);
 	}

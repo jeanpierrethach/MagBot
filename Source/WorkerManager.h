@@ -12,6 +12,8 @@
 #include <future>
 #include <string>
 #include <chrono>
+#include <mutex>
+#include <condition_variable>
 
 namespace MagBot {
 

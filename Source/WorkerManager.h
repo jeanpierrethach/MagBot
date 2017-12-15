@@ -24,7 +24,9 @@ namespace MagBot {
 		void handleGasWorkers();
 		void handleIdleWorkers();
 
-		std::pair<BWAPI::Unit, int> calculateBestPatch(BWAPI::Unit worker, int begin, int end);
+		std::pair<int, int> getRangePair(int no_future, int size, int nb_threads);
+
+		std::pair<BWAPI::Unit, int> calculateBestPatch(BWAPI::Unit worker, const int begin, const int end);
 		void assignBestPatch(BWAPI::Unit worker);
 		
 	public:

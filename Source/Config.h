@@ -57,5 +57,6 @@ namespace Config
 	{
 		extern bool OptimizeMining;
 		extern bool ParallelAssignmentMining;
+		extern int NbThreads;
 	}
 }

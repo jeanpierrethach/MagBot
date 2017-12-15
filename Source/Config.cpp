@@ -55,5 +55,6 @@ namespace Config
 	{
 		bool OptimizeMining = true;
 		bool ParallelAssignmentMining = true;
+		int NbThreads = 3;
 	}
 }

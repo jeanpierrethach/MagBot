@@ -212,8 +212,13 @@ void WorkerManager::optimizeWorkersMining()
 	}
 }
 
-std::pair<BWAPI::Unit, int> WorkerManager::calculateBestPatch(BWAPI::Unit worker, int begin, int end)
+std::pair<BWAPI::Unit, int> WorkerManager::calculateBestPatch(BWAPI::Unit worker, const int begin, const int end)
 {
+	if (end > _mineral_nodes._deque_workers.size())
+	{
+		throw std::runtime_error("WorkerManager::calculateBestPatch: Random access out of bounds");
+	}
+
 	BWAPI::Unit best_patch = nullptr;
 	int total_work = 0;
 
@@ -265,6 +270,14 @@ std::pair<BWAPI::Unit, int> WorkerManager::calculateBestPatch(BWAPI::Unit worker
 	return std::make_pair(best_patch, total_work);
 }
 
+std::pair<int, int> WorkerManager::getRangePair(int no_future, int size, int nb_threads)
+{
+	int inferior_index = no_future * size / nb_threads;
+	int superior_index = (no_future + 1) * size / nb_threads - 1;
+	
+	return std::make_pair(inferior_index, superior_index);
+}
+
 void WorkerManager::assignBestPatch(BWAPI::Unit worker)
 {	
 	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -275,11 +288,10 @@ void WorkerManager::assignBestPatch(BWAPI::Unit worker)
 	{
 		std::vector<std::future<std::pair<BWAPI::Unit, int>> > futures;
 
-		for (auto it = futures.begin(); it != futures.end(); it++)
+		for (int i = 0; i < Config::TestOptions::NbThreads; i++)
 		{
-			int size = _mineral_nodes._deque_workers.size();
-			futures.emplace_back(std::async(&WorkerManager::calculateBestPatch, this, worker, 0, size / 2));
-			futures.emplace_back(std::async(&WorkerManager::calculateBestPatch, this, worker, (size / 2) + 1, size));
+			std::pair<int, int> range = getRangePair(i, _mineral_nodes._deque_workers.size(), Config::TestOptions::NbThreads);
+			futures.emplace_back(std::async(&WorkerManager::calculateBestPatch, this, worker, range.first, range.second));
 		}
 
 		BWAPI::Unit future_patch = nullptr;

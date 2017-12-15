@@ -89,6 +89,7 @@ void MagBotModule::onFrame()
 		BWAPI::Broodwar->drawTextScreen(0, 40, "APM : %d", BWAPI::Broodwar->getAPM());
 	}
 
+	// TODO catch exception
 	WorkerManager::Instance().update();
 
 	ProductionManager::Instance().update();

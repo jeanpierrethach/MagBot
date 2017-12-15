@@ -9,6 +9,7 @@
 #include <deque>
 
 #include <thread>
+#include <future>
 #include <string>
 #include <chrono>
 
@@ -23,8 +24,9 @@ namespace MagBot {
 		void handleGasWorkers();
 		void handleIdleWorkers();
 
-		void calculateBestPatch(BWAPI::Unit worker);
-
+		std::pair<BWAPI::Unit, int> calculateBestPatch(BWAPI::Unit worker, int begin, int end);
+		void assignBestPatch(BWAPI::Unit worker);
+		
 	public:
 		WorkerManager();
 		~WorkerManager();

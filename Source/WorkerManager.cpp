@@ -186,12 +186,12 @@ void WorkerManager::optimizeWorkersMining()
 		{
 			if (Config::TestOptions::ParallelAssignmentMining)
 			{
-				std::thread first(&WorkerManager::calculateBestPatch, this, worker);
+				std::thread first(&WorkerManager::assignBestPatch, this, worker);
 				first.join();
 			}
 			else
 			{
-				calculateBestPatch(worker);
+				assignBestPatch(worker);
 			}
 		}
 
@@ -201,31 +201,29 @@ void WorkerManager::optimizeWorkersMining()
 		{
 			if (Config::TestOptions::ParallelAssignmentMining)
 			{
-				std::thread second(&WorkerManager::calculateBestPatch, this, worker);
+				std::thread second(&WorkerManager::assignBestPatch, this, worker);
 				second.join();
 			}
 			else
 			{
-				calculateBestPatch(worker);
+				assignBestPatch(worker);
 			}			
 		}
 	}
 }
 
-
-void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
-{	
-	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
-
-	// source : http://wiki.teamliquid.net/starcraft/Mining
-	const int MINING_TIME = 80;
-	
+std::pair<BWAPI::Unit, int> WorkerManager::calculateBestPatch(BWAPI::Unit worker, int begin, int end)
+{
 	BWAPI::Unit best_patch = nullptr;
 	int total_work = 0;
 
-	// calculate total work for each deque and minimize
-	for (auto & d : _mineral_nodes._deque_workers)
+	// source : http://wiki.teamliquid.net/starcraft/Mining
+	const int MINING_TIME = 80;
+
+	for (int i = begin; i < end; i++)
 	{
+		auto & d = _mineral_nodes._deque_workers[i];
+
 		int total_work_deque = 0;
 
 		if (d.deque.size() > 2)
@@ -235,10 +233,10 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 		{
 			// worker has not started mining
 			if (w.frame_start_mining == 0)
-			{	
+			{
 				int distance = w.worker->getDistance(d.patch);
 				total_work_deque += distance + MINING_TIME;
-			} 
+			}
 			else
 			{
 				int current_frame = BWAPI::Broodwar->getFrameCount();
@@ -249,17 +247,57 @@ void WorkerManager::calculateBestPatch(BWAPI::Unit worker)
 		// calculate work for current worker searching for patch
 		int work_current_worker = 0;
 		BWAPI::Position base = InformationManager::getStartingBaseLocation();
-		
+
 		work_current_worker += worker->getDistance(d.patch) + MINING_TIME
-			+ d.patch->getDistance(base);		
+			+ d.patch->getDistance(base);
 
 		int work = total_work_deque + work_current_worker;
 
-		if (!best_patch || work < total_work)
 		{
-			best_patch = d.patch;
-			total_work = work;
+			if (!best_patch || work < total_work)
+			{
+				best_patch = d.patch;
+				total_work = work;
+			}
 		}
+	}
+
+	return std::make_pair(best_patch, total_work);
+}
+
+void WorkerManager::assignBestPatch(BWAPI::Unit worker)
+{	
+	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	BWAPI::Unit best_patch = nullptr;
+
+	if (Config::TestOptions::ParallelAssignmentMining)
+	{
+		std::vector<std::future<std::pair<BWAPI::Unit, int>> > futures;
+
+		for (auto it = futures.begin(); it != futures.end(); it++)
+		{
+			int size = _mineral_nodes._deque_workers.size();
+			futures.emplace_back(std::async(&WorkerManager::calculateBestPatch, this, worker, 0, size / 2));
+			futures.emplace_back(std::async(&WorkerManager::calculateBestPatch, this, worker, (size / 2) + 1, size));
+		}
+
+		BWAPI::Unit future_patch = nullptr;
+		int work = 0;
+		for (auto & f : futures)
+		{
+			auto temp = f.get();
+			if (!future_patch || work > temp.second)
+			{
+				future_patch = temp.first;
+				work = temp.second;
+			}
+		}
+		best_patch = future_patch;
+	}
+	else
+	{
+		best_patch = calculateBestPatch(worker, 0, _mineral_nodes._deque_workers.size()).first;
 	}
 
 	int frame_start_moving = BWAPI::Broodwar->getFrameCount();

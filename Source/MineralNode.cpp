@@ -54,7 +54,6 @@ void MineralNode::displayWorkerinDeque()
 		BWAPI::Broodwar->drawTextScreen(120, 180 + (count * 10),
 			"patch_id: %d, size: %d", node.patch_id, node.deque.size());
 		count++;
-		//BWAPI::Broodwar->sendText("patch_id: %d, size: %d", node.patch_id, node.deque.size());
 	}
 }
 
@@ -64,7 +63,7 @@ WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit)
 	{
 		for (auto & worker : node.deque)
 		{
-			if (worker.getWorkerID() == unit->getID())
+			if (worker.worker_id == unit->getID())
 			{
 				return worker;
 			}
@@ -78,7 +77,7 @@ const WorkerMining & MineralNode::getWorkerMining(BWAPI::Unit unit) const
 	{
 		for (const auto & worker : node.deque)
 		{
-			if (worker.getWorkerID() == unit->getID())
+			if (worker.worker_id == unit->getID())
 			{
 				return worker;
 			}
@@ -92,7 +91,7 @@ const WorkerState MineralNode::getWorkerState(BWAPI::Unit unit) const
 	{
 		for (const auto & worker : node.deque)
 		{
-			if (worker.getWorkerID() == unit->getID())
+			if (worker.worker_id == unit->getID())
 			{
 				WorkerState state = worker.state;
 				return state;
@@ -128,7 +127,7 @@ void MineralNode::removeWorkerFromPatch(BWAPI::Unit unit)
 	{
 		for (auto & worker : node.deque)
 		{
-			if (worker.getWorkerID() == unit->getID())
+			if (worker.worker_id == unit->getID())
 			{
 				node.deque.pop_front();
 			}

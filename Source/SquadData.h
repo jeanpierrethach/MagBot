@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "Unit.h"
 
+
 namespace MagBot
 {
 	struct SquadComposition
@@ -14,10 +15,6 @@ namespace MagBot
 	class Squad
 	{
 		SquadComposition _squad;
-
-		//int _separation_distance;
-		//int _overall_health;
-		//int _overall_power;
 
 	public:
 		BWAPI::Unit getLeader() const { return _squad.squad_leader; }
@@ -38,7 +35,7 @@ namespace MagBot
 		{
 			for (auto & member : _squad.squad_members)
 			{
-				if (member.second.getPosition() == pos)
+				if (member.second.pos == pos)
 				{
 					return true;
 				}
@@ -47,6 +44,11 @@ namespace MagBot
 		}
 
 		std::map<BWAPI::Unit, Unit> getMembers() const { return _squad.squad_members; }
+		
+		std::vector<Unit> units;
+
+		void pushUnit(Unit unit) { units.push_back(unit); }
+		const size_t sizeV() const { return units.size(); }
 
 		void addUnit(BWAPI::Unit unit, Unit u) { _squad.squad_members[unit] = u; }
 		void removeUnit(BWAPI::Unit unit) { if (!unit) return;  _squad.squad_members.erase(unit); }
@@ -63,8 +65,13 @@ namespace MagBot
 
 		std::vector<Squad> getSquads() const { return _squads; }
 
+		std::deque<BWAPI::Unit> available_units;
+
 		bool isEmpty();
 		void addSquad(const Squad & squad);
 		void findUnitandAssign(Squad & squad);
+		void assignTo(Squad & squad);
+
+		void add(BWAPI::Unit unit);
 	};
 }

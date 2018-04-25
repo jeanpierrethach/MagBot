@@ -21,31 +21,8 @@ Worker::~Worker()
 
 void Worker::update()
 {
-	// detect mineral patch around x radius from starting base location
-	// TODO handle minerals workers with Queue system and cooperative pathfinding algorithms
-	for (auto & mineral_patch : _mineral_workers_count)
-	{
-		BWAPI::Broodwar->drawTextMap(mineral_patch.first->getPosition(), "#%d", mineral_patch.first->getID());
-		if (mineral_patch.first->isBeingGathered())
-		{
-			// get unit that targets the mineral patch
-			//mineral_patch.second.push_back(BWAPI::Broodwar->get);
-			
-			// TODO : uncomment later if needed
-			//BWAPI::Broodwar->drawCircleMap(mineral_patch.first->getPosition(), 30, BWAPI::Colors::Black, true);
-		}
-	}
-	// step 1 calculate travel distance from position worker to mineral field assigned
-	// step 2 calculate time gathering
-	// step 3 calculate time travel distance from mineral patch to return cargo
-
-	// assign worker to closest mineral field related to its position
-	// no more than 2 workers on one mineral patch
+	// TODO work on queue system + cooperative pathfinding (including collision detection)
 	
-	// position from worker to mineral field
-
-	// TODO try to shorten the verification of all units
-	// For every worker constructed or existing, add it to the container
 	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (!unit->exists() || !unit->isCompleted())
@@ -56,57 +33,6 @@ void Worker::update()
 			_workers.insert(unit);
 		}
 	}
-
-// *************	UNDER WORK (Cooperative pathfinding + queue system algorithms    ********************************
-
-	// TODO add linemap from pos to assigned mineral patch (queue)
-
-	// TODO calculate best mineral patch to assign for worker when returned cargo, calculate by distance, time travel, speed, etc..
-	/*
-	for (auto & worker : _workers)
-	{
-		auto & iterator = _workers_mineral_patch.begin();
-		//for (; iterator != _workers_mineral_patch.end(); ++iterator)
-		//{
-			_worker_mineral_assignment[iterator->first].push(worker);
-		//}
-		//if (_worker_mineral_assignment.find(worker) == _worker_mineral_assignment.end())
-		//{
-			
-		//}	
-		//Broodwar->sendText("%d", _worker_mineral_assignment..size());
-
-	}
-
-	// http://stackoverflow.com/questions/16096756/maps-holding-queues-using-vs-insert
-	
-	for (auto & worker : _worker_mineral_assignment)
-	{
-		for (size_t i(0); i < worker.second.size(); ++i)
-		{
-			if (worker.first->isBeingGathered())
-			{
-				//Broodwar->sendText("#%d being gathered", worker.first->getID());
-				//TODO move second worker at full speed and braking when first worker almost done
-			}
-			else
-			{
-				if (worker.second.front()->isIdle() && getWorkerTask(worker.second.front()) == Worker::MINE)
-				{
-					worker.second.front()->gather(worker.first);
-					
-					if (worker.second.front()->isCarryingMinerals())
-					{
-						worker.second.pop();
-					}
-				}
-				//Broodwar->sendText("#%d NOT being gathered", worker.first->getID());
-				
-			}	
-		}
-	}
-	*/
-// ************************************************************************************************************************
 
 	if (Config::DebugInfo::DrawAllInfo)
 	{
@@ -192,19 +118,11 @@ void Worker::setWorkerTask(BWAPI::Unit worker, enum WorkerTask task, BWAPI::Unit
 	clearPreviousTask(worker);
 	_worker_task_map[worker] = task;
 
-	// ********** IN PROGRESS ************
 	if (task == MINE)
 	{
 		_depot_worker_count[worker_task] += 1;
 		_workers_depot_map[worker] = worker_task;
-
-		// TODO get the closest mineral patch available BWAPI::Unit mineral_patch
-		// TODO use _worker_mineral_assignment or std::map<Unit, Unit> ? worker / mineral_patch
-		// TODO increment nb of workers in the mineral patch assigned
-		// send worker to gather that mineral patch
 	}
-	// ********** IN PROGRESS ************
-
 	else if (task == GAS)
 	{
 		// increase the count of workers assigned to this refinery
@@ -245,19 +163,6 @@ void Worker::setWorkerTask(BWAPI::Unit worker, enum WorkerTask task)
 
 	clearPreviousTask(worker);
 	_worker_task_map[worker] = task;
-
-	if (task == MINE)
-	{
-		
-	}
-	else if (task == BUILD)
-	{
-
-	}
-	else if (task == GAS)
-	{
-
-	}
 }
 
 void Worker::setWorkerTask(BWAPI::Unit worker, enum WorkerTask task, BWAPI::UnitType task_unit_type)
@@ -283,13 +188,8 @@ void Worker::clearPreviousTask(BWAPI::Unit unit)
 
 	if (previous_task == MINE)
 	{
-		// ********** IN PROGRESS ************
-
 		_depot_worker_count[_workers_depot_map[unit]] -= 1;
 		_workers_depot_map.erase(unit);
-
-		// TODO remove from mineral assignment
-		// ********** IN PROGRESS ************
 	}
 	else if (previous_task == BUILD)
 	{

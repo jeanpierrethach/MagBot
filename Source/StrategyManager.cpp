@@ -36,9 +36,7 @@ BuildOrder StrategyManager::getOpeningBuildOrder()
 	MetaType dragoon_range{BWAPI::UpgradeTypes::Singularity_Charge};
 	MetaType robo{BWAPI::UnitTypes::Protoss_Robotics_Facility};
 	MetaType assimilator{BWAPI::UnitTypes::Protoss_Assimilator};
-	//MetaType fleet(BWAPI::UnitTypes::Protoss_Fleet_Beacon);
 
-	//build_order.add(fleet, 1);
 	build_order.add(pylon, 1);
 	build_order.add(gateway, 1);
 	build_order.add(assimilator, 1);

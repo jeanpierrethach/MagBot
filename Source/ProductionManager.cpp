@@ -75,7 +75,7 @@ void ProductionManager::update()
 				{
 					_queue.queueAsLowestPriority(MetaType{dragoon}, false);
 				}
-				// TODO modify value/store for strategies + modify 400 into the exact amount to a pylon constructing time?
+				// TODO modify value/store for strategies + modify 400 into the exact amount to a pylon constructing time
 				// or construct pylon with an offset depending on current used supply.
 				else if (lastChecked + 400 < BWAPI::Broodwar->getFrameCount())
 				{
@@ -124,18 +124,22 @@ void ProductionManager::manageBuildOrderQueue()
 
 		if (producer && can_make)
 		{
-			if (current_item.meta_type.isUnit())
+			if (Config::DebugInfo::SendUnitOnComplete)
 			{
-				//BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getUnitType().c_str());
+				if (current_item.meta_type.isUnit())
+				{
+					BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getUnitType().c_str());
+				}
+				else if (current_item.meta_type.isTech())
+				{
+					BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getTechType().c_str());
+				}
+				else if (current_item.meta_type.isUpgrade())
+				{
+					BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getUpgradeType().c_str());
+				}
 			}
-			else if (current_item.meta_type.isTech())
-			{
-				BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getTechType().c_str());
-			}
-			else if (current_item.meta_type.isUpgrade())
-			{
-				BWAPI::Broodwar->sendText("%s confirmed and removed from queue", current_item.meta_type.getUpgradeType().c_str());
-			}
+			
 			create(producer, current_item);
 			_queue.removeCurrentHighestPriorityItem();		
 			break;	
@@ -262,7 +266,6 @@ bool ProductionManager::canMakeNow(BWAPI::Unit producer, MetaType meta_type)
 	return can_make;
 }
 
-// TODO pass queue in parameter?
 void ProductionManager::showProductionQueue()
 {
 	for (size_t i {0}; i < _queue.size(); ++i)
@@ -290,6 +293,7 @@ void ProductionManager::showProductionQueue()
 	BWAPI::Broodwar->drawTextScreen(360, 90, "Supply total: %d", BWAPI::Broodwar->self()->supplyTotal());
 }
 
+/*
 // require testing -> need to fix insertiong of every prerequiste of the metatype
 std::vector<BWAPI::UnitType> ProductionManager::getPrerequiste(const MetaType & meta_type)
 {
@@ -345,7 +349,7 @@ void ProductionManager::addUnitInQueue(const MetaType & meta_type)
 			list_of_units.erase(it);
 		}
 	}
-}
+}*/
 
 ProductionManager & ProductionManager::Instance()
 {

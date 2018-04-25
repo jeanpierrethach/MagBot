@@ -24,6 +24,7 @@ namespace MagBot
 
 		bool canMakeNow(BWAPI::Unit producer, MetaType meta_type);
 		bool hasEnoughResources(MetaType meta_type);
+		
 		bool hasPrerequiste(const MetaType & meta_type);
 		std::vector<BWAPI::UnitType> getPrerequiste(const MetaType & meta_type);
 		void addUnitInQueue(const MetaType & meta_type);

@@ -3,39 +3,41 @@
 #include "Common.h"
 #include "SquadData.h"
 #include <BWTA.h>
+#include "InformationManager.h"
+#include "TrainingWeights.h"
+#include "Utils.h"
 
 namespace MagBot
 {
 
-	class SquadManager
+	class SquadManager : InformationManager, Utils
 	{
 		SquadData _squads;
+
+		SquadData _random_squads;
 		void cohesionUpdate(const Squad & squad);
 		void concaveSqUpdate(Squad & squad, std::vector<BWAPI::Position> v_target_location);
-		void concaveUpdate(const Squad & squad, BWAPI::Position target_location);
 
-		void dragoonKiteMicro(const Squad & squad);
 		void removeUnit(BWAPI::Unit unit);
-
-		double radToDeg(double angle);
-		double getAngleDeg(BWAPI::Position p1, BWAPI::Position p2);
-		double getAngleRad(BWAPI::Position p1, BWAPI::Position p2);
-		int getDistance(BWAPI::Position p1, BWAPI::Position p2);
-		void average(BWAPI::Position & pos, int size);
-		void normalize(BWAPI::Position & pos);
 
 	public:
 		SquadManager();
 		~SquadManager();
 
+		bool assign = true;
+
+		std::vector<BWAPI::Position> positions;
 
 		virtual void smartAttackMove(BWAPI::Unit unit, const BWAPI::Position & target_location);
+
+		void onUnitComplete(BWAPI::Unit unit);
 
 		void update();	
 
 		void onUnitDestroy(BWAPI::Unit unit);
 
+		bool has_range_upgrade = false;
+
 		static SquadManager & Instance();
 	};
 }
-

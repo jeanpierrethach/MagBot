@@ -4,9 +4,19 @@ using namespace MagBot;
 
 SquadManager::SquadManager()
 {
-	//Squad squad;
-	//squad_data.assignUnitTo(squad);
-	//squad_data.addSquad(squad);
+	BWAPI::TilePosition base = BWAPI::Broodwar->self()->getStartLocation();
+	BWTA::Chokepoint* cp = BWTA::getNearestChokepoint(BWAPI::Position(base));
+	BWAPI::Position cp_center = cp->getCenter();
+	positions.push_back(cp_center);
+	positions.push_back(BWAPI::Position(cp_center.x - 100, cp_center.y - 200));
+	positions.push_back(BWAPI::Position(cp_center.x - 200, cp_center.y - 200));
+	positions.push_back(BWAPI::Position(cp_center.x, cp_center.y + 200));
+	positions.push_back(BWAPI::Position(cp_center.x, cp_center.y - 200));
+	positions.push_back(BWAPI::Position(cp_center.x, cp_center.y - 100));
+	positions.push_back(BWAPI::Position(cp_center.x, cp_center.y + 100));
+	positions.push_back(BWAPI::Position(cp_center.x + 100, cp_center.y + 200));
+	positions.push_back(BWAPI::Position(cp_center.x + 200, cp_center.y + 200));
+
 }
 
 
@@ -19,69 +29,95 @@ void SquadManager::update()
 	
 	if (_squads.isEmpty())
 	{
-		//BWAPI::Broodwar->sendText("_squads is empty");
 		Squad squad;
 		_squads.addSquad(squad);
 	}
 
-	// TODO if squad size > x then add new squad
-	// TODO not apply to leader, leader moves
-
 	for (auto & squad : _squads.getSquads())
 	{
-		_squads.findUnitandAssign(squad);
+		if (assign)
+		{
+			_squads.assignTo(squad);
+		}
+		
 		if (squad.hasLeader())
 		{
 			BWAPI::Broodwar->drawCircleMap(squad.getLeader()->getPosition(), 20, BWAPI::Colors::Purple, true);
 		}
-		static int lastChecked {0};
-		//static int lastChecked2 {0};
 
-		// TODO if updating concave too fast, it cancels the attack animation command
-		// could separate check if at good position (minimum of range attack distance)
-		// then no need to send command to that unit
-		// http://www.codeofhonor.com/blog/the-starcraft-path-finding-hack
-		// https://www.youtube.com/watch?v=RzhTG-goqXc
-		// https://github.com/TorchCraft/TorchCraft/issues/14
-		// https://github.com/TorchCraft/TorchCraft/pull/102/files
+		if (BWAPI::Broodwar->getFrameCount() < TrainingWeights::AttackTimers::StartInterval)
+		{
+			concaveSqUpdate(squad, positions);
+		}
+		else if (BWAPI::Broodwar->getFrameCount() >= TrainingWeights::AttackTimers::StartInterval 
+			&& BWAPI::Broodwar->getFrameCount() < TrainingWeights::AttackTimers::EndInterval)
+		{
+			for (auto & member : squad.getMembers())
+			{
+				BWAPI::Position enemy_base_location = InformationManager::Instance().getEnemyBaseLocation();
+				BWTA::Chokepoint* enemy_cp = BWTA::getNearestChokepoint(enemy_base_location);
+				smartAttackMove(member.first, enemy_cp->getCenter());
+			}
+		}
+		// TODO attack in random locations when all enemy buildings discovered are destroyed
+		else if (BWAPI::Broodwar->getFrameCount() >= 20000)
+		{
+			assign = false;
+			for (auto & member : squad.getMembers())
+			{
+				Squad new_squad;
 
-		std::vector<BWAPI::Position> v;
-		BWAPI::TilePosition base = BWAPI::Broodwar->self()->getStartLocation();
-		BWTA::Chokepoint* cp = BWTA::getNearestChokepoint(BWAPI::Position(base));
-		BWAPI::Position cp_center = cp->getCenter();
-		v.push_back(cp_center);
-		v.push_back(BWAPI::Position(cp_center.x - 100, cp_center.y - 200));
-		v.push_back(BWAPI::Position(cp_center.x - 200, cp_center.y - 200));
-		v.push_back(BWAPI::Position(cp_center.x, cp_center.y + 200));
-		v.push_back(BWAPI::Position(cp_center.x, cp_center.y - 200));
-		v.push_back(BWAPI::Position(cp_center.x, cp_center.y - 100));
-		v.push_back(BWAPI::Position(cp_center.x, cp_center.y + 100));
-		v.push_back(BWAPI::Position(cp_center.x + 100, cp_center.y + 200));
-		v.push_back(BWAPI::Position(cp_center.x + 200, cp_center.y + 200));
-		concaveSqUpdate(squad, v);
+				new_squad.addUnit(member.first, member.second);
+				squad.removeUnit(member.first);
+				_random_squads.addSquad(squad);
+			}
+		}
+		else
+		{
+			for (auto & member : squad.getMembers())
+			{
+				smartAttackMove(member.first, InformationManager::Instance().getEnemyBaseLocation());
+			}
+		}
 		
 		int count {0};
-		for (auto & member : squad.getMembers())
+		for (auto & member : squad.units)
 		{
-			BWAPI::Broodwar->drawTextScreen(360, 100 + count, "%d, %d", member.first->getPosition().x, member.first->getPosition().y);
+			BWAPI::Broodwar->drawTextScreen(360, 100 + count, "%d, %d", member.unit->getPosition().x, member.unit->getPosition().y);
 			count += 10;
 		}
-
-		//concaveUpdate(squad, BWAPI::Position(3400, 1000));
-		/*static int lastChecked2 = 0;
-		if (lastChecked2 + 90 < BWAPI::Broodwar->getFrameCount())
-		{
-			lastChecked2 = BWAPI::Broodwar->getFrameCount();
-			cohesionUpdate(squad);
-		}*/
-		
-		//dragoonKiteMicro(squad);
 	}
-}
 
-// https://gamedevelopment.tutsplus.com/tutorials/3-simple-rules-of-flocking-behaviors-alignment-cohesion-and-separation--gamedev-3444
-// http://harry.me/blog/2011/02/17/neat-algorithms-flocking/
-// https://processing.org/examples/flocking.html
+
+
+	int map_width = BWAPI::Broodwar->mapWidth();
+	int map_height = BWAPI::Broodwar->mapHeight();
+	
+
+	std::srand(std::time(nullptr));
+
+	for (auto & squad : _random_squads.getSquads())
+	{
+		for (auto & member : squad.getMembers())
+		{
+			if (member.second.target_pos != BWAPI::Positions::None)
+			{
+				continue;
+			}
+
+			int rnd_x = std::rand() % map_width;
+			int rnd_y = std::rand() % map_height;
+
+			BWAPI::TilePosition rnd_tile = BWAPI::TilePosition(rnd_x, rnd_y);
+			BWAPI::Position target_pos = BWAPI::Position(rnd_x / TILE_SIZE, rnd_y / TILE_SIZE);
+			
+			member.second.target_pos = target_pos;
+			smartAttackMove(member.first, target_pos);
+			
+		}
+	}
+
+}
 
 void SquadManager::cohesionUpdate(const Squad & squad)
 {
@@ -90,7 +126,6 @@ void SquadManager::cohesionUpdate(const Squad & squad)
 
 	for (auto & member : squad.getMembers())
 	{
-		// doesn't seems to work? find a way to make entities of the flock follow leader
 		//if (member == squad.getLeader())
 		//	continue;
 		BWAPI::Position pos = member.first->getPosition();
@@ -113,10 +148,8 @@ void SquadManager::cohesionUpdate(const Squad & squad)
 		//final_position = center_of_mass - pos;
 		//normalize(final_position);
 		//member->attack(final_position);
-		smartAttackMove(member.first, center_of_mass); //member->attack(center_of_mass);
+		smartAttackMove(member.first, center_of_mass);
 
-		// TODO replace center_of_mass with final_position
-		//BWAPI::Broodwar->sendText("%d, %d", center_of_mass.x, center_of_mass.y);
 		BWAPI::Broodwar->registerEvent([center_of_mass, member, pos](BWAPI::Game*)
 		{
 			BWAPI::Broodwar->drawCircleMap(member.first->getPosition(), 20, BWAPI::Colors::Red, false);
@@ -132,54 +165,6 @@ void SquadManager::cohesionUpdate(const Squad & squad)
 	}
 }
 
-// TODO add unit and target
-void SquadManager::dragoonKiteMicro(const Squad & squad)
-{
-	BWAPI::Unit unit;
-
-	if (!unit)
-		return;
-
-	const int ground_wep_cooldown = unit->getGroundWeaponCooldown();
-
-	for (auto & member : squad.getMembers())
-	{
-		// TODO get angle and get opposite to move
-		//if (member->isUnderAttack())
-		//{
-			BWAPI::Position pos = member.first->getPosition();
-			
-			//member->move()
-		//}
-	}
-
-	// TODO if squad member is under attack and member is not then help
-	// at the end of encounter regroup
-}
-
-// TODO fix BUG leader keeps showing debugging displays even when he's not moving??
-
-// TODO squareSqUpdate
-/*
-create square vector of position with N positions (squad size), assign each member of squad to an available position
-*/
-
-// TODO sendOrderToMove to new target location
-// to keep same formation, calculate new_x and new_y with current pos, current angle based on
-// current pos and current target location and distance between current target location and new target location
-// -- validate if new position for unit is valid (terrain), else attack to the new target location to find position
-// -- could also check if the new position is occupied by a squad member
-
-
-// DRAGOON PATHFINDING FLAWS
-// https://day9.tv/d/Lasion/so-for-scbw-ai/
-// add random location near target location? or send one member at different location near target location
-// consider medium-sized unit (dragoon)
-// position is subpixel? collision is pixel?
-
-// member will be 'repulsed' from the closest target_location from its current position
-// could also have vector (line of repulsion)
-
 void SquadManager::concaveSqUpdate(Squad & squad, std::vector<BWAPI::Position> v_target_location)
 {
 	if (squad.size() <= 0)
@@ -187,21 +172,40 @@ void SquadManager::concaveSqUpdate(Squad & squad, std::vector<BWAPI::Position> v
 
 	for (auto & member : squad.getMembers())
 	{
-		if (member.second.isPositionSet() && member.second.getPosition() != BWAPI::Position(0,0) )
+		BWAPI::Broodwar->registerEvent([member](BWAPI::Game*)
 		{
-			BWAPI::Broodwar->drawCircleMap(member.second.getPosition(), 15, BWAPI::Colors::Teal, true);
+			BWAPI::Position pos = member.first->getPosition();
+			BWAPI::Broodwar->drawTextMap(pos, "%d, %d", member.second.has_sing_charge, member.second.has_position);
+		},   // action
+			nullptr,    // condition
+			30);
+
+		if (!has_range_upgrade)
+		{
+			member.second.range = member.first->getType().groundWeapon().maxRange();
+		}
+		else
+		{
+			member.second.range = 192; // Singularity increases attack range from 4 to 6. Times 32 pixels
+		}
+		
+		// TODO fix: seems has_sing_charge stays false
+		if (!has_range_upgrade && BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1)
+		{
+			member.second.resetPosition();
+			has_range_upgrade = true;
+		}
+
+		if (member.second.has_position && member.second.pos != BWAPI::Positions::None)
+		{
+			smartAttackMove(member.first, member.second.pos);
+			BWAPI::Broodwar->drawCircleMap(member.second.pos, 15, BWAPI::Colors::Teal, true);
 			continue;
 		}
 
 		BWAPI::Position pos = member.first->getPosition();
-		int range = member.first->getType().groundWeapon().maxRange();
 
-		if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1)
-		{
-			range = 192; // Singularity increases attack range from 4 to 6. Times 32 pixels
-		}
-
-		double min_dist {9999};
+		double min_dist = std::numeric_limits<double>::max();
 		int closest_index {0};
 
 		for (size_t i {0}; i < v_target_location.size(); ++i)
@@ -217,24 +221,13 @@ void SquadManager::concaveSqUpdate(Squad & squad, std::vector<BWAPI::Position> v
 
 		double distance = member.first->getDistance(v_target_location[closest_index]);
 
-		// TODO create visual arc/circle of valid positions for units
-		// when unit enter valid position, make him stop
-
-		// TODO kiting get angle of valid path towards main base/expansion, then move units by certain amount
-		// of distance then call for regroup
-
-		// TODO kiting movement for dragoon -> taking damage vs nearest dragoons, cooperative fighting
-		// if below certain threshold then retreat for unit/troop, until reinforcements
-
-		// allows for smoother positioning
-		if (distance > range + 20)
+		if (distance > member.second.range + 20)
 		{
-			// TODO remove few steps (take in account the angle), can create a scale on repulsion?
-			smartAttackMove(member.first, v_target_location[closest_index]); // member->attack(v_target_location[closest_index]);
-			continue; // changed from return to continue
+			smartAttackMove(member.first, v_target_location[closest_index]);
+			continue;
 		}
 
-		double step_distance = min_dist - range;
+		double step_distance = min_dist - member.second.range;
 		double angle = getAngleDeg(pos, v_target_location[closest_index]);
 		
 		double new_pos_x = pos.x + (step_distance * cos(angle));
@@ -257,12 +250,12 @@ void SquadManager::concaveSqUpdate(Squad & squad, std::vector<BWAPI::Position> v
 		}
 	
 		smartAttackMove(member.first, final_pos);
-		member.second.setPosition(final_pos, true);
-
+		member.second.pos = final_pos;
+		member.second.has_position = true;
 		
 		BWAPI::Broodwar->drawCircleMap(final_pos, 15, BWAPI::Colors::Green, true);
 
-		BWAPI::Broodwar->registerEvent([v_target_location, closest_index, range, member, pos](BWAPI::Game*)
+		BWAPI::Broodwar->registerEvent([v_target_location, closest_index, member, pos](BWAPI::Game*)
 		{
 			for (auto & target_location : v_target_location)
 			{
@@ -270,55 +263,13 @@ void SquadManager::concaveSqUpdate(Squad & squad, std::vector<BWAPI::Position> v
 			}
 			BWAPI::Broodwar->drawLineMap(pos, member.first->getTargetPosition(), BWAPI::Colors::Cyan);
 			BWAPI::Broodwar->drawCircleMap(member.first->getPosition(), 20, BWAPI::Colors::Red, false);
-			BWAPI::Broodwar->drawTextMap(pos, "%d, %d", pos.x, pos.y);
+			//BWAPI::Broodwar->drawTextMap(pos, "%d, %d", pos.x, pos.y);
 			BWAPI::Broodwar->drawLineMap(pos, v_target_location[closest_index], BWAPI::Colors::White);		
-			BWAPI::Broodwar->drawCircleMap(pos, range, BWAPI::Colors::Red, false);
+			BWAPI::Broodwar->drawCircleMap(pos, member.second.range, BWAPI::Colors::Red, false);
 		},   // action
 			nullptr,    // condition
 			30);
 	}
-}
-
-void SquadManager::concaveUpdate(const Squad & squad, BWAPI::Position target_location)
-{
-	if (squad.size() <= 0)
-		return;
-
-	for (auto & member : squad.getMembers())
-	{
-		BWAPI::Position pos = member.first->getPosition();
-		double range = member.first->getType().groundWeapon().maxRange();
-		double distance = member.first->getDistance(target_location);
-
-		if (distance > range)
-		{
-			// TODO remove few steps (take in account the angle), can create a scale on repulsion?
-			smartAttackMove(member.first, target_location);
-			return;
-		}
-		
-		double step_distance = distance - range;
-		const double PI = std::atan(1.0) * 4;
-		double angle = getAngleDeg(pos, target_location);
-		double new_pos_x = pos.x + (step_distance * cos(angle));
-		double new_pos_y = pos.y - (step_distance * sin(angle));
-
-		BWAPI::Position final_pos(new_pos_x, new_pos_y);
-		smartAttackMove(member.first, final_pos);  //member->attack(final_pos);
-
-		BWAPI::Broodwar->registerEvent([target_location, range, member, pos](BWAPI::Game*)
-		{
-			BWAPI::Broodwar->drawCircleMap(member.first->getPosition(), 20, BWAPI::Colors::Red, false);
-			BWAPI::Broodwar->drawTextMap(pos, "%d, %d", pos.x, pos.y);
-			BWAPI::Broodwar->drawLineMap(pos, target_location, BWAPI::Colors::White);
-			BWAPI::Broodwar->drawCircleMap(target_location, 10, BWAPI::Colors::Orange, false);
-			BWAPI::Broodwar->drawCircleMap(pos, range, BWAPI::Colors::Red, false);
-		},   // action
-			nullptr,    // condition
-			60);
-		
-	}
-
 }
 
 void SquadManager::smartAttackMove(BWAPI::Unit unit, const BWAPI::Position & target_location)
@@ -347,48 +298,6 @@ void SquadManager::smartAttackMove(BWAPI::Unit unit, const BWAPI::Position & tar
 	unit->attack(target_location);
 }
 
-// TODO move to utils
-double SquadManager::radToDeg(double angle)
-{
-	const double PI = std::atan(1.0) * 4;
-	return angle * 180 / PI;
-}
-
-double SquadManager::getAngleDeg(BWAPI::Position p1, BWAPI::Position p2)
-{
-	const double PI = std::atan(1.0) * 4;
-	return atan2(p1.y - p2.y, p1.x - p2.x) * 180 / PI;
-}
-
-double SquadManager::getAngleRad(BWAPI::Position p1, BWAPI::Position p2)
-{
-	return atan2(p1.y - p2.y, p1.x - p2.x);
-}
-
-int SquadManager::getDistance(BWAPI::Position p1, BWAPI::Position p2)
-{
-	return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
-}
-
-void SquadManager::average(BWAPI::Position & pos, int size)
-{
-	if (size != 0)
-	{
-		pos.x /= size;
-		pos.y /= size;
-	}
-}
-
-void SquadManager::normalize(BWAPI::Position & pos)
-{
-	double length = sqrt((pos.x * pos.x) + (pos.y * pos.y));
-	if (length != 0)
-	{
-		pos.x = (pos.x / length);
-		pos.y = (pos.y / length);
-	}
-}
-
 void SquadManager::removeUnit(BWAPI::Unit unit)
 {
 	for (auto & squad : _squads.getSquads())
@@ -409,6 +318,17 @@ void SquadManager::onUnitDestroy(BWAPI::Unit unit)
 	{
 		removeUnit(unit);
 	}
+}
+
+void SquadManager::onUnitComplete(BWAPI::Unit unit)
+{
+	if (!unit)
+		return;
+
+	if (unit->getPlayer() == BWAPI::Broodwar->self())
+	{
+		_squads.add(unit);
+	}	
 }
 
 SquadManager & SquadManager::Instance()

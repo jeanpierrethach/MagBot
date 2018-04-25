@@ -18,61 +18,12 @@ ScoutManager::~ScoutManager()
 
 void ScoutManager::update()
 {
-	if (!_worker_scout || !_worker_scout->exists() || !(_worker_scout->getHitPoints() > 0))
+	if (!_worker_scout.scout || !_worker_scout.scout->exists() || !(_worker_scout.scout->getHitPoints() > 0))
 	{
 		return;
 	}
-	//int scout_hp = _worker_scout->getHitPoints() + _worker_scout->getShields();
-
-	BWTA::BaseLocation * enemy_base_location = nullptr;
-
-	if (!enemy_base_location)
-	{
-		for (BWTA::BaseLocation * start_location : BWTA::getStartLocations())
-		{
-			BWAPI::TilePosition start_location_tilepos = start_location->getTilePosition();
-			InformationManager::setStartingBaseLocation(BWAPI::Position(start_location->getPosition()));
-			if (!BWAPI::Broodwar->isExplored(start_location_tilepos))
-			{
-				
-				if (!_worker_scout || !start_location_tilepos.isValid())
-				{
-					return;
-				}
-
-				// todo work on a fix
-				if (_worker_scout->isUnderAttack())
-				{
-					BWAPI::Broodwar->sendText("Found enemy base location");
-					InformationManager::setEnemyStartingBaseLocation(BWAPI::Position(start_location->getPosition()));
-				}
-
-				// if we have issued a command to this unit already this frame, ignore this one
-				if (_worker_scout->getLastCommandFrame() >= BWAPI::Broodwar->getFrameCount() || _worker_scout->isAttackFrame())
-				{
-					return;
-				}
-
-				BWAPI::Broodwar->drawLineMap(_worker_scout->getPosition(), BWAPI::Position(start_location_tilepos), BWAPI::Colors::White);
-
-				// get the unit's current command
-				BWAPI::UnitCommand currentCommand(_worker_scout->getLastCommand());
-
-				// if we've already told this unit to move to this position, ignore this command
-				if ((currentCommand.getType() == BWAPI::UnitCommandTypes::Move) 
-					&& (currentCommand.getTargetPosition() == BWAPI::Position(start_location_tilepos))
-					&& _worker_scout->isMoving())
-				{
-					return;
-				}
-
-				// if nothing prevents it, attack the target
-				_worker_scout->move(BWAPI::Position(start_location_tilepos));
-				
-				return;
-			}
-		}
-	}
+	_worker_scout.scoutBaseLocations();
+	_worker_scout.updateLocation();
 }
 
 
@@ -86,11 +37,14 @@ ScoutManager & ScoutManager::Instance()
 void ScoutManager::setWorkerScout(BWAPI::Unit unit)
 {
 	// if we have a previous worker scout, release it back to the worker manager
-	/*if (_worker_scout)
+	/*if (_worker_scout.scout)
 	{
-		WorkerManager::Instance().setWorkerFree(_worker_scout);
+		WorkerManager::Instance().setWorkerFree(_worker_scout.scout);
 	}*/
 
-	_worker_scout = unit;
-	WorkerManager::Instance().setWorkerScout(_worker_scout);
+	// TODO fix null value of scout when searching
+	// for available unit
+
+	_worker_scout.scout = unit;
+	WorkerManager::Instance().setWorkerScout(_worker_scout.scout);
 }

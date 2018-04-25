@@ -5,11 +5,12 @@ namespace Config
 	namespace Paths
 	{
 		std::string Data = "bwapi-data/write/data.txt";
+		std::string EndGameData = "bwapi-data/write/endgame.txt";
 	}
 	namespace Modules
 	{
 		bool UsingGameCommander = true;
-		bool UsingScoutManager = false;
+		bool UsingScoutManager = true;
 	}
 
 	namespace BWAPIOptions
@@ -38,14 +39,15 @@ namespace Config
 		bool DrawBuildingsCount = true;
 		bool DrawBuildingTilesInfo = true;
 	    bool DrawBuildingTimeInConstruction = true;
-		bool DrawBuildingsOwnedOrDestroyed = false;
+		bool DrawBuildingsOwnedOrDestroyed = true;
 		bool DrawWorkerTaskInfo = true;
-		bool DrawProductionQueue = false;
+		bool DrawProductionQueue = true;
+		bool SendUnitOnComplete = false;
 	}
 
 	namespace StratOptions
 	{
-		bool GateReaver = false;
+		bool GateReaver = true;
 		bool TimedExpansion = true;
 		int NbFramesExpansion = 5900;
 	    int NbOfWorkers = 18;
@@ -53,13 +55,14 @@ namespace Config
 
 	namespace OptimizationOptions
 	{
-		bool OptimizeMining = true;
-		bool ParallelAssignmentMining = true;
+		bool OptimizeMining = false;
+		bool ParallelAssignmentMining = false;
 		int NbThreads = 2;
 	}
 
 	namespace GameOptions
 	{
+		bool EndGame = false;
 		int FrameEndGame = 8005;
 	}
 }

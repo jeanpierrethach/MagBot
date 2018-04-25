@@ -7,6 +7,7 @@ namespace Config
 	namespace Paths
 	{
 		extern std::string Data;
+		extern std::string EndGameData;
 	}
 	namespace Modules
 	{
@@ -43,6 +44,7 @@ namespace Config
 		extern bool DrawBuildingsOwnedOrDestroyed;
 		extern bool DrawWorkerTaskInfo;
 		extern bool DrawProductionQueue;
+		extern bool SendUnitOnComplete;
 	}
 
 	namespace StratOptions
@@ -62,6 +64,7 @@ namespace Config
 
 	namespace GameOptions
 	{
+		extern bool EndGame;
 		extern int FrameEndGame;
 	}
 }

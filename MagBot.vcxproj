@@ -92,8 +92,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Scout.cpp" />
     <ClCompile Include="Source\InformationManager.cpp" />
-    <ClCompile Include="Source\DefenceManager.cpp" />
+    <ClCompile Include="Source\TODO later on\DefenceManager.cpp" />
     <ClCompile Include="Source\MineralNode.cpp" />
     <ClCompile Include="Source\TODO later on\ReaverShuttleMicro.cpp" />
     <ClCompile Include="Source\BuildingData.cpp" />
@@ -102,7 +103,7 @@
     <ClCompile Include="Source\TODO later on\Pathfinder.cpp" />
     <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
-    <ClCompile Include="Source\PylonData.cpp" />
+    <ClCompile Include="Source\TODO later on\PylonData.cpp" />
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\TODO later on\ConstructorManager.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
@@ -118,10 +119,13 @@
     <ClCompile Include="Source\SquadManager.cpp" />
     <ClCompile Include="Source\Unit.cpp" />
     <ClCompile Include="Source\WorkerMining.cpp" />
+    <ClCompile Include="Source\TrainingWeights.cpp" />
+    <ClCompile Include="Source\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Scout.h" />
     <ClInclude Include="Source\InformationManager.h" />
-    <ClInclude Include="Source\DefenceManager.h" />
+    <ClInclude Include="Source\TODO later on\DefenceManager.h" />
     <ClInclude Include="Source\MineralNode.h" />
     <ClInclude Include="Source\TODO later on\ReaverShuttleMicro.h" />
     <ClInclude Include="Source\BuildingData.h" />
@@ -130,7 +134,7 @@
     <ClInclude Include="Source\TODO later on\Pathfinder.h" />
     <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\BuildingManager.h" />
-    <ClInclude Include="Source\PylonData.h" />
+    <ClInclude Include="Source\TODO later on\PylonData.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\TODO later on\ConstructorManager.h" />
     <ClInclude Include="Source\ScoutManager.h" />
@@ -145,6 +149,8 @@
     <ClInclude Include="Source\SquadManager.h" />
     <ClInclude Include="Source\Unit.h" />
     <ClInclude Include="Source\WorkerMining.h" />
+    <ClInclude Include="Source\TrainingWeights.h" />
+    <ClInclude Include="Source\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

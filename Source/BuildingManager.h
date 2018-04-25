@@ -27,11 +27,11 @@ namespace MagBot
 		void showBuildTimeBuildings();
 		void showOwnedOrDestroyedBuildings();
 
-		void validateWorkersAndBuildings(); // STEP 1
-		void assignWorkersToUnassignedBuildings(); // STEP 2
-		void constructAssignedBuildings(); // STEP 3
-		void checkForStartedConstruction();	// STEP 4
-		void checkForCompletedBuildings(); // STEP 5
+		void validateWorkersAndBuildings();
+		void assignWorkersToUnassignedBuildings();
+		void constructAssignedBuildings();
+		void checkForStartedConstruction();
+		void checkForCompletedBuildings();
 
 	public:
 		BuildingManager();

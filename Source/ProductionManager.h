@@ -15,6 +15,8 @@ namespace MagBot
 		BuildOrderQueue _queue;
 
 		void setBuildOrder(const BuildOrder & build_order);	
+		void setBuildOrderHP(const BuildOrder & build_order);
+
 		void manageBuildOrderQueue();
 		void create(BWAPI::Unit producer, const BuildOrderItem & item);
 
@@ -22,6 +24,10 @@ namespace MagBot
 
 		bool canMakeNow(BWAPI::Unit producer, MetaType meta_type);
 		bool hasEnoughResources(MetaType meta_type);
+		
+		bool hasPrerequiste(const MetaType & meta_type);
+		std::vector<BWAPI::UnitType> getPrerequiste(const MetaType & meta_type);
+		void addUnitInQueue(const MetaType & meta_type);
 
 		int getFreeMinerals() const;
 		int getFreeGas() const;

@@ -54,3 +54,23 @@ BuildOrder StrategyManager::getOpeningBuildOrder()
 
 	return build_order;
 }
+
+BuildOrder StrategyManager::timedExpansion()
+{
+	MetaType nexus {BWAPI::UnitTypes::Protoss_Nexus};
+
+	BuildOrder build_order;
+
+	build_order.add(nexus, 1);
+
+	return build_order;
+}
+
+BuildOrder StrategyManager::optimizeMiningTest()
+{
+	MetaType pylon {BWAPI::UnitTypes::Protoss_Pylon};
+	BuildOrder build_order;
+
+	build_order.add(pylon, 2);
+	return build_order;
+}

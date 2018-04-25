@@ -3,14 +3,18 @@
 
 using namespace MagBot;
 
-// todo onStart -> initiate all valid units to their respective structure
-
+// TODO onStart -> initiate all valid units to their respective structure
 // onUnitCreate -> append unit to their respective structure
 
 void MagBotModule::onStart()
 {
+	InformationManager::Instance().onStart();
+
 	BWAPI::Broodwar << "The map is " << BWAPI::Broodwar->mapName() << "!" << std::endl;
- 
+	BWAPI::Broodwar << "Map width: " << BWAPI::Broodwar->mapWidth() << "Map height: " << BWAPI::Broodwar->mapHeight() << std::endl;
+
+	BWAPI::Broodwar->sendText("%s", Config::Paths::Data.c_str());
+
 	BWAPI::Broodwar->setLocalSpeed(Config::BWAPIOptions::SetLocalSpeed);
 	BWAPI::Broodwar->setFrameSkip(Config::BWAPIOptions::SetFrameSkip);
 
@@ -30,8 +34,6 @@ void MagBotModule::onStart()
 		BWAPI::Broodwar->printf("Hello! I am %s, written by %s", Config::BotInfo::BotName.c_str(), Config::BotInfo::Author.c_str());
 	}
 
-	// TODO initialize information manager
-
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
 	BWAPI::Broodwar->setCommandOptimizationLevel(2);
@@ -45,11 +47,8 @@ void MagBotModule::onStart()
 
 void MagBotModule::onEnd(bool is_winner)
 {
-	// Called when the game ends
-	if (is_winner)
-	{
-		// Log your win here!
-	}
+	BWAPI::Broodwar->sendText("Game has ended");
+	InformationManager::Instance().writeEndGameWinner(is_winner);
 }
 
 void MagBotModule::onFrame()
@@ -69,6 +68,17 @@ void MagBotModule::onFrame()
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 	*/
+	if (BWAPI::Broodwar->getFrameCount() % 500 == 0)
+	{
+		InformationManager::Instance().update();
+	}
+
+	if (Config::GameOptions::EndGame && BWAPI::Broodwar->getFrameCount() > Config::GameOptions::FrameEndGame)
+	{
+		InformationManager::Instance().onClose();
+		BWAPI::Broodwar->leaveGame();
+	}
+	
 	
 	if (Config::DebugInfo::DrawAllInfo)
 	{
@@ -76,6 +86,7 @@ void MagBotModule::onFrame()
 		BWAPI::Broodwar->drawTextScreen(0, 40, "APM : %d", BWAPI::Broodwar->getAPM());
 	}
 
+	// TODO catch exception
 	WorkerManager::Instance().update();
 
 	ProductionManager::Instance().update();
@@ -86,10 +97,23 @@ void MagBotModule::onFrame()
 
 	_game_commander.update();
 
+	// display units found
+	for (auto unit : InformationManager::Instance().getEnemyUnits())
+	{
+		BWAPI::Broodwar->drawBoxMap(BWAPI::Position(unit->getTilePosition()),
+			BWAPI::Position(unit->getTilePosition() + unit->getType().tileSize()), BWAPI::Colors::Cyan, false);
+	}
+
 	if (Config::DebugInfo::DrawAllInfo)
 	{
 		BWAPI::Broodwar->drawTextScreen(360, 0, "FPS: %d", BWAPI::Broodwar->getFPS());
 		BWAPI::Broodwar->drawTextScreen(360, 20, "Average FPS: %f", BWAPI::Broodwar->getAverageFPS());
+	
+
+		int w = BWAPI::Broodwar->mapWidth();
+		int h = BWAPI::Broodwar->mapHeight();
+		BWAPI::Broodwar->drawTextScreen(500, 20, "Map size (%d, %d): ", w, h);
+
 	}
 }
 
@@ -133,7 +157,6 @@ void MagBotModule::onUnitEvade(BWAPI::Unit unit)
 
 void MagBotModule::onUnitShow(BWAPI::Unit unit)
 {
-	// TODO add onUnitShow in infomanager (buildings)
 }
 
 void MagBotModule::onUnitHide(BWAPI::Unit unit)
@@ -157,7 +180,7 @@ void MagBotModule::onUnitCreate(BWAPI::Unit unit)
 
 void MagBotModule::onUnitDestroy(BWAPI::Unit unit)
 {
-	// TODO add onUnitDestroy in infomanager (enemy buildings)
+	// TODO add onUnitDestroy in InfoManager (enemy buildings)
 	WorkerManager::Instance().onUnitDestroy(unit);
 	BuildingManager::Instance().onUnitDestroy(unit);
 	SquadManager::Instance().onUnitDestroy(unit);
@@ -189,6 +212,15 @@ void MagBotModule::onSaveGame(std::string game_name)
 
 void MagBotModule::onUnitComplete(BWAPI::Unit unit)
 {
+	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self())
+	{
+		//BWAPI::Broodwar->sendText("Probe created");
+		// TODO make multithreading optimization on resource collection
+		// then call WorkerManager method
+		// if not calling on update()
+	}
+
+	SquadManager::Instance().onUnitComplete(unit);
 }
 
 void MagBotModule::drawTerrainData()

@@ -19,10 +19,6 @@ namespace MagBot
 		BWAPI::Unitset _workers;
 		std::map<BWAPI::Unit, enum WorkerTask> _worker_task_map;
 		std::map<BWAPI::Unit, BWAPI::UnitType> _worker_building_type_map;
-
-
-		// TODO work on queue system + cooperative pathfinding (including collision detection)
-		//std::map<BWAPI::Unit, BWAPI::Unit> _workers_mineral_assignment; // assign a worker for one mineral patch
 		
 		std::map<BWAPI::Unit, std::queue<BWAPI::Unit>> _worker_mineral_assignment;
 		std::map<BWAPI::Unit, std::deque<BWAPI::Unit>> _mineral_workers_count; // mineral patch / deque
@@ -34,8 +30,6 @@ namespace MagBot
 		std::map<BWAPI::Unit, uint8_t> _refinery_worker_count; // refinery / number
 
 		void clearPreviousTask(BWAPI::Unit unit);
-
-		// TODO instantiate auto defense class object and in that class will have the micro aspect for workers
 
 	public:
 		

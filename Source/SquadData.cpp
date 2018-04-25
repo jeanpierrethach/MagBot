@@ -21,24 +21,47 @@ void SquadData::addSquad(const Squad & squad)
 	_squads.push_back(squad);
 }
 
-
 void SquadData::findUnitandAssign(Squad & squad)
 {
-	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
+	while (!available_units.empty())
 	{
-		if (!unit->exists() || !unit->isCompleted())
+		BWAPI::Unit unit = available_units.front();
+		if (!unit->exists())
 			continue;
 
-		BWAPI::UnitType dragoon = BWAPI::UnitTypes::Protoss_Dragoon;
+		Unit u(unit);
+		squad.pushUnit(u);
+		available_units.pop_front();
+	
+	}
+}
 
-		if (unit->getType() == dragoon && !squad.containsUnit(unit))
+void SquadData::assignTo(Squad & squad)
+{
+	BWAPI::UnitType drag = BWAPI::UnitTypes::Protoss_Dragoon;
+	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
+	{
+		if (unit->getType() == drag)
 		{
+			if (!unit->exists())
+				continue;
+			if (squad.containsUnit(unit))
+				continue;
 			if (!squad.hasLeader())
 			{
-				squad.setLeader(unit);
+				Unit u = Unit(unit);
+				squad.addUnit(unit, u);
 			}
-			Unit u;
-			squad.addUnit(unit, u);
 		}
+	}
+}
+
+void SquadData::add(BWAPI::Unit unit)
+{
+	BWAPI::UnitType dragoon = BWAPI::UnitTypes::Protoss_Dragoon;
+
+	if (unit->getType() == dragoon)
+	{
+		available_units.push_back(unit);
 	}
 }

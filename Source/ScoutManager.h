@@ -4,14 +4,15 @@
 #include "WorkerManager.h"
 #include <BWTA.h>
 #include "InformationManager.h"
+#include "Scout.h"
 
 namespace MagBot
 {
 
 	class ScoutManager : InformationManager
 	{
-
-		BWAPI::Unit	_worker_scout;
+		Scout _worker_scout;
+		bool _enemy_base_location = false;
 
 	public:
 		ScoutManager();

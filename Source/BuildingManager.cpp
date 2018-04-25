@@ -32,7 +32,11 @@ void BuildingManager::update()
 {
 	validateWorkersAndBuildings();          // check to see if assigned workers have died en route or while constructing
 	assignWorkersToUnassignedBuildings();   // assign workers to the unassigned buildings and label them 'planned'    
-	constructAssignedBuildings();           // for each planned building, if the worker isn't constructing, send the command    
+	constructAssignedBuildings();           // for each planned building, if the worker isn't constructing, send the command  
+
+	// testing phase
+	//mockTestForDestroyedBuilder();
+
 	checkForStartedConstruction();          // check to see if any buildings have started construction and update data structures        
 	checkForCompletedBuildings();           // check to see if any buildings have completed and update data structures
 
@@ -58,8 +62,6 @@ void BuildingManager::update()
 
 	BWAPI::Broodwar->drawTextScreen(360, 130, "Mineral Rate %f", _inf_manager.calculateMineralRate());
 	BWAPI::Broodwar->drawTextScreen(360, 140, "Gas Rate %f", _inf_manager.calculateGasRate());
-	BWAPI::Broodwar->drawTextScreen(360, 150, "Minerate Rate/sec %d", BWAPI::Broodwar->getLatency());
-	BWAPI::Broodwar->drawTextScreen(360, 160, "Gas Rate/sec");
 }
 
 void BuildingManager::showAllBuildings()
@@ -70,11 +72,6 @@ void BuildingManager::showAllBuildings()
 
 		if (unit_type.isBuilding() && !_all_buildings.contains(unit))
 		{
-			if (Config::DebugInfo::DrawAllInfo)
-			{
-				BWAPI::Broodwar->sendText("Building %s confirmed at position (%d, %d)", unit_type.c_str(),
-					unit->getTilePosition().x, unit->getTilePosition().y);
-			}
 			_all_buildings.insert(unit);
 			++_buildings_owned_map[unit_type];
 
@@ -117,7 +114,6 @@ void BuildingManager::showBuildTimeBuildings()
 
 	for (const auto & building : _buildings.getBuildings())
 	{
-		// TODO FIX display when, example : 3 pylons are being queued but 2 only built since one of them couldn't find a location 
 		if (building._status == BuildingStatus::UNDERCONSTRUCTION)
 		{
 			BWAPI::Broodwar->drawTextScreen(0, (building_count * 10) + 70, "%s : %d",
@@ -151,7 +147,6 @@ void BuildingManager::showOwnedOrDestroyedBuildings()
 	BWAPI::Broodwar->drawTextScreen(480, 90, "Buildings destroyed: %d", _building_destroyed);
 }
 
-// STEP 1:
 void BuildingManager::validateWorkersAndBuildings()
 {
 	std::vector<Building> to_remove_buildings;
@@ -162,6 +157,7 @@ void BuildingManager::validateWorkersAndBuildings()
 		{
 			continue;
 		}
+		// if worker has died in the process of construction of the building
 		if (b._building_unit == nullptr || !b._building_unit->getType().isBuilding() || b._building_unit->getHitPoints() <= 0)
 		{
 			to_remove_buildings.push_back(b);
@@ -171,7 +167,6 @@ void BuildingManager::validateWorkersAndBuildings()
 	_buildings.removeBuildings(to_remove_buildings);
 }
 
-// STEP 2:
 void BuildingManager::assignWorkersToUnassignedBuildings()
 {
 	for (Building & b : _buildings.getBuildings())
@@ -215,7 +210,6 @@ void BuildingManager::assignWorkersToUnassignedBuildings()
 	}
 }
 
-// STEP 3:
 void BuildingManager::constructAssignedBuildings()
 {
 	for (auto & b : _buildings.getBuildings())
@@ -223,6 +217,16 @@ void BuildingManager::constructAssignedBuildings()
 		if (b._status != BuildingStatus::ASSIGNED)
 		{
 			continue;
+		}
+
+		// if the builder has been destroyed, assign to another worker
+		if (!b._builder_unit)
+		{
+			WorkerManager::Instance().setWorkerFree(b._builder_unit);
+			b._builder_unit = nullptr;
+			b._build_command_given = false;
+			b._status = BuildingStatus::UNASSIGNED;
+			assignWorkersToUnassignedBuildings();
 		}
 
 		if (!b._builder_unit->isConstructing())
@@ -244,7 +248,6 @@ void BuildingManager::constructAssignedBuildings()
 	}
 }
 
-// STEP 4:
 void BuildingManager::checkForStartedConstruction()
 {
 	for (auto & building_started : BWAPI::Broodwar->self()->getUnits())
@@ -279,7 +282,6 @@ void BuildingManager::checkForStartedConstruction()
 	}
 }
 
-// STEP 5:
 void BuildingManager::checkForCompletedBuildings()
 {
 	std::vector<Building> to_remove_buildings;

@@ -7,6 +7,7 @@ namespace Config
 	namespace Paths
 	{
 		extern std::string Data;
+		extern std::string EndGameData;
 	}
 	namespace Modules
 	{
@@ -43,7 +44,7 @@ namespace Config
 		extern bool DrawBuildingsOwnedOrDestroyed;
 		extern bool DrawWorkerTaskInfo;
 		extern bool DrawProductionQueue;
-		extern bool DrawMineralHandling;
+		extern bool SendUnitOnComplete;
 	}
 
 	namespace StratOptions
@@ -51,5 +52,19 @@ namespace Config
 		extern bool GateReaver;
 		extern bool TimedExpansion;
 		extern int NbFramesExpansion;
+		extern int NbOfWorkers;
+	}
+
+	namespace OptimizationOptions
+	{
+		extern bool OptimizeMining;
+		extern bool ParallelAssignmentMining;
+		extern int NbThreads;
+	}
+
+	namespace GameOptions
+	{
+		extern bool EndGame;
+		extern int FrameEndGame;
 	}
 }

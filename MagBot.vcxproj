@@ -25,7 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -45,7 +45,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BWAPI_DIR)/include;$(BWTA_DIR)/include;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -62,7 +62,8 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>../lib/BWAPId.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(BWAPI_DIR)/lib/BWAPI.lib;$(BWTA_DIR)/lib/BWTA.lib;$(BWTA_DIR)/lib/libboost_system-vc120-mt-1_56.lib;$(BWTA_DIR)/lib/libboost_thread-vc120-mt-1_56.lib;$(BWTA_DIR)/lib/libCGAL-vc120-mt-4.4.lib;$(BWTA_DIR)/lib/libgmp-10.lib;$(BWTA_DIR)/lib/libmpfr-4.lib;$(BWTA_DIR)/lib/libboost_filesystem-vc120-mt-1_56.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,8 +92,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Scout.cpp" />
     <ClCompile Include="Source\InformationManager.cpp" />
-    <ClCompile Include="Source\DefenceManager.cpp" />
+    <ClCompile Include="Source\TODO later on\DefenceManager.cpp" />
     <ClCompile Include="Source\MineralNode.cpp" />
     <ClCompile Include="Source\TODO later on\ReaverShuttleMicro.cpp" />
     <ClCompile Include="Source\BuildingData.cpp" />
@@ -101,7 +103,7 @@
     <ClCompile Include="Source\TODO later on\Pathfinder.cpp" />
     <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
-    <ClCompile Include="Source\PylonData.cpp" />
+    <ClCompile Include="Source\TODO later on\PylonData.cpp" />
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\TODO later on\ConstructorManager.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
@@ -116,10 +118,14 @@
     <ClCompile Include="Source\SquadData.cpp" />
     <ClCompile Include="Source\SquadManager.cpp" />
     <ClCompile Include="Source\Unit.cpp" />
+    <ClCompile Include="Source\WorkerMining.cpp" />
+    <ClCompile Include="Source\TrainingWeights.cpp" />
+    <ClCompile Include="Source\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Scout.h" />
     <ClInclude Include="Source\InformationManager.h" />
-    <ClInclude Include="Source\DefenceManager.h" />
+    <ClInclude Include="Source\TODO later on\DefenceManager.h" />
     <ClInclude Include="Source\MineralNode.h" />
     <ClInclude Include="Source\TODO later on\ReaverShuttleMicro.h" />
     <ClInclude Include="Source\BuildingData.h" />
@@ -128,7 +134,7 @@
     <ClInclude Include="Source\TODO later on\Pathfinder.h" />
     <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\BuildingManager.h" />
-    <ClInclude Include="Source\PylonData.h" />
+    <ClInclude Include="Source\TODO later on\PylonData.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\TODO later on\ConstructorManager.h" />
     <ClInclude Include="Source\ScoutManager.h" />
@@ -142,6 +148,9 @@
     <ClInclude Include="Source\SquadData.h" />
     <ClInclude Include="Source\SquadManager.h" />
     <ClInclude Include="Source\Unit.h" />
+    <ClInclude Include="Source\WorkerMining.h" />
+    <ClInclude Include="Source\TrainingWeights.h" />
+    <ClInclude Include="Source\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

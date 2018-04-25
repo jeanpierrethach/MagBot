@@ -6,6 +6,7 @@
 #include "BuildingManager.h"
 #include "ProductionManager.h"
 #include "SquadManager.h"
+#include "InformationManager.h"
 
 #include "Config.h"
 

@@ -4,6 +4,16 @@ using namespace MagBot;
 
 WorkerManager::WorkerManager()
 {	
+	for (auto & unit : BWAPI::Broodwar->getAllUnits())
+	{
+		BWAPI::TilePosition base = BWAPI::Broodwar->self()->getStartLocation();
+		if (unit->getType().isMineralField()
+			&& unit->getDistance(BWAPI::Position(base)) < 300)
+		{
+			_mineral_nodes.insertMineralPatch(unit);
+		}
+	}
+	_mineral_nodes.initializePatch();
 }
 
 
@@ -21,12 +31,11 @@ void WorkerManager::update()
 {
 	updateWorkerCount();
 
-	// TODO Move for loop in their respective handle function, to make the conditionals more specific
 	for (const auto & worker : _worker.getWorkers())
 	{
-		// TODO check these conditionals, if can move to init constructor of worker instead and some can keep here for the update
-		// TODO may have to uncomment if worker isConstruction since we want to be able to have multiple builders at the same time
-		/*if (!worker->exists())
+		// Uncomment when these states will need to be considered
+		/*
+		if (!worker->exists())
 			continue;
 
 		// Ignore the unit if it has one of the following status ailments
@@ -42,9 +51,10 @@ void WorkerManager::update()
 			continue;
 		*/
 
-		if (!worker->isCompleted()) // || worker->isConstructing() TODO may have to remove isConstructing or try to redisplay MINER, etc.
+		if (!worker->isCompleted())
 			continue;
 
+		// TODO fix when scout is idle for a frame
 		if (worker->isIdle()
 			&& _worker.getWorkerTask(worker) != Worker::BUILD
 			&& _worker.getWorkerTask(worker) != Worker::SCOUT)
@@ -52,16 +62,11 @@ void WorkerManager::update()
 			_worker.setWorkerTask(worker, Worker::IDLE);
 		}
 
-		// ************** IN PROGRESS **************
-
-		// TODO change logic, find the assigned unit (refinery to the worker)
-		// TODO add function to force assignment to refinery? -> get 3 closest mineral worker and isnt carrying minerals
-		
+		// TODO add function to force assignment to refinery -> get 3 closest mineral worker and that aren't carrying minerals
 		if (_worker.getWorkerTask(worker) == Worker::GAS)
 		{
 			BWAPI::Unit refinery = _worker.getWorkerResource(worker);
 
-			// if the refinery doesn't exist anymore
 			if (!refinery || !refinery->exists() || refinery->getHitPoints() <= 0)
 			{
 				BWAPI::Unit depot = getClosestDepot(worker);
@@ -76,12 +81,13 @@ void WorkerManager::update()
 		{
 			showDebugWorkerInfo(worker);
 		}
-		
 	}
 
 	handleGasWorkers();
 	handleIdleWorkers();
-	handleMineralWorkers();
+	optimizeWorkersMining();
+
+	//handleMineralWorkers();
 }
 
 void WorkerManager::updateWorkerCount()
@@ -89,16 +95,6 @@ void WorkerManager::updateWorkerCount()
 	_worker.update();
 }
 
-// TODO : FIX BUG multiple gateways is built, probe task glitch, check !test_location.isValid() ?
-
-// whats happening, when enough minerals, closest mining worker is set to builder and wants to build, but a worker set to mine
-// also wants to build it
-
-// may be related to the fact that when getbuild gets called, the closest mining worker is set to Builder
-// then if the test location isn't valid, we go to the next closest mining worker?
-// Possible solution : add reserved tiles? getValidBuildingLocation when doing test_location in BuildingManager
-
-// this problem occurs in Benzene 1.1 top right location
 BWAPI::Unit WorkerManager::getBuilder(Building & building)
 {
 	BWAPI::Unit closest_mining_worker = nullptr;
@@ -109,7 +105,6 @@ BWAPI::Unit WorkerManager::getBuilder(Building & building)
 		if (_worker.getWorkerTask(worker) == Worker::SCOUT || _worker.getWorkerTask(worker) == Worker::GAS)
 			continue;
 
-		// this seems to fix the problem above, but WHY?
 		if (worker->isCarryingMinerals())
 			continue;
 
@@ -132,118 +127,212 @@ BWAPI::Unit WorkerManager::getBuilder(Building & building)
 	return closest_mining_worker;
 }
 
-// TODO finish this function
-// Can be used with a Building _final_position tile position
-BWAPI::Unit WorkerManager::getBuilderClosestTo(BWAPI::TilePosition tile_position)
-{
-	BWAPI::Unit closest_mining_worker = nullptr;
-	int closest_mining_distance {9999};
-
-	// find the closest unit to this one -> so find the worker which is the closest to the pylon
-	for (const auto & worker : _worker.getWorkers())
-	{
-		if (_worker.getWorkerTask(worker) == Worker::SCOUT || _worker.getWorkerTask(worker) == Worker::GAS)
-			continue;
-
-		if (_worker.getWorkerTask(worker) == Worker::MINE)
-		{
-			int distance = worker->getDistance(BWAPI::Position(tile_position));
-			if (!closest_mining_worker || distance < closest_mining_distance)
-			{
-				closest_mining_worker = worker;
-				closest_mining_distance = distance;
-			}
-		}
-	}
-
-	if (!closest_mining_worker)
-	{
-		//return getBuilder();
-	}
-	return closest_mining_worker;
-}
-
-// TODO could add int or a type Priority for the BuildOrderManager
-/*bool WorkerManager::build(BWAPI::UnitType unit_type)
-{
-	// TODO modify to pylons built, that exist then if !canBuildHere then continue, if can build, if cant find then build pylon,
-	// TODO fix bug when targetlocation is slightly in the fog of war, it doesn't build it: SOLUTION -> moveBuilder to location before?
-	// -> could be even before having enough minerals to optimize build time
-	// TODO when selecting a valid targetlocation, make sure it stays there unless theres something blocking the construction
-	// TODO FIX targetlocation example : building photon cannons on some of the tiles of a pylon, etc.
-	for (const auto & unit : BWAPI::Broodwar->self()->getUnits())
-	{
-		if (unit->getType() == BWAPI::UnitTypes::Protoss_Pylon || unit_type == BWAPI::UnitTypes::Protoss_Pylon)
-		{
-			TilePosition pos = unit->getTilePosition();
-			TilePosition target_build_location = Broodwar->getBuildLocation(unit_type, pos);
-
-			// TODO fix getBuilderClosestTo
-			//BWAPI::Unit builder = getBuilderClosestTo(target_build_location);
-			BWAPI::Unit builder = getBuilder();
-
-			if (!builder)
-				return false;
-
-			if (Broodwar->canBuildHere(target_build_location, unit_type, builder))
-			{
-				_worker.setWorkerTask(builder, Worker::BUILD, unit_type);
-				//Broodwar->drawBoxMap(Position(target_build_location), Position(target_build_location + unitType.tileSize()), Colors::Green);
-				
-				if (Config::DebugInfo::DrawAllInfo)
-				{
-					Broodwar->registerEvent([target_build_location, unit_type](Game*)
-					{ Broodwar->drawBoxMap(Position(target_build_location),
-					Position(target_build_location + unit_type.tileSize()), Colors::Green); },   // action
-					nullptr,    // condition
-					42);  // frames to run
-				}		
-				
-				builder->build(unit_type, target_build_location);
-				// TODO check return here or after the condition
-				return true;
-
-			}		
-			// TODO check return here or inside the condition
-			// return;
-		}
-	}
-	return false;
-}*/
-
 void WorkerManager::showDebugWorkerInfo(const BWAPI::Unit & worker)
 {
 	BWAPI::Position pos = worker->getPosition();
 
-	BWAPI::Broodwar->drawTextMap(pos, "%s", getWorkerTaskName(worker).c_str());
+	WorkerState worker_state = _mineral_nodes.getWorkerState(worker);
+
+	std::string state = "";
+	if (worker_state == WorkerState::MOVING_TO_PATCH)
+	{
+		state = "MOVING_TO_PATCH";
+	} 
+	else if (worker_state == WorkerState::MINING)
+	{
+		state = "MINING";
+	}
+	else if (worker_state == WorkerState::NONE)
+	{
+		state = "MOVING_TO_DEPOT";
+	}
+	else if (worker_state == WorkerState::SCOUT)
+	{
+		state = "";
+	}
+	BWAPI::Broodwar->drawTextMap(pos, "%s : %s", getWorkerTaskName(worker).c_str(), state.c_str());
 }
 
-// TODO optimize mineral assignment per worker
-// steps: instantiate queues for each mineral nodes
-// set optimal nb of workers per mineral nodes
-// calculate optimal node for each worker (depending on others)
-// send worker to queue's node
-
-// TODO start of game, assign ids to mineral nodes next to starting base
-// then add into the vector of deques
-
-// loop over mineral nodes and for each id, insert an optimal worker for its node position
-// create mineral node class
 void WorkerManager::optimizeWorkersMining()
 {
-	/*
-	for (auto & mineralNode : _mineralNodes)
-	{
-
-	}*/
+	_mineral_nodes.displayWorkerinDeque();
 
 	for (const auto & worker : _worker.getWorkers())
 	{
-		
+		WorkerState state = _mineral_nodes.getWorkerState(worker);
+
+		BWAPI::Order mining_order {BWAPI::Orders::MiningMinerals};
+		BWAPI::Order order = worker->getOrder();
+
+		if (_worker.getWorkerTask(worker) != Worker::MINE)
+			continue;
+
+		if (state == WorkerState::MOVING_TO_PATCH && order == mining_order)
+		{
+			int frame = BWAPI::Broodwar->getFrameCount();
+			_mineral_nodes.setFrameStartMining(worker, frame);
+			_mineral_nodes.setWorkerState(worker, WorkerState::MINING);
+		}
+
+		// TODO: 12/14/2017 (size() cannot read memory)
+		/*if (state == WorkerState::MINING && !worker->isCarryingMinerals())
+		{
+			BWAPI::Unit assigned_patch = _mineral_nodes.getAssignedMineralPatch(worker);
+			worker->rightClick(assigned_patch);
+			continue;
+		}*/
+
+		if (state == WorkerState::MINING && worker->isCarryingMinerals())
+		{
+			_mineral_nodes.removeWorkerFromPatch(worker);
+		}
+
+		// isIdle() is called once whenever the worker has been sucessfully completed trained from the depot
+		if ((state == WorkerState::NONE && !worker->isCarryingMinerals() || worker->isIdle()))	
+		{
+			assignBestPatch(worker);
+		}
 	}
 }
 
-// TODO call public function from worker.h
+std::pair<BWAPI::Unit, int> WorkerManager::calculateBestPatch(BWAPI::Unit worker, const int begin, const int end)
+{
+	if (end > _mineral_nodes._deque_workers.size())
+	{
+		throw std::runtime_error("WorkerManager::calculateBestPatch: Random access out of bounds");
+	}
+
+	BWAPI::Unit best_patch = nullptr;
+	int total_work = 0;
+
+	// source : http://wiki.teamliquid.net/starcraft/Mining
+	const int MINING_TIME = 80;
+
+	for (int i = begin; i < end; i++)
+	{
+		auto & node = _mineral_nodes._deque_workers[i];
+
+		int total_work_deque = 0;
+
+		if (node.deque.size() > 2)
+			continue;
+
+		for (auto & worker : node.deque)
+		{
+			// worker has not started mining
+			if (worker.frame_start_mining == 0)
+			{
+				int distance = worker.worker->getDistance(node.patch);
+				total_work_deque += distance + MINING_TIME;
+			}
+			else
+			{
+				int current_frame = BWAPI::Broodwar->getFrameCount();
+				total_work_deque += MINING_TIME - (current_frame - worker.frame_start_mining);
+			}
+		}
+
+		// calculate work for current worker searching for patch
+		int work_current_worker = 0;
+		BWAPI::Position base = InformationManager::getStartingBaseLocation();
+
+		work_current_worker += worker->getDistance(node.patch) + MINING_TIME
+			+ node.patch->getDistance(base);
+
+		int work = total_work_deque + work_current_worker;
+
+		if (!best_patch || work < total_work)
+		{
+			best_patch = node.patch;
+			total_work = work;
+		}
+	}
+
+	return std::make_pair(best_patch, total_work);
+}
+
+std::pair<int, int> WorkerManager::getRangePair(int no_future, int size, int nb_threads)
+{
+	int inferior_index = no_future * size / nb_threads;
+	int superior_index = (no_future + 1) * size / nb_threads - 1;
+	
+	return std::make_pair(inferior_index, superior_index);
+}
+
+void WorkerManager::assignBestPatch(BWAPI::Unit worker)
+{
+	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+	BWAPI::Unit best_patch = nullptr;
+
+	if (Config::OptimizationOptions::ParallelAssignmentMining)
+	{
+		std::mutex mutex;
+		std::condition_variable cv;
+
+		std::thread th1([&]()
+		{
+			std::unique_lock<std::mutex> lock(mutex);
+		
+				std::vector<std::future<std::pair<BWAPI::Unit, int>> > futures;
+
+				for (int i = 0; i < Config::OptimizationOptions::NbThreads; i++)
+				{
+					std::pair<int, int> range = getRangePair(i, _mineral_nodes._deque_workers.size(), Config::OptimizationOptions::NbThreads);
+					futures.emplace_back(std::async(&WorkerManager::calculateBestPatch, this, worker, range.first, range.second));
+				}
+
+				BWAPI::Unit future_patch = nullptr;
+				int work = 0;
+				for (auto & f : futures)
+				{
+					auto temp = f.get();
+					if (!future_patch || work > temp.second)
+					{
+						future_patch = temp.first;
+						work = temp.second;
+					}
+				}
+				best_patch = future_patch;
+				cv.notify_one();
+		
+		});
+
+		std::unique_lock<std::mutex> lock(mutex);
+		while (!best_patch)
+		{
+			cv.wait(lock);
+		}
+
+		th1.join();
+	}
+	else
+	{
+		best_patch = calculateBestPatch(worker, 0, _mineral_nodes._deque_workers.size()).first;
+	}
+
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
+	int frame_start_moving = BWAPI::Broodwar->getFrameCount();
+	WorkerMining worker_mining(0, frame_start_moving, best_patch, worker);
+	worker_mining.state = WorkerState::MOVING_TO_PATCH;
+
+	int patch_id = best_patch->getID();
+
+	if (Config::OptimizationOptions::ParallelAssignmentMining)
+	{
+		_mineral_nodes.insertWorkerToPatchParallel(worker_mining, patch_id);
+	}
+	else
+	{
+		_mineral_nodes.insertWorkerToPatch(worker_mining, patch_id);
+	}
+
+	worker->gather(best_patch);
+
+	long long duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+	InformationManager::Instance().log(worker_mining, duration);
+}
+
 void WorkerManager::handleMineralWorkers()
 {
 	for (const auto & worker : _worker.getWorkers())
@@ -254,14 +343,10 @@ void WorkerManager::handleMineralWorkers()
 			{
 				worker->returnCargo();
 			}
-			// TODO Comment or remove after cooperative pathfinding + queue system algorithms is completed
-			else if (!worker->getPowerUp())  // The worker cannot harvest anything if it
-			{                             // is carrying a powerup such as a flag
-				// Harvest from the nearest mineral patch or gas refinery
-
+			else if (!worker->getPowerUp())  // The worker cannot harvest anything if it is carrying a powerup such as a flag
+			{
 				if (!worker->gather(worker->getClosestUnit(BWAPI::Filter::IsMineralField)))
 				{
-					//TODO send workers to next mineral lines
 					// If the call fails, then print the last error message
 					BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 				}
@@ -351,6 +436,7 @@ BWAPI::Unit WorkerManager::getClosestDepot(BWAPI::Unit worker)
 void WorkerManager::setWorkerScout(BWAPI::Unit worker)
 {
 	_worker.setWorkerTask(worker, Worker::SCOUT);
+	_mineral_nodes.setWorkerState(worker, WorkerState::SCOUT);
 }
 
 std::string WorkerManager::getWorkerTaskName(BWAPI::Unit worker)

@@ -4,33 +4,37 @@
 
 namespace MagBot
 {
-
+	// TODO generalize class so it can describe units as
+	// either buildings or bwapi::unit (any unit)
 	class Unit
 	{
-	private:
-		BWAPI::Position _pos;
-		bool _is_position_set;
-
 	public:
+		BWAPI::Unit unit;
+
+		BWAPI::Position pos;
+		bool has_position;
+		bool has_sing_charge;
+		int range;
+		BWAPI::Position target_pos;
+
 		Unit()
-			: _pos(BWAPI::Positions::None)
-			, _is_position_set(false)
-		{
-		}
-		Unit(BWAPI::Position pos)
-			: _pos(pos)
 		{
 		}
 
-		void setPosition(BWAPI::Position pos, bool b);
-		BWAPI::Position getPosition();
+		Unit(BWAPI::Unit unit)
+			: pos(BWAPI::Positions::None)
+			, has_position(false)
+			, has_sing_charge(false)
+			, unit(unit)
+			, target_pos(BWAPI::Positions::None)
+		{
+		}
 
-		bool isPositionSet();
 		void resetPosition();
 
 		bool operator == (const Unit & p) const
 		{
-			return (p._pos == _pos);
+			return (p.pos == pos);
 		}
 	};
 

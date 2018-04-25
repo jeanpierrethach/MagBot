@@ -63,7 +63,6 @@ namespace MagBot
 		void removeBuilding(const Building & b);
 		void removeBuildings(const std::vector<Building> & buildings);
 		bool isBeingBuilt(BWAPI::UnitType unit_type);
-		BWAPI::TilePosition findFirstAvailablePosition(const BWAPI::TilePosition tileposition);
 	};
 
 }

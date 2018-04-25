@@ -51,35 +51,13 @@ void GameCommander::setScoutUnits()
 		{
 			BWAPI::Unit worker_scout = getClosestWorkerToTarget(supply_provider->getPosition());
 			
-			if (worker_scout)
+			if (worker_scout != nullptr)
 			{
 				ScoutManager::Instance().setWorkerScout(worker_scout);
 				assignUnit(worker_scout, _scout_units);
 				_initial_scout = true;
 				_active_scout = true;
 			}
-		}
-	}
-}
-
-void GameCommander::setCombatUnits()
-{
-	for (auto unit : BWAPI::Broodwar->self()->getUnits())
-	{
-
-	}
-
-	if (_combat_units.empty())
-	{
-		BWAPI::Unit unit;
-
-		// search for valid units around the zone
-		// else search for squads nearby
-
-		if (unit)
-		{
-			// todo set combat units in class
-			DefenceManager::Instance();
 		}
 	}
 }

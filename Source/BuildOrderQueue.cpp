@@ -124,15 +124,3 @@ int BuildOrderQueue::getSkippedItemsCount() const
 {
 	return _num_skipped_items;
 }
-
-/*bool BuildOrderQueue::hasItemInQueue(BWAPI::UnitType unit_type)
-{
-	for (const auto & item : _queue)
-	{
-		// TODO fix
-		if (item.meta_type.getUnitType == unit_type)
-		{
-			return true;
-		}
-	}
-}*/

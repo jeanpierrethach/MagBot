@@ -54,6 +54,7 @@ void WorkerManager::update()
 		if (!worker->isCompleted())
 			continue;
 
+		// TODO fix when scout is idle for a frame
 		if (worker->isIdle()
 			&& _worker.getWorkerTask(worker) != Worker::BUILD
 			&& _worker.getWorkerTask(worker) != Worker::SCOUT)
@@ -144,6 +145,10 @@ void WorkerManager::showDebugWorkerInfo(const BWAPI::Unit & worker)
 	else if (worker_state == WorkerState::NONE)
 	{
 		state = "MOVING_TO_DEPOT";
+	}
+	else if (worker_state == WorkerState::SCOUT)
+	{
+		state = "";
 	}
 	BWAPI::Broodwar->drawTextMap(pos, "%s : %s", getWorkerTaskName(worker).c_str(), state.c_str());
 }
@@ -305,6 +310,8 @@ void WorkerManager::assignBestPatch(BWAPI::Unit worker)
 		best_patch = calculateBestPatch(worker, 0, _mineral_nodes._deque_workers.size()).first;
 	}
 
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
 	int frame_start_moving = BWAPI::Broodwar->getFrameCount();
 	WorkerMining worker_mining(0, frame_start_moving, best_patch, worker);
 	worker_mining.state = WorkerState::MOVING_TO_PATCH;
@@ -322,7 +329,6 @@ void WorkerManager::assignBestPatch(BWAPI::Unit worker)
 
 	worker->gather(best_patch);
 
-	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 	long long duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 	InformationManager::Instance().log(worker_mining, duration);
 }
@@ -430,6 +436,7 @@ BWAPI::Unit WorkerManager::getClosestDepot(BWAPI::Unit worker)
 void WorkerManager::setWorkerScout(BWAPI::Unit worker)
 {
 	_worker.setWorkerTask(worker, Worker::SCOUT);
+	_mineral_nodes.setWorkerState(worker, WorkerState::SCOUT);
 }
 
 std::string WorkerManager::getWorkerTaskName(BWAPI::Unit worker)

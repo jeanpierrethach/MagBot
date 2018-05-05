@@ -1,8 +1,8 @@
 #pragma once
 
 #include <BWAPI.h>
-#include "ScoutManager.h"
-#include "WorkerManager.h"
+#include "Micro/Scouting/ScoutManager.h"
+#include "Macro/WorkerManager.h"
 
 
 namespace MagBot

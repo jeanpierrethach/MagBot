@@ -3,7 +3,7 @@
 #include <BWAPI.h>
 #include "Worker.h"
 #include "BuildingManager.h"
-#include "InformationManager.h"
+#include "Information/InformationManager.h"
 #include "MineralNode.h"
 #include <stdint.h>
 #include <deque>
@@ -17,7 +17,7 @@
 
 namespace MagBot {
 
-	class WorkerManager : InformationManager
+	class WorkerManager
 	{
 		Worker _worker;
 		MineralNode _mineral_nodes;

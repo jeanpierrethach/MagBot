@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "WorkerMining.h"
+#include "Macro/WorkerMining.h"
 #include "Unit.h"
 
 #include <iomanip>

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Common.h"
-#include "InformationManager.h"
 
 namespace MagBot
 {
+
 	namespace BuildingStatus
 	{
 		enum { UNASSIGNED = 0, ASSIGNED = 1, UNDERCONSTRUCTION = 2 };
@@ -48,21 +48,6 @@ namespace MagBot
 		{
 			return (b._building_unit == _building_unit) || (b._builder_unit == _builder_unit);
 		}
-	};
-
-	class BuildingData : InformationManager
-	{
-		std::vector<Building> _buildings;
-
-	public:
-		BuildingData();
-
-		std::vector<Building> & getBuildings();
-
-		void addBuilding(const Building & building);
-		void removeBuilding(const Building & b);
-		void removeBuildings(const std::vector<Building> & buildings);
-		bool isBeingBuilt(BWAPI::UnitType unit_type);
 	};
 
 }

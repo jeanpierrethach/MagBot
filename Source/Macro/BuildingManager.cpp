@@ -33,10 +33,6 @@ void BuildingManager::update()
 	validateWorkersAndBuildings();          // check to see if assigned workers have died en route or while constructing
 	assignWorkersToUnassignedBuildings();   // assign workers to the unassigned buildings and label them 'planned'    
 	constructAssignedBuildings();           // for each planned building, if the worker isn't constructing, send the command  
-
-	// testing phase
-	//mockTestForDestroyedBuilder();
-
 	checkForStartedConstruction();          // check to see if any buildings have started construction and update data structures        
 	checkForCompletedBuildings();           // check to see if any buildings have completed and update data structures
 

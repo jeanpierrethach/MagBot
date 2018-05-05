@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "BuildingData.h"
 #include "WorkerManager.h"
-#include "InformationManager.h"
+#include "Information/InformationManager.h"
 #include <stdint.h>
 
 namespace MagBot

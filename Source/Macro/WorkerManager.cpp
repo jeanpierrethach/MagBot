@@ -234,7 +234,7 @@ std::pair<BWAPI::Unit, int> WorkerManager::calculateBestPatch(BWAPI::Unit worker
 
 		// calculate work for current worker searching for patch
 		int work_current_worker = 0;
-		BWAPI::Position base = InformationManager::getStartingBaseLocation();
+		BWAPI::Position base = InformationManager::Instance().getStartingBaseLocation();
 
 		work_current_worker += worker->getDistance(node.patch) + MINING_TIME
 			+ node.patch->getDistance(base);

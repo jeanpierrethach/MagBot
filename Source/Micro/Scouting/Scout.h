@@ -3,7 +3,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include "Common.h"
-#include "InformationManager.h"
+#include "Information/InformationManager.h"
 #include <cstdlib>
 
 
@@ -13,7 +13,7 @@ namespace MagBot
 	enum class Actions : int { LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, NONE = 4 };
 	enum class Goal : int { LOOP = 0, EXPLORE = 1 };
 
-	class Scout : InformationManager
+	class Scout
 	{
 
 	private:

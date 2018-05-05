@@ -45,12 +45,12 @@ void SquadManager::update()
 			BWAPI::Broodwar->drawCircleMap(squad.getLeader()->getPosition(), 20, BWAPI::Colors::Purple, true);
 		}
 
-		if (BWAPI::Broodwar->getFrameCount() < TrainingWeights::AttackTimers::StartInterval)
+		if (BWAPI::Broodwar->getFrameCount() < Timers::AttackTimers::StartInterval)
 		{
 			concaveSqUpdate(squad, positions);
 		}
-		else if (BWAPI::Broodwar->getFrameCount() >= TrainingWeights::AttackTimers::StartInterval 
-			&& BWAPI::Broodwar->getFrameCount() < TrainingWeights::AttackTimers::EndInterval)
+		else if (BWAPI::Broodwar->getFrameCount() >= Timers::AttackTimers::StartInterval
+			&& BWAPI::Broodwar->getFrameCount() < Timers::AttackTimers::EndInterval)
 		{
 			for (auto & member : squad.getMembers())
 			{
@@ -107,11 +107,11 @@ void SquadManager::update()
 
 			int rnd_x = std::rand() % map_width;
 			int rnd_y = std::rand() % map_height;
-
-			BWAPI::TilePosition rnd_tile = BWAPI::TilePosition(rnd_x, rnd_y);
-			BWAPI::Position target_pos = BWAPI::Position(rnd_x / TILE_SIZE, rnd_y / TILE_SIZE);
+			
+			BWAPI::Position target_pos = BWAPI::Position(rnd_x, rnd_y);
 			
 			member.second.target_pos = target_pos;
+			BWAPI::Broodwar->sendText("target pos: (%d, %d)", target_pos.x, target_pos.y);
 			smartAttackMove(member.first, target_pos);
 			
 		}

@@ -3,14 +3,14 @@
 #include "Common.h"
 #include "SquadData.h"
 #include <BWTA.h>
-#include "InformationManager.h"
-#include "TrainingWeights.h"
-#include "Utils.h"
+#include "Information/InformationManager.h"
+#include "Strategery/Timers.h"
+#include "Utilities/Utils.h"
 
 namespace MagBot
 {
 
-	class SquadManager : InformationManager, Utils
+	class SquadManager : Utils
 	{
 		SquadData _squads;
 

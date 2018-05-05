@@ -42,10 +42,13 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(BWAPI_DIR)/include;$(BWTA_DIR)/include;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\BWAPI\MagBot\Source;$(BWAPI_DIR)/include;$(BWTA_DIR)/include;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -70,7 +73,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../include;$(BWTA_DIR)/include;$(BWAPI_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\BWAPI\MagBot\Source;../include;$(BWTA_DIR)/include;$(BWAPI_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -92,65 +95,65 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Scout.cpp" />
-    <ClCompile Include="Source\InformationManager.cpp" />
+    <ClCompile Include="Source\Micro\Scouting\Scout.cpp" />
+    <ClCompile Include="Source\Information\InformationManager.cpp" />
     <ClCompile Include="Source\TODO later on\DefenceManager.cpp" />
-    <ClCompile Include="Source\MineralNode.cpp" />
+    <ClCompile Include="Source\Macro\MineralNode.cpp" />
     <ClCompile Include="Source\TODO later on\ReaverShuttleMicro.cpp" />
-    <ClCompile Include="Source\BuildingData.cpp" />
+    <ClCompile Include="Source\Macro\BuildingData.cpp" />
     <ClCompile Include="Source\MetaType.cpp" />
-    <ClCompile Include="Source\ProductionManager.cpp" />
+    <ClCompile Include="Source\Macro\ProductionManager.cpp" />
     <ClCompile Include="Source\TODO later on\Pathfinder.cpp" />
-    <ClCompile Include="Source\Config.cpp" />
-    <ClCompile Include="Source\BuildingManager.cpp" />
+    <ClCompile Include="Source\Debugging\Config.cpp" />
+    <ClCompile Include="Source\Macro\BuildingManager.cpp" />
     <ClCompile Include="Source\TODO later on\PylonData.cpp" />
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\TODO later on\ConstructorManager.cpp" />
-    <ClCompile Include="Source\ScoutManager.cpp" />
-    <ClCompile Include="Source\BuildOrder.cpp" />
-    <ClCompile Include="Source\BuildOrderQueue.cpp" />
-    <ClCompile Include="Source\GameCommander.cpp" />
+    <ClCompile Include="Source\Micro\Scouting\ScoutManager.cpp" />
+    <ClCompile Include="Source\Macro\BuildOrder.cpp" />
+    <ClCompile Include="Source\Macro\BuildOrderQueue.cpp" />
+    <ClCompile Include="Source\Macro\GameCommander.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\MagBotModule.cpp" />
-    <ClCompile Include="Source\WorkerManager.cpp" />
-    <ClCompile Include="Source\Worker.cpp" />
-    <ClCompile Include="Source\StrategyManager.cpp" />
-    <ClCompile Include="Source\SquadData.cpp" />
-    <ClCompile Include="Source\SquadManager.cpp" />
+    <ClCompile Include="Source\Macro\WorkerManager.cpp" />
+    <ClCompile Include="Source\Macro\Worker.cpp" />
+    <ClCompile Include="Source\Strategery\StrategyManager.cpp" />
+    <ClCompile Include="Source\Micro\Squads\SquadData.cpp" />
+    <ClCompile Include="Source\Micro\Squads\SquadManager.cpp" />
     <ClCompile Include="Source\Unit.cpp" />
-    <ClCompile Include="Source\WorkerMining.cpp" />
-    <ClCompile Include="Source\TrainingWeights.cpp" />
-    <ClCompile Include="Source\Utils.cpp" />
+    <ClCompile Include="Source\Strategery\Timers.cpp" />
+    <ClCompile Include="Source\Utilities\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Scout.h" />
-    <ClInclude Include="Source\InformationManager.h" />
+    <ClInclude Include="Source\Macro\Building.h" />
+    <ClInclude Include="Source\Micro\Scouting\Scout.h" />
+    <ClInclude Include="Source\Information\InformationManager.h" />
     <ClInclude Include="Source\TODO later on\DefenceManager.h" />
-    <ClInclude Include="Source\MineralNode.h" />
+    <ClInclude Include="Source\Macro\MineralNode.h" />
     <ClInclude Include="Source\TODO later on\ReaverShuttleMicro.h" />
-    <ClInclude Include="Source\BuildingData.h" />
+    <ClInclude Include="Source\Macro\BuildingData.h" />
     <ClInclude Include="Source\MetaType.h" />
-    <ClInclude Include="Source\ProductionManager.h" />
+    <ClInclude Include="Source\Macro\ProductionManager.h" />
     <ClInclude Include="Source\TODO later on\Pathfinder.h" />
-    <ClInclude Include="Source\Config.h" />
-    <ClInclude Include="Source\BuildingManager.h" />
+    <ClInclude Include="Source\Debugging\Config.h" />
+    <ClInclude Include="Source\Macro\BuildingManager.h" />
     <ClInclude Include="Source\TODO later on\PylonData.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\TODO later on\ConstructorManager.h" />
-    <ClInclude Include="Source\ScoutManager.h" />
-    <ClInclude Include="Source\BuildOrder.h" />
-    <ClInclude Include="Source\BuildOrderQueue.h" />
-    <ClInclude Include="Source\GameCommander.h" />
+    <ClInclude Include="Source\Micro\Scouting\ScoutManager.h" />
+    <ClInclude Include="Source\Macro\BuildOrder.h" />
+    <ClInclude Include="Source\Macro\BuildOrderQueue.h" />
+    <ClInclude Include="Source\Macro\GameCommander.h" />
     <ClInclude Include="Source\MagBotModule.h" />
-    <ClInclude Include="Source\WorkerManager.h" />
-    <ClInclude Include="Source\Worker.h" />
-    <ClInclude Include="Source\StrategyManager.h" />
-    <ClInclude Include="Source\SquadData.h" />
-    <ClInclude Include="Source\SquadManager.h" />
+    <ClInclude Include="Source\Macro\WorkerManager.h" />
+    <ClInclude Include="Source\Macro\Worker.h" />
+    <ClInclude Include="Source\Strategery\StrategyManager.h" />
+    <ClInclude Include="Source\Micro\Squads\SquadData.h" />
+    <ClInclude Include="Source\Micro\Squads\SquadManager.h" />
     <ClInclude Include="Source\Unit.h" />
-    <ClInclude Include="Source\WorkerMining.h" />
-    <ClInclude Include="Source\TrainingWeights.h" />
-    <ClInclude Include="Source\Utils.h" />
+    <ClInclude Include="Source\Macro\WorkerMining.h" />
+    <ClInclude Include="Source\Strategery\Timers.h" />
+    <ClInclude Include="Source\Utilities\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

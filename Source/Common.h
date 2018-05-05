@@ -6,5 +6,5 @@
 #include <deque>
 #include <queue>
 
-#include "Config.h"
+#include "Debugging/Config.h"
 #include <BWAPI.h>

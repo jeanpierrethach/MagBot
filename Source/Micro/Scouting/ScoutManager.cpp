@@ -45,6 +45,9 @@ void ScoutManager::setWorkerScout(BWAPI::Unit unit)
 	// TODO fix null value of scout when searching
 	// for available unit
 
+	if (!unit)
+		return;
+
 	_worker_scout.scout = unit;
 	WorkerManager::Instance().setWorkerScout(_worker_scout.scout);
 }

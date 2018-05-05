@@ -1,15 +1,15 @@
 #pragma once
 
 #include <BWAPI.h>
-#include "WorkerManager.h"
+#include "Macro/WorkerManager.h"
 #include <BWTA.h>
-#include "InformationManager.h"
-#include "Scout.h"
+#include "Information/InformationManager.h"
+#include "Micro/Scouting/Scout.h"
 
 namespace MagBot
 {
 
-	class ScoutManager : InformationManager
+	class ScoutManager
 	{
 		Scout _worker_scout;
 		bool _enemy_base_location = false;

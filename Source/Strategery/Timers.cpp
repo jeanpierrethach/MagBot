@@ -1,7 +1,7 @@
-#include "TrainingWeights.h"
+#include "Timers.h"
 
 
-namespace TrainingWeights
+namespace Timers
 {
 	namespace AttackTimers
 	{

@@ -2,7 +2,7 @@
 
 #include <map>
 
-namespace TrainingWeights
+namespace Timers
 {
 	namespace AttackTimers
 	{

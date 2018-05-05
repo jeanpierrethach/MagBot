@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "InformationManager.h"
+#include "Information/InformationManager.h"
 #include "Building.h"
 
 namespace MagBot

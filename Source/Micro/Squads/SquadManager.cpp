@@ -45,12 +45,12 @@ void SquadManager::update()
 			BWAPI::Broodwar->drawCircleMap(squad.getLeader()->getPosition(), 20, BWAPI::Colors::Purple, true);
 		}
 
-		if (BWAPI::Broodwar->getFrameCount() < TrainingWeights::AttackTimers::StartInterval)
+		if (BWAPI::Broodwar->getFrameCount() < Timers::AttackTimers::StartInterval)
 		{
 			concaveSqUpdate(squad, positions);
 		}
-		else if (BWAPI::Broodwar->getFrameCount() >= TrainingWeights::AttackTimers::StartInterval 
-			&& BWAPI::Broodwar->getFrameCount() < TrainingWeights::AttackTimers::EndInterval)
+		else if (BWAPI::Broodwar->getFrameCount() >= Timers::AttackTimers::StartInterval
+			&& BWAPI::Broodwar->getFrameCount() < Timers::AttackTimers::EndInterval)
 		{
 			for (auto & member : squad.getMembers())
 			{

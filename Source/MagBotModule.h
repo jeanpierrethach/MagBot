@@ -2,13 +2,13 @@
 
 #include <BWAPI.h>
 #include <BWTA.h>
-#include "GameCommander.h"
-#include "BuildingManager.h"
-#include "ProductionManager.h"
-#include "SquadManager.h"
-#include "InformationManager.h"
+#include "Macro/GameCommander.h"
+#include "Macro/BuildingManager.h"
+#include "Macro/ProductionManager.h"
+#include "Micro/Squads/SquadManager.h"
+#include "Information/InformationManager.h"
 
-#include "Config.h"
+#include "Debugging/Config.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
 

@@ -3,7 +3,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include "Common.h"
-#include "InformationManager.h"
+#include "Information/InformationManager.h"
 #include <cstdlib>
 
 

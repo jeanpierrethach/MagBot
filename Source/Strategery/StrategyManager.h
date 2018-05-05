@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Common.h"
-#include "BuildOrderQueue.h"
-#include "BuildOrder.h"
-#include "WorkerManager.h"
+#include "Macro/BuildOrderQueue.h"
+#include "Macro/BuildOrder.h"
+#include "Macro/WorkerManager.h"
 #include <BWTA.h>
 #include <string.h>
 

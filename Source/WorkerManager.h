@@ -17,7 +17,7 @@
 
 namespace MagBot {
 
-	class WorkerManager : InformationManager
+	class WorkerManager
 	{
 		Worker _worker;
 		MineralNode _mineral_nodes;

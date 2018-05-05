@@ -118,11 +118,11 @@
     <ClCompile Include="Source\SquadData.cpp" />
     <ClCompile Include="Source\SquadManager.cpp" />
     <ClCompile Include="Source\Unit.cpp" />
-    <ClCompile Include="Source\WorkerMining.cpp" />
     <ClCompile Include="Source\TrainingWeights.cpp" />
     <ClCompile Include="Source\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Building.h" />
     <ClInclude Include="Source\Scout.h" />
     <ClInclude Include="Source\InformationManager.h" />
     <ClInclude Include="Source\TODO later on\DefenceManager.h" />

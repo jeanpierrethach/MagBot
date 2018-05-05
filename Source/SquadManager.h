@@ -10,7 +10,7 @@
 namespace MagBot
 {
 
-	class SquadManager : InformationManager, Utils
+	class SquadManager : Utils
 	{
 		SquadData _squads;
 

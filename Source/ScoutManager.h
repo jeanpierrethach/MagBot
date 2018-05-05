@@ -9,7 +9,7 @@
 namespace MagBot
 {
 
-	class ScoutManager : InformationManager
+	class ScoutManager
 	{
 		Scout _worker_scout;
 		bool _enemy_base_location = false;
